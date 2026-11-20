@@ -73,3 +73,23 @@ dotnet test SoftReset.sln
   elevated. It now says the disk/driver doesn't report them when the scan is already elevated.
 
 The results of the run that includes these fixes are recorded below.
+
+### Real Windows — GitHub Actions run 2 (with the fixes)
+
+[Run 44775300558](https://github.com/vexascriptz/app/actions/runs/44775300558), same runner image:
+
+- Core: **136 passed** (including the new regression test). UI: **11 passed**. Windows-only: **16 passed, 0 skipped**.
+- `--self-test`: **all 14 checks passed**. The network false positive is gone and the disk note is accurate:
+
+```
+[PASS] Collection issues (informational): Disk reliability: This disk or its driver does not report wear and temperature
+       counters (common for virtual disks, some RAID and USB controllers).
+[PASS] Diagnostics: 35 rules, 4 findings, health 75: [High] Real-time protection is off; [Medium] Unknown device: not working;
+       [Medium] UAC is set to never notify; [Low] 1 service(s) repeatedly failed
+```
+
+- `--capture-pages`: **all 11 pages opened and were captured** (exit code 0).
+
+The screenshots captured on Windows, the self-test output files (`snapshot.json`, `diagnostics.json`,
+`settings.json`, `diagnostic-report.pdf`), and the `.trx` test results are in each run's
+`windows-validation` artifact. Every later push re-runs the same workflow.
