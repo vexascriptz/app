@@ -15,6 +15,7 @@ internal static class Program
     ///   --elevated-run &lt;payload&gt;   run one approved action with administrator rights (started via UAC)
     ///   --probe nvapi-drs &lt;file&gt;   read NVIDIA driver settings in an isolated process
     ///   --self-test &lt;folder&gt;      run read-only checks and write results (used for Windows validation)
+    ///   --capture-pages &lt;folder&gt;  open each page, save screenshots, and exit (used for Windows validation)
     /// </summary>
     [STAThread]
     public static int Main(string[] args)
@@ -33,8 +34,7 @@ internal static class Program
         }
 
         StartupOptions = StartupOptions.Parse(args);
-        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
-        return 0;
+        return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }
 
     public static StartupOptions StartupOptions { get; set; } = new();
@@ -67,12 +67,16 @@ public sealed class StartupOptions
 {
     public bool Demo { get; set; }
     public string? DataDirectory { get; set; }
+    /// <summary>--capture-pages &lt;folder&gt;: open every page read-only, save a PNG of each, then exit (Windows validation).</summary>
+    public string? CaptureDirectory { get; set; }
 
     public static StartupOptions Parse(string[] args)
     {
         var o = new StartupOptions { Demo = args.Contains("--demo") || !OperatingSystem.IsWindows() };
         var i = Array.IndexOf(args, "--data");
         if (i >= 0 && i + 1 < args.Length) o.DataDirectory = args[i + 1];
+        var c = Array.IndexOf(args, "--capture-pages");
+        if (c >= 0 && c + 1 < args.Length) o.CaptureDirectory = args[c + 1];
         return o;
     }
 }

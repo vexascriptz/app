@@ -23,6 +23,8 @@ public partial class App : Application
             var vm = new MainWindowViewModel(services);
             desktop.MainWindow = new MainWindow { DataContext = vm };
             _ = vm.ActivateCurrentAsync();
+            if (Program.StartupOptions.CaptureDirectory is { } dir)
+                desktop.MainWindow.Opened += async (_, _) => await PageCapture.RunAsync(desktop, vm, dir);
         }
         base.OnFrameworkInitializationCompleted();
     }
