@@ -289,7 +289,8 @@ internal sealed class WindowsNetworkService : INetworkService
     private static ConnectivityTest TestConnectivity(NetworkStatus st)
     {
         var t = new ConnectivityTest { Time = DateTimeOffset.Now };
-        var gw = st.Adapters.Where(a => a.IsUp && !a.IsVirtual).SelectMany(a => a.Gateways).FirstOrDefault();
+        var gw = st.Adapters.Where(a => a.IsUp && !a.IsVirtual).SelectMany(a => a.Gateways).FirstOrDefault()
+                 ?? st.Adapters.Where(a => a.IsUp).SelectMany(a => a.Gateways).FirstOrDefault();
         if (gw is not null)
         {
             try

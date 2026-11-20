@@ -10,3 +10,5 @@ publish/
 *.trx
 softreset-data/
 /build/out/
+dist/
+__pycache__/

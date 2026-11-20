@@ -1,0 +1,75 @@
+# Testing and results
+
+## Test suites
+
+| Suite | Tests | Runs on | What it covers |
+|---|---|---|---|
+| `tests/SoftReset.Core.Tests` | 136 | Linux and Windows | Every diagnostic rule against fixtures; every optimization action's apply → verify → rollback against the simulated PC (including admin actions through the elevated helper, UAC decline, failure part-way, interrupted changes); file organizer apply/undo/never-overwrite; knowledge-base integrity (all 245 settings have all fields, safe controls, valid read specs; processes; app guides; GPU settings); PDF structure; output parsers; sessions; storage. |
+| `tests/SoftReset.App.Tests` | 11 | Linux and Windows | The real application window rendered headlessly and driven with mouse clicks and keyboard input: every page opens; approve → apply → verify → undo; declining approval; declined UAC; settings change rolled back from Change History; display change auto-revert; full 10-step customer session ending in a PDF; file organizer apply and undo; typed confirmation for data removal; protected processes. Also produces the screenshots in `docs/screenshots`. |
+| `tests/SoftReset.Windows.Tests` | 16 | Windows only (skipped elsewhere) | Real registry, WMI, event logs, signatures, services, Task Scheduler, startup, installed apps, power, displays, network, GPU, live metrics; all 35 rules on real data; all 245 settings read; every action inspected and previewed on real Windows without changing anything. Three tests change real settings and restore them (Explorer option, power plan, DNS flush) — they run only with `SOFTRESET_ALLOW_SYSTEM_CHANGES=1`. |
+| `SoftResetConsole.exe --self-test` | 14 checks | Windows | The published executable's own read-only validation. |
+| `SoftResetConsole.exe --capture-pages` | 11 pages | Windows | The published executable opens every page against real data and saves screenshots. |
+
+Run locally:
+
+```bash
+dotnet test SoftReset.sln
+```
+
+## Recorded results
+
+### Linux development environment (simulated PC)
+
+- Core: **136 passed**, 0 failed.
+- UI: **11 passed**, 0 failed.
+- Windows-only: **16 skipped** (reported as skipped — not counted as passing).
+- The actual application binary was also launched under a virtual X display in `--demo --capture-pages`
+  mode; all 11 pages opened and rendered (exit code 0).
+
+### Real Windows — GitHub Actions run 1
+
+[Run 44774306587](https://github.com/vexascriptz/app/actions/runs/44774306587) on `windows-latest`
+(Windows Server 2025 Datacenter 24H2, build 26100, elevated administrator, Hyper-V VM, no GPU):
+
+- Build: succeeded.
+- Core: **135 passed**. UI: **11 passed**. Windows-only: **16 passed, 0 skipped** (including the three
+  tests that change real settings and roll them back: Explorer option, power plan, DNS flush).
+- Publish: single-file `SoftResetConsole.exe` produced.
+- `--self-test` of the published exe: **all 14 checks passed**. Recorded output:
+
+```
+[PASS] Create platform: Windows, build 26100, elevated=True
+[PASS] Collect snapshot (7s): Windows Server 2025 Datacenter 24H2 (build 26100.33828); CPU AMD EPYC 9V74 80-Core Processor;
+       RAM 16 GB; 151 processes; 5 startup entries; 5 events; 1 GPU(s); 1 display(s); 2 disk(s); 1 collection note(s) in 6.8s
+[PASS] Diagnostics: 35 rules, 5 findings, health 66: [High] Real-time protection is off; [High] No active network connection
+       with a gateway; [Medium] Unknown device: not working; [Medium] UAC is set to never notify; [Low] 1 service(s) repeatedly failed
+[PASS] Settings catalog read (7.36s): 245 settings: 153 readable, 8 not applicable to this PC
+[PASS] Process details and signatures: 152 processes, 148 with paths; signatures: SignedMicrosoftWindows=31, Unsigned=2, Signed=7;
+       notepad.exe=SignedMicrosoftWindows; explorer.exe=SignedMicrosoftWindows (Microsoft Windows)
+[PASS] Installed applications (7.86s): 99 apps (39 Store, 60 desktop), 11 with guides; 319 optional features
+[PASS] Graphics: Microsoft Hyper-V Video [Microsoft] driver 10.0.26100.1150 temp n/a | NVIDIA DRS: NVAPI is not available
+       (no NVIDIA driver installed). (0 settings) | NVCP: none
+[PASS] Displays: \\.\DISPLAY1 HyperVMonitor 1024x768@64 (max 64) on Microsoft Hyper-V Video, 13 modes
+[PASS] Power: High performance (3 plans), AC=True, max CPU 100%, hibernation=False, modern standby=False
+[PASS] Services and tasks: 259 services; 210 scheduled tasks
+[PASS] Network: 14 adapters (11 up), proxy=False, hosts entries=1
+[PASS] Live metrics: CPU 2.3%, memory 26.9%
+[PASS] Optimization actions: Inspect (read-only): 39 actions inspected without errors
+```
+
+- `--capture-pages` of the published exe: **all 11 pages opened and were captured** (exit code 0).
+
+**What run 1 found, and what was fixed.** Reviewing the findings against the runner's actual state:
+
+- *Real-time protection is off*, *UAC is set to never notify*, *Unknown device*, *service failures*:
+  correct for a CI virtual machine.
+- *No active network connection with a gateway*: **a false positive.** The runner's network card is a
+  Hyper-V adapter, which the console classed as "virtual" and ignored. The same mistake would have
+  affected real PCs whose connection runs through a Hyper-V external switch (`vEthernet`, common with
+  WSL/Docker). The rule now accepts any connected adapter with a default gateway and is suppressed when
+  a connectivity test confirms internet access; a regression test was added
+  (`Network_RouteThroughVirtualAdapter_IsNotReportedAsDisconnected`).
+- *Disk reliability* note said counters "require administrator rights" although the process was
+  elevated. It now says the disk/driver doesn't report them when the scan is already elevated.
+
+The results of the run that includes these fixes are recorded below.

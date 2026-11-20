@@ -438,7 +438,9 @@ internal sealed class WindowsSnapshotCollector : ISnapshotCollector
             s.PhysicalDisks.Add(info);
         }
         if (s.PhysicalDisks.Count > 0 && !s.PhysicalDisks.Any(x => x.ReliabilityCountersAvailable))
-            s.AddIssue("Disk reliability", cerr ?? "SSD wear and temperature counters require administrator rights.", true);
+            s.AddIssue("Disk reliability", cerr ?? (s.CollectedElevated
+                ? "This disk or its driver does not report wear and temperature counters (common for virtual disks, some RAID and USB controllers)."
+                : "SSD wear and temperature counters require administrator rights."), !s.CollectedElevated);
         foreach (var f in Wmi.Query(@"root\wmi", "SELECT InstanceName, PredictFailure FROM MSStorageDriver_FailurePredictStatus", out _, 10).Where(x => x.B("PredictFailure") == true))
         {
             var target = s.PhysicalDisks.FirstOrDefault();

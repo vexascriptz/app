@@ -14,11 +14,15 @@ internal sealed class NetworkConfigRule : Rule
         var up = physical.Where(a => a.IsUp).ToList();
         if (s.Network.Adapters.Count == 0) yield break;
 
-        if (up.Count == 0 || !up.Any(a => a.Gateways.Count > 0))
+        // Any connected adapter with a default gateway counts, including virtual ones: a Hyper-V external
+        // switch (vEthernet) or a virtual machine's own NIC legitimately carries the internet route.
+        var routed = s.Network.Adapters.Any(a => a.IsUp && a.Gateways.Count > 0);
+        var internetConfirmed = s.Network.Connectivity?.InternetReachable == true;
+        if (!routed && !internetConfirmed)
         {
             var f = New("No active network connection with a gateway", Severity.High, Confidence.Medium,
-                    "No physical adapter is connected with a default gateway, so the PC cannot reach the internet.", key: "network.no-connection");
-            foreach (var a in physical) f.Ev("Adapter", $"{a.Description}: {(a.IsUp ? "up" : "down")}, gateway {(a.Gateways.Count > 0 ? string.Join(", ", a.Gateways) : "none")}", "NetworkInterface");
+                    "No connected network adapter has a default gateway, so the PC cannot reach the internet.", key: "network.no-connection");
+            foreach (var a in s.Network.Adapters.Where(a => !a.IsVirtual || a.IsUp)) f.Ev("Adapter", $"{a.Description}: {(a.IsUp ? "up" : "down")}, gateway {(a.Gateways.Count > 0 ? string.Join(", ", a.Gateways) : "none")}", "NetworkInterface");
             f.Cause("Cable unplugged, Wi-Fi disconnected, or the router is not handing out an address.")
              .Rec("Check the physical connection / Wi-Fi network, then renew the IP address.", ActionIds.RenewDhcp)
              .Shortcut("Open network status.", "ms-settings:network-status", "Open Network settings")

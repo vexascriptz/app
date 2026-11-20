@@ -185,6 +185,17 @@ public class RuleFixtureTests
     }
 
     [Fact]
+    public void Network_RouteThroughVirtualAdapter_IsNotReportedAsDisconnected()
+    {
+        // Found on a real Windows run: a VM's NIC (and a Hyper-V external switch on a physical PC) is
+        // a "virtual" adapter that carries the default gateway.
+        var s = new SystemSnapshot();
+        s.Network.Adapters.Add(new NetworkAdapterInfo { Name = "Ethernet", Description = "Realtek PCIe GbE", Type = "Ethernet", IsUp = false });
+        s.Network.Adapters.Add(new NetworkAdapterInfo { Name = "vEthernet (External)", Description = "Hyper-V Virtual Ethernet Adapter", IsVirtual = true, IsUp = true, Gateways = { "192.168.1.1" } });
+        Assert.DoesNotContain(Run(new NetworkConfigRule(), s), x => x.Key == "network.no-connection");
+    }
+
+    [Fact]
     public void RefreshRate_RecommendsActionWithParameters()
     {
         var s = new SystemSnapshot { Displays = { new DisplayInfo { DeviceName = @"\\.\DISPLAY1", MonitorName = "Mon", Width = 1920, Height = 1080, RefreshHz = 60, MaxRefreshHzAtCurrentResolution = 144 } } };

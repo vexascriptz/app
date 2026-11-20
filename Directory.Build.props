@@ -12,6 +12,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <NoWarn>$(NoWarn);NU1507;CA1416</NoWarn>
     <Deterministic>true</Deterministic>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' != '' and $(TargetFramework.Contains('-windows'))">
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
