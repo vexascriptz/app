@@ -7,6 +7,15 @@
     <local:ViewLocator />
   </Application.DataTemplates>
 
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://SoftResetConsole/Theme/Brand.axaml" />
+        <ResourceInclude Source="avares://SoftResetConsole/Theme/Icons.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+
   <Application.Styles>
     <FluentTheme>
       <FluentTheme.Palettes>
@@ -17,12 +26,4 @@
     <StyleInclude Source="avares://SoftResetConsole/Theme/Styles.axaml" />
   </Application.Styles>
 
-  <Application.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <ResourceInclude Source="avares://SoftResetConsole/Theme/Brand.axaml" />
-        <ResourceInclude Source="avares://SoftResetConsole/Theme/Icons.axaml" />
-      </ResourceDictionary.MergedDictionaries>
-    </ResourceDictionary>
-  </Application.Resources>
 </Application>

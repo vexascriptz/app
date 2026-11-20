@@ -64,22 +64,26 @@ public sealed class DiagnosticEngine
         return report;
     }
 
-    /// <summary>An indicative 0-100 score. Low-confidence findings count for less.</summary>
+    /// <summary>
+    /// An indicative 0-100 score. Each finding removes a share of the remaining score (critical 30%,
+    /// high 15%, medium 6%, low 1%), so many small issues cannot outweigh one serious problem and the
+    /// score never saturates at zero. Low-confidence findings count for less.
+    /// </summary>
     public static int ComputeHealthScore(IEnumerable<Finding> findings)
     {
         double score = 100;
         foreach (var f in findings)
         {
-            double weight = f.Severity switch
+            double share = f.Severity switch
             {
-                Severity.Critical => 25,
-                Severity.High => 12,
-                Severity.Medium => 6,
-                Severity.Low => 2,
+                Severity.Critical => 0.30,
+                Severity.High => 0.15,
+                Severity.Medium => 0.06,
+                Severity.Low => 0.01,
                 _ => 0,
             };
-            weight *= f.Confidence switch { Confidence.High => 1.0, Confidence.Medium => 0.75, _ => 0.4 };
-            score -= weight;
+            share *= f.Confidence switch { Confidence.High => 1.0, Confidence.Medium => 0.75, _ => 0.4 };
+            score *= 1 - share;
         }
         return (int)Math.Clamp(Math.Round(score), 0, 100);
     }

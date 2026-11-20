@@ -1,0 +1,130 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SoftReset.App.ViewModels"
+             xmlns:app="using:SoftReset.App"
+             xmlns:m="using:SoftReset.Core.Models"
+             xmlns:s="using:SoftReset.Core.Sessions"
+             x:Class="SoftReset.App.Views.DashboardView" x:DataType="vm:DashboardViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="32,6,32,32" Spacing="20">
+      <Border Classes="danger" IsVisible="{Binding HasInterrupted}">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Classes="body" VerticalAlignment="Center">
+            <Run Text="{Binding InterruptedCount, Mode=OneWay}" FontWeight="Bold" />
+            <Run Text="change(s) were interrupted last time the console ran. Review them in Change History and roll back if needed." />
+          </TextBlock>
+          <Button Grid.Column="1" Classes="secondary small" Content="Review" Command="{Binding OpenHistoryCommand}" />
+        </Grid>
+      </Border>
+
+      <Border Classes="hero">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Ready when you are" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" />
+            <TextBlock Classes="body" MaxWidth="620" HorizontalAlignment="Left" Text="Start a customer session to record concerns, run diagnostics, get approval for each fix, and produce a before-and-after report. Or jump straight into any tool on the left." />
+            <TextBlock Classes="muted small" Text="{Binding PlatformText}" />
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,8,0,0">
+              <Button Classes="primary" Command="{Binding StartSessionCommand}" x:Name="StartSessionButton">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Path Classes="icon" Data="{StaticResource IconSession}" Stroke="White" Width="15" Height="15" />
+                  <TextBlock Text="Start customer session" />
+                </StackPanel>
+              </Button>
+              <Button Classes="secondary" Command="{Binding RunDiagnosticsCommand}" x:Name="QuickScanButton">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Path Classes="icon" Data="{StaticResource IconPulse}" Width="15" Height="15" />
+                  <TextBlock Text="Quick diagnostic scan" />
+                </StackPanel>
+              </Button>
+            </StackPanel>
+          </StackPanel>
+          <Image Grid.Column="1" Source="avares://SoftResetConsole/Assets/softreset-512.png" Width="150" Height="150" Margin="20,-10,6,-10" VerticalAlignment="Center" />
+        </Grid>
+      </Border>
+
+      <Grid ColumnDefinitions="*,20,*,20,*">
+        <Border Classes="card">
+          <StackPanel Spacing="6">
+            <TextBlock Classes="label" Text="CPU LOAD" />
+            <TextBlock Classes="metric" Text="{Binding CpuNow, StringFormat='{}{0:0}%'}" />
+            <app:Sparkline Height="64" Values="{Binding CpuHistory}" Stroke="{StaticResource AccentBrush}" Fill="#1A2F80ED" />
+            <TextBlock Classes="muted small" Text="Live, last 60 seconds" />
+          </StackPanel>
+        </Border>
+        <Border Classes="card" Grid.Column="2">
+          <StackPanel Spacing="6">
+            <TextBlock Classes="label" Text="MEMORY IN USE" />
+            <TextBlock Classes="metric" Text="{Binding MemoryNow, StringFormat='{}{0:0}%'}" />
+            <app:Sparkline Height="64" Values="{Binding MemoryHistory}" Stroke="#0B2545" Fill="#122F80ED" />
+            <TextBlock Classes="muted small" Text="{Binding MemoryText}" />
+          </StackPanel>
+        </Border>
+        <Border Classes="card" Grid.Column="4">
+          <Grid RowDefinitions="Auto,*">
+            <TextBlock Classes="label" Text="LAST DIAGNOSTIC SCAN" />
+            <StackPanel Grid.Row="1" IsVisible="{Binding HasReport}" Orientation="Horizontal" Spacing="16" Margin="0,10,0,0">
+              <app:HealthRing Width="96" Height="96" Value="{Binding LastReport.HealthScore, FallbackValue=0}" />
+              <StackPanel VerticalAlignment="Center" Spacing="4">
+                <TextBlock Classes="h3" Text="Health score" />
+                <TextBlock Classes="muted small" Text="{Binding LastReport.Findings.Count, StringFormat='{}{0} findings'}" />
+                <Button Classes="ghost small" Content="View findings" Command="{Binding RunDiagnosticsCommand}" Padding="0,4" />
+              </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Row="1" IsVisible="{Binding !HasReport}" Spacing="8" Margin="0,12,0,0">
+              <TextBlock Classes="body" Text="No scan yet this session." />
+              <Button Classes="secondary small" Content="Run a scan" Command="{Binding RunDiagnosticsCommand}" HorizontalAlignment="Left" />
+            </StackPanel>
+          </Grid>
+        </Border>
+      </Grid>
+
+      <Grid ColumnDefinitions="3*,20,2*">
+        <Border Classes="card">
+          <StackPanel Spacing="12">
+            <TextBlock Classes="h3" Text="Tools" />
+            <UniformGrid Columns="3">
+              <Button Classes="secondary" Margin="0,0,8,8" HorizontalAlignment="Stretch" Command="{Binding OpenProcessesCommand}">
+                <StackPanel Spacing="4" HorizontalAlignment="Left">
+                  <Path Classes="icon" Data="{StaticResource IconProcesses}" HorizontalAlignment="Left" />
+                  <TextBlock Text="Background processes" />
+                </StackPanel>
+              </Button>
+              <Button Classes="secondary" Margin="0,0,8,8" HorizontalAlignment="Stretch" Command="{Binding OpenSettingsCommand}">
+                <StackPanel Spacing="4" HorizontalAlignment="Left">
+                  <Path Classes="icon" Data="{StaticResource IconSliders}" HorizontalAlignment="Left" />
+                  <TextBlock Text="Settings explorer" />
+                </StackPanel>
+              </Button>
+              <Button Classes="secondary" Margin="0,0,0,8" HorizontalAlignment="Stretch" Command="{Binding OpenOptimizationCommand}">
+                <StackPanel Spacing="4" HorizontalAlignment="Left">
+                  <Path Classes="icon" Data="{StaticResource IconWand}" HorizontalAlignment="Left" />
+                  <TextBlock Text="Optimization" />
+                </StackPanel>
+              </Button>
+            </UniformGrid>
+            <TextBlock Classes="muted small" TextWrapping="Wrap" Text="Diagnostics never change anything. Every change goes through a preview and an approval step, is backed up first, and is recorded in Change History." />
+          </StackPanel>
+        </Border>
+        <Border Classes="card" Grid.Column="2">
+          <StackPanel Spacing="10">
+            <TextBlock Classes="h3" Text="Recent sessions" />
+            <TextBlock Classes="muted" Text="No sessions yet." IsVisible="{Binding !RecentSessions.Count}" />
+            <ItemsControl ItemsSource="{Binding RecentSessions}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="s:CustomerSession">
+                  <Button Classes="ghost" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="6,6"
+                          Command="{Binding $parent[UserControl].((vm:DashboardViewModel)DataContext).ResumeSessionCommand}" CommandParameter="{Binding}">
+                    <StackPanel>
+                      <TextBlock Text="{Binding Id}" Foreground="{StaticResource NavyBrush}" FontWeight="SemiBold" />
+                      <TextBlock Classes="muted small" Text="{Binding StartedAt, Converter={x:Static app:Converters.LocalTime}}" />
+                    </StackPanel>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Classes="muted small" Text="{Binding DataLocation}" TextWrapping="Wrap" />
+          </StackPanel>
+        </Border>
+      </Grid>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

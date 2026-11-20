@@ -1,0 +1,100 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SoftReset.App.ViewModels"
+             x:Class="SoftReset.App.Views.DataView" x:DataType="vm:DataViewModel">
+  <ScrollViewer>
+    <Grid ColumnDefinitions="*,20,*" Margin="32,4,32,32">
+      <StackPanel Spacing="16">
+        <Border Classes="card">
+          <StackPanel Spacing="10">
+            <TextBlock Classes="h3" Text="Technician settings" />
+            <TextBlock Classes="label" Text="TECHNICIAN NAME (PRE-FILLS NEW SESSIONS)" />
+            <TextBox Text="{Binding TechnicianName}" x:Name="SettingsTechnician" />
+            <TextBlock Classes="label" Text="BUSINESS CONTACT LINE (PRINTED ON REPORTS)" />
+            <TextBox Text="{Binding BusinessContact}" Watermark="e.g. softreset · phone or website" />
+            <TextBlock Classes="label" Text="CPU SAMPLING DURING SCANS" />
+            <ComboBox ItemsSource="{Binding SampleOptions}" SelectedItem="{Binding SampleSeconds}" Width="140">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="x:Int32"><TextBlock Text="{Binding StringFormat='{}{0} seconds'}" /></DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <TextBlock Classes="muted small wrap" Text="Longer sampling gives a steadier picture of background CPU use but makes each scan take longer." />
+            <Button Classes="primary" Content="Save settings" Command="{Binding SaveSettingsCommand}" HorizontalAlignment="Left" x:Name="SaveSettingsButton" />
+          </StackPanel>
+        </Border>
+
+        <Border Classes="card">
+          <StackPanel Spacing="10">
+            <TextBlock Classes="h3" Text="Where data is stored" />
+            <TextBlock Classes="body" Text="{Binding ModeText}" />
+            <Border Classes="soft">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="label" Text="FOLDER" />
+                <TextBlock Classes="body" Text="{Binding DataRoot}" />
+                <TextBlock Classes="label" Text="SIZE" Margin="0,6,0,0" />
+                <TextBlock Classes="body" Text="{Binding DataSize}" x:Name="DataSizeText" />
+              </StackPanel>
+            </Border>
+            <TextBlock Classes="body" Text="Contents: sessions/ (customer sessions), reports/ (PDFs), scans/ (diagnostic results), journal/ (change records and backups), file-operations/ (file organizer logs), backups/, logs/, settings.json." />
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Classes="secondary" Content="Open data folder" Command="{Binding OpenDataFolderCommand}" />
+              <Button Classes="secondary" Content="Open reports" Command="{Binding OpenReportsFolderCommand}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="danger">
+          <StackPanel Spacing="10">
+            <TextBlock Classes="h3" Text="Remove all application data" />
+            <TextBlock Classes="body" Text="Deletes everything the console has stored: sessions, reports, scans, the change journal and its backups, logs, and settings. Changes already made to Windows stay in place, and backups needed to undo them are removed too, so roll back anything you need first." />
+            <TextBlock Classes="body" Text="The console never installs itself, adds startup entries, or creates services or scheduled tasks. After removing data, deleting the console's folder removes it completely." />
+            <Button Classes="danger" Content="Remove all data…" Command="{Binding RemoveAllDataCommand}" HorizontalAlignment="Left" x:Name="RemoveDataButton" />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <StackPanel Grid.Column="2" Spacing="16">
+        <Border Classes="hero">
+          <Grid ColumnDefinitions="Auto,*">
+            <Image Source="avares://SoftResetConsole/Assets/softreset.png" Width="64" Height="64" Margin="0,0,16,0" VerticalAlignment="Top" />
+            <StackPanel Grid.Column="1" Spacing="4">
+              <TextBlock Classes="h2" Text="softreset Technician Console" />
+              <TextBlock Classes="muted" Text="{Binding Version, StringFormat='Version {0}'}" />
+              <TextBlock Classes="muted small wrap" Text="{Binding PlatformText}" />
+              <TextBlock Classes="body" Margin="0,8,0,0" Text="Portable, offline-first diagnostics and optimization for Windows 10 and 11. No account, subscription, installer, background service, or telemetry." />
+            </StackPanel>
+          </Grid>
+        </Border>
+
+        <Border Classes="card">
+          <StackPanel Spacing="10">
+            <TextBlock Classes="h3" Text="Safety principles" />
+            <TextBlock Classes="body" Text="• Diagnostics are read-only." />
+            <TextBlock Classes="body" Text="• Every change is previewed, approved, backed up, verified, and logged." />
+            <TextBlock Classes="body" Text="• Security features, Windows Update, and critical services are never disabled." />
+            <TextBlock Classes="body" Text="• Files are never deleted by the organizer; duplicates go to a review folder." />
+            <TextBlock Classes="body" Text="• Software is only removed through its own uninstaller, and Windows components are never removed." />
+            <TextBlock Classes="body" Text="• Administrator rights are requested per action through Windows' own UAC prompt." />
+            <TextBlock Classes="body" Text="• Irreversible actions (such as clearing caches) are labelled as such before approval." />
+          </StackPanel>
+        </Border>
+
+        <Border Classes="card">
+          <StackPanel Spacing="8">
+            <TextBlock Classes="h3" Text="Third-party components" />
+            <TextBlock Classes="body" Text="Avalonia UI — MIT licence" />
+            <TextBlock Classes="body" Text="CommunityToolkit.Mvvm — MIT licence" />
+            <TextBlock Classes="body" Text="Inter typeface — SIL Open Font Licence 1.1" />
+            <TextBlock Classes="body" Text="NVIDIA NVAPI interface definitions — MIT licence (NVIDIA Corporation). The driver library itself is part of the installed NVIDIA driver and is not distributed with the console." />
+            <TextBlock Classes="body" Text="NVIDIA Management Library (NVML) — used from the installed driver only." />
+            <TextBlock Classes="body" Text=".NET runtime — MIT licence (.NET Foundation)" />
+            <TextBlock Classes="body" Text="Microsoft Sysinternals — not bundled. Microsoft's licence does not allow redistribution; the console launches copies placed in tools\sysinternals or opens the official download page." />
+            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
+              <Button Classes="ghost small" Content="Sysinternals licence" Command="{Binding OpenLinkCommand}" CommandParameter="https://learn.microsoft.com/sysinternals/license-terms" />
+              <Button Classes="ghost small" Content="Avalonia" Command="{Binding OpenLinkCommand}" CommandParameter="https://avaloniaui.net/" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </Grid>
+  </ScrollViewer>
+</UserControl>

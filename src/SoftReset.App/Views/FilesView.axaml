@@ -1,0 +1,163 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SoftReset.App.ViewModels"
+             xmlns:app="using:SoftReset.App"
+             xmlns:f="using:SoftReset.Core.Files"
+             x:Class="SoftReset.App.Views.FilesView" x:DataType="vm:FilesViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="32,4,32,32" Spacing="16">
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <Grid ColumnDefinitions="*,10,Auto,10,Auto">
+            <TextBox Text="{Binding Folder}" Watermark="Folder to analyse" x:Name="FolderBox" />
+            <Button Grid.Column="2" Classes="secondary" Content="Browse…" Command="{Binding BrowseCommand}" />
+            <Button Grid.Column="4" Classes="primary" Content="Analyse folder" Command="{Binding AnalyzeCommand}" IsEnabled="{Binding !Busy}" x:Name="AnalyzeButton" />
+          </Grid>
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBlock Classes="muted small" Text="Quick pick:" VerticalAlignment="Center" />
+            <Button Classes="ghost small" Content="Downloads" Command="{Binding UseFolderCommand}" CommandParameter="Downloads" />
+            <Button Classes="ghost small" Content="Desktop" Command="{Binding UseFolderCommand}" CommandParameter="Desktop" />
+            <Button Classes="ghost small" Content="Documents" Command="{Binding UseFolderCommand}" CommandParameter="Documents" />
+            <Button Classes="ghost small" Content="Pictures" Command="{Binding UseFolderCommand}" CommandParameter="Pictures" />
+            <Button Classes="ghost small" Content="Videos" Command="{Binding UseFolderCommand}" CommandParameter="Videos" />
+          </StackPanel>
+          <ProgressBar IsIndeterminate="True" IsVisible="{Binding Busy}" />
+          <TextBlock Classes="muted small" Text="{Binding Status}" x:Name="FilesStatus" />
+        </StackPanel>
+      </Border>
+
+      <Grid ColumnDefinitions="*,20,*" IsVisible="{Binding HasAnalysis}">
+        <Border Classes="card">
+          <StackPanel Spacing="10">
+            <TextBlock Classes="h3" Text="What's in this folder" />
+            <TextBlock Classes="muted" Text="{Binding AnalysisSummary}" />
+            <ItemsControl ItemsSource="{Binding Categories}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:CategoryBar">
+                  <Grid ColumnDefinitions="120,*,Auto" Margin="0,3">
+                    <TextBlock Text="{Binding Name}" FontSize="13" VerticalAlignment="Center" />
+                    <Border Grid.Column="1" Height="10" CornerRadius="5" Width="{Binding Width}" HorizontalAlignment="Left" Background="{StaticResource PrimaryGradient}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="2" Classes="muted small" Text="{Binding Detail}" VerticalAlignment="Center" Margin="8,0,0,0" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Classes="label" Text="SUGGESTIONS" Margin="0,6,0,0" IsVisible="{Binding Suggestions.Count}" />
+            <ItemsControl ItemsSource="{Binding Suggestions}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="x:String"><TextBlock Classes="body" Text="{Binding StringFormat='• {0}'}" Margin="0,1" /></DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="2" Classes="card">
+          <StackPanel Spacing="8">
+            <TextBlock Classes="h3" Text="Largest files" />
+            <ItemsControl ItemsSource="{Binding Largest}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="f:ScannedFile">
+                  <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,2">
+                    <TextBlock Text="{Binding RelativePath}" FontSize="13" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Classes="muted small" Text="{Binding Size, Converter={x:Static app:Converters.BytesL}}" Margin="10,0" VerticalAlignment="Center" />
+                    <Button Grid.Column="2" Classes="ghost small" Content="Show" Padding="6,0"
+                            Command="{Binding $parent[UserControl].((vm:FilesViewModel)DataContext).RevealCommand}" CommandParameter="{Binding Path}" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <Border Classes="card" IsVisible="{Binding HasAnalysis}">
+        <StackPanel Spacing="10">
+          <Grid ColumnDefinitions="*,Auto,Auto">
+            <StackPanel>
+              <TextBlock Classes="h3" Text="Duplicate files" />
+              <TextBlock Classes="muted small wrap" Text="Files are compared byte for byte, not by name. The oldest copy of each group is kept; the others are pre-selected to move into a '_softreset_review' folder for the customer to check. Nothing is deleted." />
+            </StackPanel>
+            <Button Grid.Column="1" Classes="secondary" Content="Find duplicates" Command="{Binding FindDuplicatesCommand}" IsEnabled="{Binding !Busy}" VerticalAlignment="Center" Margin="10,0" x:Name="FindDuplicatesButton" />
+            <Button Grid.Column="2" Classes="primary" Content="Move selected to review…" Command="{Binding MoveDuplicatesToReviewCommand}" IsVisible="{Binding HasDuplicates}" VerticalAlignment="Center" x:Name="MoveDuplicatesButton" />
+          </Grid>
+          <ItemsControl ItemsSource="{Binding Duplicates}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:DuplicateGroupItem">
+                <Border Classes="soft" Margin="0,0,0,8">
+                  <StackPanel Spacing="4">
+                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" />
+                    <ItemsControl ItemsSource="{Binding Files}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:SelectableItem">
+                          <CheckBox IsChecked="{Binding IsSelected}" IsEnabled="{Binding Selectable}">
+                            <StackPanel>
+                              <TextBlock Text="{Binding Label}" FontSize="13" />
+                              <TextBlock Classes="muted small" Text="{Binding Detail}" />
+                            </StackPanel>
+                          </CheckBox>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="card" IsVisible="{Binding HasAnalysis}">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h3" Text="Reorganise" />
+          <WrapPanel>
+            <ComboBox ItemsSource="{Binding Strategies}" SelectedItem="{Binding Strategy}" Width="230" Margin="0,0,14,6" />
+            <CheckBox IsChecked="{Binding TopLevelOnly}" Content="Only files directly in this folder" Margin="0,0,14,6" />
+            <CheckBox IsChecked="{Binding SkipShortcuts}" Content="Leave shortcuts in place" Margin="0,0,14,6" />
+            <Button Classes="secondary" Content="Preview moves" Command="{Binding BuildPlanCommand}" Margin="0,0,0,6" x:Name="PreviewMovesButton" />
+          </WrapPanel>
+          <StackPanel Spacing="8" IsVisible="{Binding HasPlan}">
+            <TextBlock Classes="body" FontWeight="SemiBold" Text="{Binding PlanSummary}" />
+            <ListBox Classes="plain" ItemsSource="{Binding Moves}" MaxHeight="340">
+              <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="f:PlannedMove">
+                  <StackPanel>
+                    <TextBlock FontSize="12.5" TextTrimming="CharacterEllipsis">
+                      <Run Text="{Binding Source, Mode=OneWay}" Foreground="{StaticResource MutedBrush}" />
+                    </TextBlock>
+                    <TextBlock FontSize="12.5" TextTrimming="CharacterEllipsis">
+                      <Run Text="→ " Foreground="{StaticResource AccentBrush}" FontWeight="Bold" /><Run Text="{Binding Destination, Mode=OneWay}" Foreground="{StaticResource NavyBrush}" />
+                    </TextBlock>
+                  </StackPanel>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+            <Button Classes="primary" Content="Customer approves — move files" Command="{Binding ApplyPlanCommand}" HorizontalAlignment="Left" IsEnabled="{Binding !Busy}" x:Name="ApplyPlanButton" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="card">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="h3" Text="Operation log" />
+          <TextBlock Classes="muted" Text="No file operations yet." IsVisible="{Binding !Logs.Count}" />
+          <ItemsControl ItemsSource="{Binding Logs}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="f:FileOperationLog">
+                <Border Classes="soft" Margin="0,0,0,6">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Spacing="1">
+                      <TextBlock Text="{Binding Description}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" />
+                      <TextBlock Classes="muted small">
+                        <Run Text="{Binding StartedAt, Converter={x:Static app:Converters.LocalTime}, Mode=OneWay}" /><Run Text=" · " /><Run Text="{Binding Status, Mode=OneWay}" /><Run Text=" · " /><Run Text="{Binding Done, Mode=OneWay}" /><Run Text=" moved" />
+                      </TextBlock>
+                    </StackPanel>
+                    <Button Grid.Column="1" Classes="secondary small" Content="Undo" IsVisible="{Binding CanUndo}" VerticalAlignment="Center"
+                            Command="{Binding $parent[UserControl].((vm:FilesViewModel)DataContext).UndoCommand}" CommandParameter="{Binding}" />
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

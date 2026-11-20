@@ -19,7 +19,7 @@ public abstract class StartupItemsActionBase : OptimizationAction
     public override string Measurement => "Startup items are re-read after the change; boot time improvement is visible after the next restart.";
 
     protected List<StartupEntry> Entries(ActionContext ctx) =>
-        new StartupInventory(ctx.Platform.Registry, ctx.Platform.Folders).Enumerate()
+        new StartupInventory(ctx.Platform.Registry, ctx.Platform.Folders, ctx.Platform.FileExists).Enumerate()
             .Where(e => e.MachineWide == MachineScope && e.Location != StartupLocation.ScheduledTaskLogon)
             .ToList();
 
@@ -69,7 +69,7 @@ public abstract class StartupItemsActionBase : OptimizationAction
     public override Task ApplyAsync(ActionContext ctx, ActionRequest request, ChangeRecord record, CancellationToken ct)
     {
         var enable = request.Param("mode", "disable") == "enable";
-        var inv = new StartupInventory(ctx.Platform.Registry, ctx.Platform.Folders);
+        var inv = new StartupInventory(ctx.Platform.Registry, ctx.Platform.Folders, ctx.Platform.FileExists);
         var entries = Entries(ctx).ToDictionary(e => e.Id);
         foreach (var id in request.SelectedItems)
         {

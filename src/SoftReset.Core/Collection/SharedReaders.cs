@@ -146,8 +146,9 @@ public static class ProcessHeuristics
     {
         var reasons = new List<string>();
         if (string.IsNullOrEmpty(path)) return reasons;
-        var dir = Path.GetDirectoryName(path) ?? "";
-        var system32 = folders.System32;
+        // Split on either separator: Windows paths can contain '/', and the cross-platform test host splits only on '/'.
+        var cut = path.LastIndexOfAny(new[] { '\\', '/' });
+        var dir = cut > 0 ? path[..cut] : "";
         var windows = folders.WindowsDir;
 
         var mimics = SystemNames.FirstOrDefault(s => s.Equals(name, StringComparison.OrdinalIgnoreCase));

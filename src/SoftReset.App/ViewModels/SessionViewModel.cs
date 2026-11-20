@@ -82,6 +82,8 @@ public sealed partial class SessionViewModel : PageViewModel
     partial void OnStepChanged(int value)
     {
         foreach (var n in Enumerable.Range(1, 10)) OnPropertyChanged($"IsStep{n}");
+        OnPropertyChanged(nameof(ApprovedItems));
+        OnPropertyChanged(nameof(SessionChanges));
         UpdateSteps();
     }
 

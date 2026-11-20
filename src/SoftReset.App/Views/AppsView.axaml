@@ -1,0 +1,153 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SoftReset.App.ViewModels"
+             xmlns:app="using:SoftReset.App"
+             xmlns:k="using:SoftReset.Core.Knowledge"
+             xmlns:p="using:SoftReset.Core.Platform"
+             x:Class="SoftReset.App.Views.AppsView" x:DataType="vm:AppsViewModel">
+  <UserControl.Resources>
+    <DataTemplate x:Key="Bullet" x:DataType="x:String">
+      <TextBlock Classes="body" Text="{Binding StringFormat='• {0}'}" Margin="0,1" />
+    </DataTemplate>
+  </UserControl.Resources>
+  <Grid ColumnDefinitions="420,*" Margin="32,4,32,24">
+    <DockPanel>
+      <Grid DockPanel.Dock="Top" ColumnDefinitions="*,10,170" Margin="0,0,0,10">
+        <TextBox Text="{Binding Search}" Watermark="Search apps or publishers" x:Name="AppSearch" />
+        <ComboBox Grid.Column="2" ItemsSource="{Binding KindFilters}" SelectedItem="{Binding KindFilter}" HorizontalAlignment="Stretch" />
+      </Grid>
+      <StackPanel DockPanel.Dock="Bottom" Spacing="8" Margin="0,10,0,0">
+        <TextBlock Classes="muted small wrap" Text="{Binding Summary}" />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button Classes="secondary small" Content="Windows Installed apps" Command="{Binding OpenAppsSettingsCommand}" />
+          <Button Classes="secondary small" Content="Windows features" Command="{Binding OpenFeaturesCommand}" />
+        </StackPanel>
+      </StackPanel>
+      <Border Classes="card" Padding="6">
+        <Grid>
+          <ProgressBar IsIndeterminate="True" VerticalAlignment="Top" IsVisible="{Binding Loading}" />
+          <ListBox Classes="plain" ItemsSource="{Binding Apps}" SelectedItem="{Binding Selected}" x:Name="AppList">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:AppRow">
+                <Grid ColumnDefinitions="*,Auto">
+                  <StackPanel Spacing="1">
+                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Classes="muted small" TextTrimming="CharacterEllipsis">
+                      <Run Text="{Binding KindText, Mode=OneWay}" /><Run Text=" · " /><Run Text="{Binding Publisher, Mode=OneWay}" />
+                    </TextBlock>
+                  </StackPanel>
+                  <Border Grid.Column="1" Classes="pill" VerticalAlignment="Center" IsVisible="{Binding HasGuide}" Margin="8,0,0,0">
+                    <TextBlock Text="Guide" />
+                  </Border>
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Grid>
+      </Border>
+    </DockPanel>
+
+    <ScrollViewer Grid.Column="1" Margin="20,0,0,0">
+      <StackPanel Spacing="14">
+        <Border Classes="card" IsVisible="{Binding !HasSelection}">
+          <StackPanel Spacing="10">
+            <TextBlock Classes="h3" Text="Pick an application" />
+            <TextBlock Classes="body" Text="Each page shows what the program is, its version and storage, whether it starts with Windows, common problems with fixes, repair and reset steps, and how to uninstall it safely. Uninstalling always uses the program's own uninstaller, and Windows components are never offered for removal." />
+            <TextBlock Classes="h3" Text="Windows optional features" Margin="0,10,0,0" />
+            <ItemsControl ItemsSource="{Binding Features}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="p:OptionalFeatureInfo">
+                  <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                    <TextBlock Classes="body" Text="{Binding Caption}" />
+                    <TextBlock Grid.Column="1" Classes="muted small" Text="{Binding State}" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="card" IsVisible="{Binding HasSelection}">
+          <StackPanel Spacing="12">
+            <StackPanel Spacing="3">
+              <TextBlock Classes="label" Text="{Binding Selected.KindText, FallbackValue='', Converter={x:Static app:Converters.Upper}}" Foreground="{StaticResource AccentBrush}" />
+              <TextBlock Classes="h2" Text="{Binding Selected.Name, FallbackValue=''}" TextWrapping="Wrap" />
+              <TextBlock Classes="body" Text="{Binding Guide.Purpose, FallbackValue=''}" IsVisible="{Binding HasGuide}" />
+            </StackPanel>
+            <Border Classes="soft">
+              <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                <TextBlock Classes="label" Text="PUBLISHER" />
+                <TextBlock Grid.Column="1" Classes="body" Text="{Binding Selected.Publisher, FallbackValue=''}" />
+                <TextBlock Grid.Row="1" Classes="label" Text="VERSION" Margin="0,6,0,0" />
+                <TextBlock Grid.Row="1" Grid.Column="1" Classes="body" Text="{Binding Selected.Version, FallbackValue=''}" Margin="0,6,0,0" />
+                <TextBlock Grid.Row="2" Classes="label" Text="STORAGE" Margin="0,6,0,0" />
+                <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="10" Margin="0,6,0,0">
+                  <TextBlock Classes="body" Text="{Binding SizeText}" VerticalAlignment="Center" />
+                  <Button Classes="ghost small" Content="Measure folder" Command="{Binding ComputeSizeCommand}" Padding="4,0" />
+                </StackPanel>
+                <TextBlock Grid.Row="3" Classes="label" Text="LOCATION" Margin="0,6,0,0" />
+                <TextBlock Grid.Row="3" Grid.Column="1" Classes="body" Text="{Binding Selected.App.InstallLocation, FallbackValue='Not recorded', TargetNullValue='Not recorded by the installer'}" Margin="0,6,0,0" />
+                <TextBlock Grid.Row="4" Classes="label" Text="STARTUP" Margin="0,6,0,0" />
+                <TextBlock Grid.Row="4" Grid.Column="1" Classes="body" Text="{Binding StartupText}" Margin="0,6,0,0" />
+              </Grid>
+            </Border>
+            <Border Classes="notice" IsVisible="{Binding EssentialText, Converter={x:Static app:Converters.NotEmpty}}">
+              <TextBlock Classes="body" Text="{Binding EssentialText}" />
+            </Border>
+            <WrapPanel>
+              <Button Classes="secondary small" Content="Open" Command="{Binding OpenAppCommand}" Margin="0,0,8,8" />
+              <Button Classes="secondary small" Content="Repair (Windows Installer)" Command="{Binding RepairMsiCommand}" IsVisible="{Binding CanRepairMsi}" Margin="0,0,8,8" />
+              <Button Classes="secondary small" Content="Modify / repair setup" Command="{Binding ModifyCommand}" IsVisible="{Binding CanModify}" Margin="0,0,8,8" />
+              <Button Classes="secondary small" Content="Repair or reset (Windows)" Command="{Binding StoreAdvancedCommand}" IsVisible="{Binding IsStore}" Margin="0,0,8,8" />
+              <Button Classes="secondary small" Content="Clear caches…" Command="{Binding ClearCacheCommand}" IsVisible="{Binding HasCaches}" Margin="0,0,8,8" />
+              <Button Classes="danger small" Content="Uninstall…" Command="{Binding UninstallCommand}" IsVisible="{Binding CanUninstall}" Margin="0,0,8,8" />
+            </WrapPanel>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="card" IsVisible="{Binding HasGuide}">
+          <StackPanel Spacing="12">
+            <TextBlock Classes="h3" Text="Common problems" />
+            <ItemsControl ItemsSource="{Binding Guide.CommonProblems, FallbackValue={x:Null}}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="k:CommonProblem">
+                  <Border Classes="soft" Margin="0,0,0,8">
+                    <StackPanel Spacing="4">
+                      <TextBlock Text="{Binding Problem}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" TextWrapping="Wrap" />
+                      <ItemsControl ItemsSource="{Binding Fixes}" ItemTemplate="{StaticResource Bullet}" />
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <Grid ColumnDefinitions="*,20,*">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="label" Text="REPAIR" />
+                <ItemsControl ItemsSource="{Binding Guide.Repair, FallbackValue={x:Null}}" ItemTemplate="{StaticResource Bullet}" />
+                <TextBlock Classes="label" Text="RESET" Margin="0,8,0,0" />
+                <ItemsControl ItemsSource="{Binding Guide.Reset, FallbackValue={x:Null}}" ItemTemplate="{StaticResource Bullet}" />
+              </StackPanel>
+              <StackPanel Grid.Column="2" Spacing="4">
+                <TextBlock Classes="label" Text="SAFE UNINSTALL" />
+                <ItemsControl ItemsSource="{Binding Guide.SafeUninstall, FallbackValue={x:Null}}" ItemTemplate="{StaticResource Bullet}" />
+                <TextBlock Classes="label" Text="SETTINGS WORTH KNOWING" Margin="0,8,0,0" />
+                <ItemsControl ItemsSource="{Binding Guide.RelevantSettings, FallbackValue={x:Null}}" ItemTemplate="{StaticResource Bullet}" />
+              </StackPanel>
+            </Grid>
+            <StackPanel Spacing="4">
+              <TextBlock Classes="label" Text="OFFICIAL GUIDANCE" />
+              <ItemsControl ItemsSource="{Binding Guide.Links, FallbackValue={x:Null}}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="k:GuideLink">
+                    <Button Classes="ghost small" Content="{Binding Label}" Margin="0,0,8,4"
+                            Command="{Binding $parent[UserControl].((vm:AppsViewModel)DataContext).OpenLinkCommand}" CommandParameter="{Binding}" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

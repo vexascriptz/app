@@ -26,6 +26,9 @@ public interface ISystemPlatform
     IElevationService Elevation { get; }
     ISettingProbe SettingProbe { get; }
     ILiveMetrics Live { get; }
+
+    /// <summary>Whether a file referenced by the system (e.g. a startup command) exists.</summary>
+    bool FileExists(string path) => File.Exists(path);
 }
 
 /// <summary>Cheap, frequently sampled system load for live graphs.</summary>

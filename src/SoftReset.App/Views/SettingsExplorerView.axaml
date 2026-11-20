@@ -1,0 +1,123 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SoftReset.App.ViewModels"
+             xmlns:app="using:SoftReset.App"
+             xmlns:k="using:SoftReset.Core.Knowledge"
+             x:Class="SoftReset.App.Views.SettingsExplorerView" x:DataType="vm:SettingsExplorerViewModel">
+  <Grid ColumnDefinitions="230,390,*" Margin="32,4,32,24">
+    <DockPanel>
+      <TextBox DockPanel.Dock="Top" Text="{Binding Search}" Watermark="Search all settings" Margin="0,0,0,10" x:Name="SettingsSearch" />
+      <CheckBox DockPanel.Dock="Bottom" IsChecked="{Binding ShowUnavailable}" Margin="0,8,0,0">
+        <TextBlock Text="Show settings not available on this PC" TextWrapping="Wrap" FontSize="12" />
+      </CheckBox>
+      <ListBox Classes="plain" ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}" x:Name="CategoryList">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:SettingsExplorerViewModel+CategoryItem">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="{Binding Name}" FontSize="13" TextTrimming="CharacterEllipsis" />
+              <TextBlock Grid.Column="1" Text="{Binding Count}" FontSize="11.5" Foreground="{StaticResource SubtleBrush}" />
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+
+    <Border Grid.Column="1" Classes="card" Padding="6" Margin="16,0,0,0">
+      <ListBox Classes="plain" ItemsSource="{Binding Items}" SelectedItem="{Binding Selected}" x:Name="SettingsList">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:SettingRow">
+            <StackPanel Spacing="2">
+              <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding Current}" FontSize="12" Foreground="{StaticResource AccentDarkBrush}" TextTrimming="CharacterEllipsis" />
+              <TextBlock Classes="muted small" Text="{Binding Badges}" />
+            </StackPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </Border>
+
+    <ScrollViewer Grid.Column="2" Margin="16,0,0,0">
+      <StackPanel>
+        <Border Classes="card" IsVisible="{Binding !HasSelection}">
+          <StackPanel Spacing="8">
+            <TextBlock Classes="h3" Text="Pick a setting" />
+            <TextBlock Classes="body" Text="Every entry explains the setting, shows its current value where Windows exposes it, recommends values by use case, and gives a working control. Settings Windows does not expose programmatically open the right Windows page instead." />
+          </StackPanel>
+        </Border>
+        <Border Classes="card" IsVisible="{Binding HasSelection}">
+          <StackPanel Spacing="14">
+            <StackPanel Spacing="4">
+              <TextBlock Classes="label" Text="{Binding Selected.Category, FallbackValue='', Converter={x:Static app:Converters.Upper}}" Foreground="{StaticResource AccentBrush}" />
+              <TextBlock Classes="h2" Text="{Binding Selected.Name, FallbackValue=''}" TextWrapping="Wrap" />
+              <TextBlock Classes="body" Text="{Binding Selected.Definition.Description, FallbackValue=''}" />
+            </StackPanel>
+            <Border Classes="notice" IsVisible="{Binding Selected.Unavailable, FallbackValue=False}">
+              <TextBlock Classes="body" Text="{Binding Selected.State.AvailabilityNote, FallbackValue=''}" />
+            </Border>
+            <Border Classes="soft">
+              <Grid ColumnDefinitions="160,*" RowDefinitions="Auto,Auto,Auto,Auto">
+                <TextBlock Classes="label" Text="CURRENT VALUE" />
+                <StackPanel Grid.Column="1">
+                  <TextBlock Classes="body" FontWeight="SemiBold" Text="{Binding Selected.Current, FallbackValue=''}" />
+                  <TextBlock Classes="muted small wrap" Text="{Binding Selected.State.Current.Note, FallbackValue=''}" />
+                  <TextBlock Classes="small wrap" Foreground="{StaticResource WarningBrush}" Text="{Binding Selected.State.PolicyNote, FallbackValue=''}" />
+                </StackPanel>
+                <TextBlock Grid.Row="1" Classes="label" Text="AVAILABLE VALUES" Margin="0,8,0,0" />
+                <ItemsControl Grid.Row="1" Grid.Column="1" Margin="0,8,0,0" ItemsSource="{Binding Selected.Definition.Values, FallbackValue={x:Null}}">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="x:String"><Border Classes="pill" Margin="0,0,6,4"><TextBlock Text="{Binding}" TextWrapping="Wrap" MaxWidth="460" /></Border></DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBlock Grid.Row="2" Classes="label" Text="ADMINISTRATOR" Margin="0,8,0,0" />
+                <TextBlock Grid.Row="2" Grid.Column="1" Classes="body" Margin="0,8,0,0" Text="{Binding Selected.Definition.AdminRequired, Converter={x:Static app:Converters.YesNo}, FallbackValue=''}" />
+                <TextBlock Grid.Row="3" Classes="label" Text="RESTART NEEDED" Margin="0,8,0,0" />
+                <TextBlock Grid.Row="3" Grid.Column="1" Classes="body" Margin="0,8,0,0" Text="{Binding Selected.Definition.RestartText, FallbackValue=''}" />
+              </Grid>
+            </Border>
+            <StackPanel Spacing="6">
+              <TextBlock Classes="label" Text="RECOMMENDED BY USE CASE" />
+              <ItemsControl ItemsSource="{Binding Selected.Definition.Recommendations, FallbackValue={x:Null}}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="k:UseCaseRecommendation">
+                    <Grid ColumnDefinitions="200,*" Margin="0,3">
+                      <TextBlock Text="{Binding UseCase}" FontWeight="SemiBold" Foreground="{StaticResource NavySoftBrush}" TextWrapping="Wrap" Margin="0,0,10,0" />
+                      <TextBlock Grid.Column="1" Classes="body">
+                        <Run Text="{Binding Value, Mode=OneWay}" FontWeight="SemiBold" /><Run Text=" — " /><Run Text="{Binding Why, Mode=OneWay}" />
+                      </TextBlock>
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+            <Grid ColumnDefinitions="*,20,*">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="label" Text="PERFORMANCE" />
+                <TextBlock Classes="body" Text="{Binding Selected.Definition.Performance, FallbackValue=''}" />
+              </StackPanel>
+              <StackPanel Grid.Column="2" Spacing="4">
+                <TextBlock Classes="label" Text="RISKS &amp; COMPATIBILITY" />
+                <TextBlock Classes="body" Text="{Binding Selected.Definition.Risks, FallbackValue=''}" />
+              </StackPanel>
+            </Grid>
+            <StackPanel Spacing="4">
+              <TextBlock Classes="label" Text="RESET / ROLLBACK" />
+              <TextBlock Classes="body" Text="{Binding Selected.Definition.Rollback, FallbackValue=''}" />
+            </StackPanel>
+            <StackPanel Spacing="8">
+              <TextBlock Classes="label" Text="CONTROLS" />
+              <ItemsControl ItemsSource="{Binding Controls}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:SettingControlItem">
+                    <Button Margin="0,0,8,8" Content="{Binding Label}" Command="{Binding ExecuteCommand}"
+                            Classes="secondary" Classes.primary="{Binding IsWrite}" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

@@ -14,11 +14,7 @@
       <Border Background="{StaticResource SidebarGradient}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0">
         <DockPanel Margin="16,20,16,16">
           <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="6,0,0,22">
-            <Grid Width="40" Height="34">
-              <Path Data="{StaticResource IconCloud}" Fill="{StaticResource CloudGradient}" Stretch="Uniform" />
-              <Path Data="{StaticResource IconResetArrow}" Stroke="White" StrokeThickness="1.6" StrokeLineCap="Round" Stretch="None"
-                    RenderTransform="scale(1.45)" Margin="0,6,0,0" />
-            </Grid>
+            <Image Source="avares://SoftResetConsole/Assets/softreset.png" Width="42" Height="42" />
             <StackPanel VerticalAlignment="Center">
               <TextBlock Text="softreset" FontSize="21" FontWeight="Bold" Foreground="{StaticResource NavyBrush}" />
               <TextBlock Text="Technician Console" Classes="muted small" Margin="1,-2,0,0" />
@@ -101,7 +97,7 @@
         <DataTemplate x:DataType="vm:ToastItem">
           <Border Classes="card" Padding="14,11" Margin="0,8,0,0" BoxShadow="{StaticResource RaisedShadow}">
             <Grid ColumnDefinitions="Auto,*,Auto">
-              <Ellipse Width="9" Height="9" VerticalAlignment="Top" Margin="0,5,10,0" Fill="{StaticResource AccentBrush}" Classes.success="{Binding Kind, Converter={x:Static app:Converters.ToastIsSuccess}}" />
+              <Ellipse Width="9" Height="9" VerticalAlignment="Top" Margin="0,5,10,0" Fill="{StaticResource AccentBrush}" Classes.success="{Binding Kind, Converter={x:Static app:Converters.ToastIsSuccess}}" Classes.warning="{Binding Kind, Converter={x:Static app:Converters.ToastIsWarning}}" />
               <TextBlock Grid.Column="1" Text="{Binding Text}" TextWrapping="Wrap" FontSize="13" />
               <Button Grid.Column="2" Classes="ghost small" Content="✕" Padding="6,0" Margin="8,0,0,0"
                       Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).DismissToastCommand}" CommandParameter="{Binding}" />
@@ -115,6 +111,9 @@
   <Window.Styles>
     <Style Selector="Ellipse.success">
       <Setter Property="Fill" Value="{StaticResource SuccessBrush}" />
+    </Style>
+    <Style Selector="Ellipse.warning">
+      <Setter Property="Fill" Value="{StaticResource WarningBrush}" />
     </Style>
   </Window.Styles>
 </Window>

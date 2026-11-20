@@ -1,0 +1,96 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SoftReset.App.ViewModels"
+             xmlns:app="using:SoftReset.App"
+             xmlns:safety="using:SoftReset.Core.Safety"
+             x:Class="SoftReset.App.Views.HistoryView" x:DataType="vm:HistoryViewModel">
+  <Grid ColumnDefinitions="440,*" Margin="32,4,32,24">
+    <DockPanel>
+      <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+        <ComboBox ItemsSource="{Binding Filters}" SelectedItem="{Binding Filter}" HorizontalAlignment="Stretch" />
+        <Button Grid.Column="1" Classes="secondary small" Content="Reload" Command="{Binding ReloadCommand}" Margin="10,0,0,0" />
+      </Grid>
+      <Border Classes="card" Padding="6">
+        <Grid>
+          <TextBlock Classes="muted" Margin="12" Text="No changes recorded yet. Every change made through the console appears here." IsVisible="{Binding !HasRecords}" TextWrapping="Wrap" />
+          <ListBox Classes="plain" ItemsSource="{Binding Records}" SelectedItem="{Binding Selected}" x:Name="RecordList">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="safety:ChangeRecord">
+                <Grid ColumnDefinitions="*,Auto">
+                  <StackPanel Spacing="1">
+                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Classes="muted small" Text="{Binding CreatedAt, Converter={x:Static app:Converters.LocalTime}}" />
+                  </StackPanel>
+                  <Border Grid.Column="1" CornerRadius="999" Padding="9,2" VerticalAlignment="Center" Margin="8,0,0,0" Background="{Binding Status, Converter={x:Static app:Converters.StatusBackground}}">
+                    <TextBlock Text="{Binding Status}" FontSize="11" FontWeight="SemiBold" Foreground="{Binding Status, Converter={x:Static app:Converters.StatusForeground}}" />
+                  </Border>
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Grid>
+      </Border>
+    </DockPanel>
+
+    <ScrollViewer Grid.Column="1" Margin="20,0,0,0">
+      <StackPanel>
+        <Border Classes="card" IsVisible="{Binding HasSelection}">
+          <StackPanel Spacing="12">
+            <StackPanel Spacing="4">
+              <TextBlock Classes="label" Text="{Binding Selected.Category, FallbackValue='', Converter={x:Static app:Converters.Upper}}" Foreground="{StaticResource AccentBrush}" />
+              <TextBlock Classes="h2" Text="{Binding Selected.Title, FallbackValue=''}" TextWrapping="Wrap" />
+              <TextBlock Classes="body" Text="{Binding Selected.Message, FallbackValue=''}" IsVisible="{Binding Selected.Message, Converter={x:Static app:Converters.NotEmpty}, FallbackValue=False}" />
+            </StackPanel>
+            <Border Classes="soft">
+              <Grid ColumnDefinitions="160,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+                <TextBlock Classes="label" Text="STATUS" />
+                <TextBlock Grid.Column="1" Classes="body" FontWeight="SemiBold" Text="{Binding Selected.Status, FallbackValue=''}" />
+                <TextBlock Grid.Row="1" Classes="label" Text="STARTED" Margin="0,6,0,0" />
+                <TextBlock Grid.Row="1" Grid.Column="1" Classes="body" Margin="0,6,0,0" Text="{Binding Selected.CreatedAt, Converter={x:Static app:Converters.LocalTime}, FallbackValue=''}" />
+                <TextBlock Grid.Row="2" Classes="label" Text="COMPLETED" Margin="0,6,0,0" />
+                <TextBlock Grid.Row="2" Grid.Column="1" Classes="body" Margin="0,6,0,0" Text="{Binding Selected.CompletedAt, Converter={x:Static app:Converters.LocalTimeN}, FallbackValue=''}" />
+                <TextBlock Grid.Row="3" Classes="label" Text="REVERSIBILITY" Margin="0,6,0,0" />
+                <TextBlock Grid.Row="3" Grid.Column="1" Classes="body" Margin="0,6,0,0" Text="{Binding Selected.Reversibility, FallbackValue=''}" />
+                <TextBlock Grid.Row="4" Classes="label" Text="ADMINISTRATOR" Margin="0,6,0,0" />
+                <TextBlock Grid.Row="4" Grid.Column="1" Classes="body" Margin="0,6,0,0" Text="{Binding Selected.Elevated, Converter={x:Static app:Converters.YesNo}, FallbackValue=''}" />
+                <TextBlock Grid.Row="5" Classes="label" Text="SESSION" Margin="0,6,0,0" />
+                <TextBlock Grid.Row="5" Grid.Column="1" Classes="body" Margin="0,6,0,0" Text="{Binding Selected.SessionId, FallbackValue='—', TargetNullValue='—'}" />
+              </Grid>
+            </Border>
+            <StackPanel Spacing="4">
+              <TextBlock Classes="label" Text="WHAT CHANGED" />
+              <ItemsControl ItemsSource="{Binding Selected.ChangesApplied, FallbackValue={x:Null}}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="x:String"><TextBlock Classes="body" Text="{Binding StringFormat='• {0}'}" Margin="0,1" /></DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+            <StackPanel Spacing="4">
+              <TextBlock Classes="label" Text="BACKUPS TAKEN BEFORE THE CHANGE" />
+              <ItemsControl ItemsSource="{Binding Selected.Backups, FallbackValue={x:Null}}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="safety:BackupItem">
+                    <TextBlock Classes="body" Margin="0,1">
+                      <Run Text="•" /> <Run Text="{Binding Description, Mode=OneWay}" /> <Run Text="{Binding Kind, StringFormat='({0})', Mode=OneWay}" Foreground="{StaticResource SubtleBrush}" />
+                    </TextBlock>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+            <StackPanel Spacing="4">
+              <TextBlock Classes="label" Text="VERIFICATION" />
+              <TextBlock Classes="body" Text="{Binding Selected.VerificationMessage, FallbackValue='', TargetNullValue='Not verified.'}" />
+            </StackPanel>
+            <StackPanel Spacing="4" IsVisible="{Binding Selected.RollbackMessage, Converter={x:Static app:Converters.NotEmpty}, FallbackValue=False}">
+              <TextBlock Classes="label" Text="ROLLBACK" />
+              <TextBlock Classes="body" Text="{Binding Selected.RollbackMessage, FallbackValue=''}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Classes="primary" Content="Roll back this change…" Command="{Binding RollbackCommand}" IsEnabled="{Binding Selected.CanRollback, FallbackValue=False}" x:Name="RollbackButton" />
+              <TextBlock Classes="muted small" VerticalAlignment="Center" Text="Not reversible, already rolled back, or nothing was changed." IsVisible="{Binding !Selected.CanRollback, FallbackValue=False}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

@@ -1,0 +1,426 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SoftReset.App.ViewModels"
+             xmlns:app="using:SoftReset.App"
+             xmlns:m="using:SoftReset.Core.Models"
+             xmlns:s="using:SoftReset.Core.Sessions"
+             xmlns:safety="using:SoftReset.Core.Safety"
+             x:Class="SoftReset.App.Views.SessionView" x:DataType="vm:SessionViewModel">
+  <UserControl.Styles>
+    <Style Selector="Border.step">
+      <Setter Property="CornerRadius" Value="999" />
+      <Setter Property="Width" Value="28" />
+      <Setter Property="Height" Value="28" />
+      <Setter Property="Background" Value="{StaticResource SkyLightBrush}" />
+      <Setter Property="BorderBrush" Value="{StaticResource LineBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style Selector="Border.step.done">
+      <Setter Property="Background" Value="{StaticResource SuccessBgBrush}" />
+      <Setter Property="BorderBrush" Value="#B7E3CB" />
+    </Style>
+    <Style Selector="Border.step.current">
+      <Setter Property="Background" Value="{StaticResource NavyBrush}" />
+      <Setter Property="BorderBrush" Value="{StaticResource NavyBrush}" />
+    </Style>
+    <Style Selector="Border.step TextBlock">
+      <Setter Property="Foreground" Value="{StaticResource NavyBrush}" />
+    </Style>
+    <Style Selector="Border.step.current TextBlock">
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+  </UserControl.Styles>
+
+  <DockPanel Margin="32,4,32,24">
+    <!-- Stepper -->
+    <Border DockPanel.Dock="Top" Classes="card" Padding="16,12" Margin="0,0,0,18">
+      <ItemsControl ItemsSource="{Binding Steps}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate><UniformGrid Rows="1" /></ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:StepItem">
+            <Button Classes="ghost" Padding="2" HorizontalAlignment="Center"
+                    Command="{Binding $parent[UserControl].((vm:SessionViewModel)DataContext).GoToStepCommand}" CommandParameter="{Binding}">
+              <StackPanel Spacing="5" HorizontalAlignment="Center">
+                <Border Classes="step" Classes.done="{Binding IsDone}" Classes.current="{Binding IsCurrent}" HorizontalAlignment="Center">
+                  <TextBlock Text="{Binding Number}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" FontWeight="Bold" />
+                </Border>
+                <TextBlock Text="{Binding Title}" FontSize="11.5" HorizontalAlignment="Center" Foreground="{StaticResource NavySoftBrush}" />
+              </StackPanel>
+            </Button>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </Border>
+
+    <ScrollViewer>
+      <StackPanel Spacing="16">
+
+        <!-- 1 Start -->
+        <Grid ColumnDefinitions="*,24,340" IsVisible="{Binding IsStep1}">
+          <Border Classes="card">
+            <StackPanel Spacing="14">
+              <TextBlock Classes="h2" Text="Start a session" />
+              <TextBlock Classes="muted wrap" Text="Only record what you need to identify the job. Never record passwords or payment details." />
+              <Grid ColumnDefinitions="*,16,*" RowDefinitions="Auto,Auto,Auto">
+                <StackPanel Spacing="4">
+                  <TextBlock Classes="label" Text="TECHNICIAN" />
+                  <TextBox Text="{Binding TechnicianName}" Watermark="Your name" x:Name="TechnicianBox" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Spacing="4">
+                  <TextBlock Classes="label" Text="CUSTOMER (OPTIONAL)" />
+                  <TextBox Text="{Binding CustomerName}" Watermark="Name or initials" x:Name="CustomerBox" />
+                </StackPanel>
+                <StackPanel Grid.Row="1" Spacing="4" Margin="0,12,0,0">
+                  <TextBlock Classes="label" Text="JOB REFERENCE (OPTIONAL)" />
+                  <TextBox Text="{Binding Reference}" Watermark="e.g. ticket number" />
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="2" Spacing="4" Margin="0,12,0,0">
+                  <TextBlock Classes="label" Text="DEVICE DESCRIPTION (OPTIONAL)" />
+                  <TextBox Text="{Binding DeviceLabel}" Watermark="e.g. Gaming desktop" />
+                </StackPanel>
+                <CheckBox Grid.Row="2" Grid.ColumnSpan="3" Margin="0,12,0,0" IsChecked="{Binding IncludeIdentifiers}" Content="Include the computer name in the report" />
+              </Grid>
+              <Button Classes="primary" Content="Start session" Command="{Binding StartSessionCommand}" HorizontalAlignment="Left" x:Name="StartButton" />
+            </StackPanel>
+          </Border>
+          <Border Grid.Column="2" Classes="card">
+            <StackPanel Spacing="8">
+              <TextBlock Classes="h3" Text="Resume a session" />
+              <TextBlock Classes="muted" Text="No previous sessions." IsVisible="{Binding !PastSessions.Count}" />
+              <ItemsControl ItemsSource="{Binding PastSessions}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="s:CustomerSession">
+                    <Button Classes="ghost" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="6"
+                            Command="{Binding $parent[UserControl].((vm:SessionViewModel)DataContext).ResumeSessionCommand}" CommandParameter="{Binding}">
+                      <StackPanel>
+                        <TextBlock Text="{Binding Id}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" />
+                        <TextBlock Classes="muted small">
+                          <Run Text="{Binding StartedAt, Converter={x:Static app:Converters.LocalTime}, Mode=OneWay}" /> <Run Text="·" /> <Run Text="{Binding Stage, Mode=OneWay}" />
+                        </TextBlock>
+                      </StackPanel>
+                    </Button>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+        </Grid>
+
+        <!-- 2 Concerns -->
+        <Border Classes="card" IsVisible="{Binding IsStep2}">
+          <StackPanel Spacing="14">
+            <TextBlock Classes="h2" Text="What is the customer experiencing?" />
+            <Grid ColumnDefinitions="*,10,200,10,Auto">
+              <TextBox Text="{Binding NewConcern}" Watermark="e.g. Games stutter and the PC restarted twice this week" x:Name="ConcernBox" />
+              <ComboBox Grid.Column="2" ItemsSource="{Binding ConcernCategories}" SelectedItem="{Binding NewConcernCategory}" HorizontalAlignment="Stretch" />
+              <Button Grid.Column="4" Classes="secondary" Content="Add" Command="{Binding AddConcernCommand}" x:Name="AddConcernButton" />
+            </Grid>
+            <Border Classes="notice" IsVisible="{Binding SensitiveWarning, Converter={x:Static app:Converters.NotNull}}">
+              <TextBlock Classes="body" Text="{Binding SensitiveWarning}" Foreground="{StaticResource WarningBrush}" />
+            </Border>
+            <ItemsControl ItemsSource="{Binding Concerns}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="s:CustomerConcern">
+                  <Border Classes="soft" Margin="0,0,0,8" Padding="12,8">
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                      <Border Classes="pill" Margin="0,0,10,0"><TextBlock Text="{Binding Category}" /></Border>
+                      <TextBlock Grid.Column="1" Classes="body" Text="{Binding Text}" VerticalAlignment="Center" />
+                      <Button Grid.Column="2" Classes="ghost small" Content="Remove"
+                              Command="{Binding $parent[UserControl].((vm:SessionViewModel)DataContext).RemoveConcernCommand}" CommandParameter="{Binding}" />
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <StackPanel Spacing="4">
+              <TextBlock Classes="label" Text="TECHNICIAN NOTES (OPTIONAL — APPEAR IN THE REPORT)" />
+              <TextBox Text="{Binding Notes}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="70" />
+            </StackPanel>
+            <Button Classes="primary" Content="Continue to diagnostics" Command="{Binding ConcernsDoneCommand}" HorizontalAlignment="Left" x:Name="ConcernsDoneButton" />
+          </StackPanel>
+        </Border>
+
+        <!-- 3 Diagnose -->
+        <Border Classes="card" IsVisible="{Binding IsStep3}">
+          <StackPanel Spacing="14">
+            <TextBlock Classes="h2" Text="Run diagnostics" />
+            <TextBlock Classes="body" Text="A read-only scan collects real measurements from this PC. Nothing is changed. The result becomes the baseline for the before-and-after report." />
+            <CheckBox IsChecked="{Binding ConnectivityTest}" Content="Include an internet connectivity test" />
+            <Button Classes="primary" Content="Run baseline scan" Command="{Binding RunBaselineCommand}" HorizontalAlignment="Left" IsEnabled="{Binding !IsScanning}" x:Name="BaselineButton" />
+            <StackPanel Spacing="6" IsVisible="{Binding IsScanning}">
+              <ProgressBar Value="{Binding Progress}" Maximum="100" />
+              <TextBlock Classes="muted small" Text="{Binding Stage}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <!-- 4 Baseline -->
+        <StackPanel Spacing="14" IsVisible="{Binding IsStep4}">
+          <Border Classes="card">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+              <app:HealthRing Width="90" Height="90" Value="{Binding Baseline.HealthScore, FallbackValue=0}" Margin="0,0,20,0" />
+              <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                <TextBlock Classes="h2" Text="Baseline captured" />
+                <TextBlock Classes="muted" Text="{Binding BaselineSummary}" />
+                <TextBlock Classes="muted small wrap" Text="Walk the customer through the findings below. Each one shows its evidence and how confident the analysis is." />
+              </StackPanel>
+              <Button Grid.Column="2" Classes="primary" Content="Choose fixes" Command="{Binding BaselineDoneCommand}" VerticalAlignment="Center" x:Name="ChooseFixesButton" />
+            </Grid>
+          </Border>
+          <ItemsControl ItemsSource="{Binding BaselineFindings}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:FindingItem">
+                <Border Classes="card" Padding="16,12" Margin="0,0,0,10">
+                  <Grid ColumnDefinitions="Auto,*">
+                    <Border CornerRadius="999" Padding="10,3" VerticalAlignment="Top" Margin="0,1,12,0" Background="{Binding Finding.Severity, Converter={x:Static app:Converters.SeverityBackground}}">
+                      <TextBlock Text="{Binding Finding.Severity, Converter={x:Static app:Converters.Upper}}" FontSize="11" FontWeight="Bold" Foreground="{Binding Finding.Severity, Converter={x:Static app:Converters.SeverityForeground}}" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Spacing="3">
+                      <TextBlock Text="{Binding Finding.Title}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" TextWrapping="Wrap" />
+                      <TextBlock Classes="body" Text="{Binding Finding.Summary}" />
+                    </StackPanel>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+
+        <!-- 5 Select fixes -->
+        <StackPanel Spacing="14" IsVisible="{Binding IsStep5}">
+          <Border Classes="card">
+            <StackPanel Spacing="8">
+              <TextBlock Classes="h2" Text="Choose what to propose" />
+              <TextBlock Classes="body" Text="Proposals come from the findings. Pre-selected items are reversible fixes for medium-or-higher findings with good confidence. Untick anything the customer does not need. Add manual tasks (e.g. 'Clean dust from fans') if you'll do them yourself." />
+              <Grid ColumnDefinitions="*,10,Auto">
+                <TextBox Text="{Binding NewManualFix}" Watermark="Add a manual task" />
+                <Button Grid.Column="2" Classes="secondary" Content="Add task" Command="{Binding AddManualFixCommand}" />
+              </Grid>
+            </StackPanel>
+          </Border>
+          <ItemsControl ItemsSource="{Binding Fixes}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:ProposedFixItem">
+                <Border Classes="card" Padding="16,14" Margin="0,0,0,10">
+                  <StackPanel Spacing="8">
+                    <Grid ColumnDefinitions="Auto,*">
+                      <CheckBox IsChecked="{Binding IsSelected}" VerticalAlignment="Top" Margin="0,-4,6,0" />
+                      <StackPanel Grid.Column="1" Spacing="3">
+                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="14.5" Foreground="{StaticResource NavyBrush}" TextWrapping="Wrap" />
+                        <TextBlock Classes="body" Text="{Binding Description}" />
+                        <TextBlock Classes="muted small" Text="{Binding Fix.FindingTitle, StringFormat='For finding: {0}'}" IsVisible="{Binding Fix.FindingTitle, Converter={x:Static app:Converters.NotNull}}" />
+                        <Border Classes="pill" HorizontalAlignment="Left" Margin="0,4,0,0"><TextBlock Text="{Binding Badges}" /></Border>
+                      </StackPanel>
+                    </Grid>
+                    <StackPanel IsVisible="{Binding NeedsItems}" Margin="34,0,0,0" Spacing="6">
+                      <Button Classes="secondary small" Content="Choose items…" HorizontalAlignment="Left" IsVisible="{Binding !ItemsLoaded}"
+                              Command="{Binding $parent[UserControl].((vm:SessionViewModel)DataContext).LoadItemsCommand}" CommandParameter="{Binding}" />
+                      <ItemsControl ItemsSource="{Binding Items}">
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="vm:SelectableItem">
+                            <CheckBox IsChecked="{Binding IsSelected}" IsEnabled="{Binding Selectable}" Margin="0,1">
+                              <StackPanel>
+                                <TextBlock Text="{Binding Label}" FontWeight="SemiBold" />
+                                <TextBlock Classes="muted small" Text="{Binding State}" />
+                                <TextBlock Classes="muted small wrap" Text="{Binding Recommendation}" IsVisible="{Binding Recommendation, Converter={x:Static app:Converters.NotEmpty}}" MaxWidth="760" />
+                              </StackPanel>
+                            </CheckBox>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button Classes="secondary" Content="Back" Command="{Binding BackCommand}" />
+            <Button Classes="primary" Content="Prepare approval checklist" Command="{Binding FixesDoneCommand}" x:Name="FixesDoneButton" />
+          </StackPanel>
+        </StackPanel>
+
+        <!-- 6 Approval -->
+        <StackPanel Spacing="14" IsVisible="{Binding IsStep6}">
+          <Border Classes="hero">
+            <StackPanel Spacing="6">
+              <TextBlock Classes="h2" Text="Approval checklist" />
+              <TextBlock Classes="body" Text="Please review each proposed change with your technician. Untick anything you don't want. Reversible changes are backed up and can be undone." />
+            </StackPanel>
+          </Border>
+          <ItemsControl ItemsSource="{Binding ApprovalItems}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:ProposedFixItem">
+                <Border Classes="card" Padding="16,14" Margin="0,0,0,10">
+                  <Grid ColumnDefinitions="Auto,*">
+                    <CheckBox IsChecked="{Binding Approved}" VerticalAlignment="Top" Margin="0,-4,6,0" />
+                    <StackPanel Grid.Column="1" Spacing="6">
+                      <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="14.5" Foreground="{StaticResource NavyBrush}" TextWrapping="Wrap" />
+                      <Grid ColumnDefinitions="*,20,*" IsVisible="{Binding !IsManual}">
+                        <StackPanel Spacing="2">
+                          <TextBlock Classes="label" Text="BENEFIT" />
+                          <TextBlock Classes="body" Text="{Binding Benefit}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Spacing="2">
+                          <TextBlock Classes="label" Text="RISK" />
+                          <TextBlock Classes="body" Text="{Binding Risk}" />
+                        </StackPanel>
+                      </Grid>
+                      <ItemsControl ItemsSource="{Binding Fix.PreviewLines}">
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="x:String"><TextBlock Classes="muted small wrap" Text="{Binding}" /></DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                      <Border Classes="pill" HorizontalAlignment="Left"><TextBlock Text="{Binding Badges}" /></Border>
+                    </StackPanel>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <Border Classes="card">
+            <StackPanel Spacing="10">
+              <CheckBox IsChecked="{Binding RestorePoint}">
+                <TextBlock TextWrapping="Wrap" Text="Create a System Restore point before administrator changes (recommended)" />
+              </CheckBox>
+              <TextBlock Classes="label" Text="CUSTOMER NAME OR INITIALS (CONFIRMS APPROVAL)" />
+              <TextBox Text="{Binding ApprovedBy}" Width="320" HorizontalAlignment="Left" x:Name="ApprovedByBox" />
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button Classes="secondary" Content="Back" Command="{Binding BackCommand}" />
+                <Button Classes="primary" Content="Customer approves the ticked changes" Command="{Binding RecordApprovalCommand}" x:Name="RecordApprovalButton" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+
+        <!-- 7 Apply -->
+        <StackPanel Spacing="14" IsVisible="{Binding IsStep7}">
+          <Border Classes="card">
+            <StackPanel Spacing="10">
+              <TextBlock Classes="h2" Text="Apply approved changes" />
+              <TextBlock Classes="body" Text="Each change is backed up, applied, and verified. Windows may ask for administrator approval for system-wide changes. Mark manual tasks as done when you finish them." />
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button Classes="primary" Content="Apply approved changes" Command="{Binding ApplyApprovedCommand}" IsEnabled="{Binding !IsApplying}" x:Name="ApplyApprovedButton" />
+                <Button Classes="secondary" Content="Continue to re-check" Command="{Binding ApplyDoneCommand}" IsEnabled="{Binding Applied}" x:Name="ApplyDoneButton" />
+              </StackPanel>
+              <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsApplying}" />
+            </StackPanel>
+          </Border>
+          <ItemsControl ItemsSource="{Binding ApprovedItems}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:ProposedFixItem">
+                <Border Classes="card" Padding="16,12" Margin="0,0,0,10">
+                  <StackPanel Spacing="6">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" TextWrapping="Wrap" />
+                      <TextBlock Grid.Column="1" Classes="muted small" Text="{Binding Status}" MaxWidth="420" TextWrapping="Wrap" />
+                    </Grid>
+                    <StackPanel IsVisible="{Binding IsManual}" Orientation="Horizontal" Spacing="10">
+                      <CheckBox IsChecked="{Binding ManualDone}" Content="Done" />
+                      <TextBox Text="{Binding ManualOutcome}" Watermark="Outcome (optional)" Width="420" />
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+
+        <!-- 8 Recheck -->
+        <StackPanel Spacing="14" IsVisible="{Binding IsStep8}">
+          <Border Classes="card">
+            <StackPanel Spacing="10">
+              <TextBlock Classes="h2" Text="Re-check the system" />
+              <TextBlock Classes="body" Text="Run the same scan again to measure what changed. Restart first if any change requires it." />
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button Classes="primary" Content="Run follow-up scan" Command="{Binding RunRecheckCommand}" IsEnabled="{Binding !IsScanning}" x:Name="RecheckButton" />
+                <Button Classes="secondary" Content="Continue to report" Command="{Binding RecheckDoneCommand}" IsEnabled="{Binding FollowUp, Converter={x:Static app:Converters.NotNull}}" x:Name="RecheckDoneButton" />
+              </StackPanel>
+              <StackPanel Spacing="6" IsVisible="{Binding IsScanning}">
+                <ProgressBar Value="{Binding Progress}" Maximum="100" />
+                <TextBlock Classes="muted small" Text="{Binding Stage}" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+          <Border Classes="card" IsVisible="{Binding Comparison, Converter={x:Static app:Converters.NotNull}}">
+            <StackPanel Spacing="10">
+              <StackPanel Orientation="Horizontal" Spacing="24">
+                <StackPanel Spacing="2"><TextBlock Classes="label" Text="BEFORE" /><app:HealthRing Width="72" Height="72" Value="{Binding Baseline.HealthScore, FallbackValue=0}" /></StackPanel>
+                <StackPanel Spacing="2"><TextBlock Classes="label" Text="AFTER" /><app:HealthRing Width="72" Height="72" Value="{Binding FollowUp.HealthScore, FallbackValue=0}" /></StackPanel>
+                <StackPanel VerticalAlignment="Center" Spacing="4">
+                  <TextBlock Classes="h3" Text="{Binding Comparison.Resolved.Count, StringFormat='{}{0} issue(s) resolved'}" />
+                  <TextBlock Classes="muted" Text="{Binding Comparison.New.Count, StringFormat='{}{0} new finding(s)'}" />
+                </StackPanel>
+              </StackPanel>
+              <Grid ColumnDefinitions="*,130,130,110">
+                <TextBlock Classes="label" Text="MEASUREMENT" />
+                <TextBlock Grid.Column="1" Classes="label" Text="BEFORE" />
+                <TextBlock Grid.Column="2" Classes="label" Text="AFTER" />
+                <TextBlock Grid.Column="3" Classes="label" Text="RESULT" />
+              </Grid>
+              <ItemsControl ItemsSource="{Binding Metrics}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="m:MetricComparison">
+                    <Grid ColumnDefinitions="*,130,130,110" Margin="0,3">
+                      <TextBlock Text="{Binding Name}" FontSize="13" />
+                      <TextBlock Grid.Column="1" FontSize="13"><Run Text="{Binding Before, StringFormat='{}{0:0.##}', Mode=OneWay}" /> <Run Text="{Binding Unit, Mode=OneWay}" Foreground="{StaticResource SubtleBrush}" /></TextBlock>
+                      <TextBlock Grid.Column="2" FontSize="13" FontWeight="SemiBold"><Run Text="{Binding After, StringFormat='{}{0:0.##}', Mode=OneWay}" /> <Run Text="{Binding Unit, Mode=OneWay}" FontWeight="Normal" Foreground="{StaticResource SubtleBrush}" /></TextBlock>
+                      <TextBlock Grid.Column="3" Text="{Binding Assessment}" FontSize="13" FontWeight="SemiBold" Foreground="{Binding Assessment, Converter={x:Static app:Converters.AssessmentBrush}}" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <TextBlock Classes="muted small wrap" Text="{Binding Comparison.Caveat}" />
+            </StackPanel>
+          </Border>
+        </StackPanel>
+
+        <!-- 9 Report -->
+        <Border Classes="card" IsVisible="{Binding IsStep9}">
+          <StackPanel Spacing="12">
+            <TextBlock Classes="h2" Text="Before-and-after report" />
+            <TextBlock Classes="body" Text="Generates a professional PDF with the customer's concerns, findings and evidence, exactly what changed (and whether it can be undone), the before-and-after measurements, and remaining recommendations." />
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Classes="primary" Content="Generate PDF report" Command="{Binding GenerateReportCommand}" x:Name="GenerateReportButton" />
+              <Button Classes="secondary" Content="Show report file" Command="{Binding OpenReportCommand}" IsVisible="{Binding ReportPath, Converter={x:Static app:Converters.NotNull}}" />
+              <Button Classes="secondary" Content="Continue" Command="{Binding ReportDoneCommand}" x:Name="ReportDoneButton" />
+            </StackPanel>
+            <TextBlock Classes="muted small" Text="{Binding ReportPath}" />
+          </StackPanel>
+        </Border>
+
+        <!-- 10 Close -->
+        <StackPanel Spacing="14" IsVisible="{Binding IsStep10}">
+          <Border Classes="card">
+            <StackPanel Spacing="10">
+              <TextBlock Classes="h2" Text="Close the session" />
+              <TextBlock Classes="body" Text="Closing saves the session record. Changes listed below stay in Change History and reversible ones can still be rolled back later." />
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button Classes="primary" Content="Close session" Command="{Binding CloseSessionCommand}" IsVisible="{Binding !Session.IsClosed, FallbackValue=False}" x:Name="CloseSessionButton" />
+                <Button Classes="secondary" Content="Start a new session" Command="{Binding NewSessionCommand}" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+          <ItemsControl ItemsSource="{Binding SessionChanges}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="safety:ChangeRecord">
+                <Border Classes="soft" Margin="0,0,0,8">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel>
+                      <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" />
+                      <TextBlock Classes="muted small" Text="{Binding Reversibility}" />
+                    </StackPanel>
+                    <Border Grid.Column="1" CornerRadius="999" Padding="10,3" Background="{Binding Status, Converter={x:Static app:Converters.StatusBackground}}">
+                      <TextBlock Text="{Binding Status}" FontSize="11.5" FontWeight="SemiBold" Foreground="{Binding Status, Converter={x:Static app:Converters.StatusForeground}}" />
+                    </Border>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </StackPanel>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

@@ -70,7 +70,10 @@ public class DiagnosticEngineTests
         var low = new Finding { Severity = Severity.High, Confidence = Confidence.Low };
         Assert.True(DiagnosticEngine.ComputeHealthScore(new[] { high }) < DiagnosticEngine.ComputeHealthScore(new[] { low }));
         Assert.Equal(100, DiagnosticEngine.ComputeHealthScore(Array.Empty<Finding>()));
-        Assert.Equal(0, DiagnosticEngine.ComputeHealthScore(Enumerable.Repeat(new Finding { Severity = Severity.Critical, Confidence = Confidence.High }, 10)));
+        Assert.True(DiagnosticEngine.ComputeHealthScore(Enumerable.Repeat(new Finding { Severity = Severity.Critical, Confidence = Confidence.High }, 10)) <= 5);
+        Assert.Equal(70, DiagnosticEngine.ComputeHealthScore(new[] { new Finding { Severity = Severity.Critical, Confidence = Confidence.High } }));
+        // Many minor findings never outweigh one critical problem.
+        Assert.True(DiagnosticEngine.ComputeHealthScore(Enumerable.Repeat(new Finding { Severity = Severity.Low, Confidence = Confidence.High }, 20)) > 70);
     }
 
     [Fact]

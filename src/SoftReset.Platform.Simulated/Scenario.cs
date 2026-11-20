@@ -437,7 +437,7 @@ internal static class Scenario
         }).OrderByDescending(x => x.PrivateBytes).Take(options.TopProcessCount).ToList();
 
         // Startup (shared inventory code)
-        s.StartupEntries = new StartupInventory(reg, p.Folders, path => !path.Contains("CCleaner64.exe", StringComparison.OrdinalIgnoreCase) || File.Exists(path) || true).Enumerate(st.Tasks);
+        s.StartupEntries = new StartupInventory(reg, p.Folders, p.FileExists).Enumerate(st.Tasks);
         foreach (var e in s.StartupEntries)
         {
             e.IsMicrosoft = e.Name is "SecurityHealth" or "OneDrive" || e.Name.StartsWith("MicrosoftEdge", StringComparison.Ordinal) || e.Name.Contains("OneNote", StringComparison.Ordinal);

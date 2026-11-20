@@ -1,0 +1,163 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SoftReset.App.ViewModels"
+             xmlns:app="using:SoftReset.App"
+             x:Class="SoftReset.App.Views.OptimizationView" x:DataType="vm:OptimizationViewModel">
+  <UserControl.Styles>
+    <Style Selector="Button.ghost.selected">
+      <Setter Property="Background" Value="{StaticResource SkyLightBrush}" />
+    </Style>
+  </UserControl.Styles>
+  <Grid ColumnDefinitions="360,*" Margin="32,4,32,24">
+    <ScrollViewer>
+      <ItemsControl ItemsSource="{Binding Groups}" x:Name="ActionGroups">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:CategoryGroup">
+            <StackPanel Spacing="6" Margin="0,0,10,18">
+              <TextBlock Classes="label" Text="{Binding Name, Converter={x:Static app:Converters.Upper}}" />
+              <ItemsControl ItemsSource="{Binding Actions}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:ActionCard">
+                    <Button Classes="ghost" Classes.selected="{Binding IsSelected}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="10,8" Margin="0,0,0,2"
+                            Command="{Binding $parent[UserControl].((vm:OptimizationViewModel)DataContext).SelectCommand}" CommandParameter="{Binding}">
+                      <StackPanel Spacing="1">
+                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" TextWrapping="Wrap" />
+                        <TextBlock Classes="muted small" Text="{Binding Badges}" />
+                      </StackPanel>
+                    </Button>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+
+    <ScrollViewer Grid.Column="1" Margin="16,0,0,0">
+      <StackPanel Spacing="14">
+        <Border Classes="hero" IsVisible="{Binding !HasSelection}">
+          <StackPanel Spacing="8">
+            <TextBlock Classes="h2" Text="How optimization works here" />
+            <TextBlock Classes="body" Text="1. Inspect — the console reads the current state of this PC." />
+            <TextBlock Classes="body" Text="2. Explain — you see the expected benefit, the risks, and how the result will be measured." />
+            <TextBlock Classes="body" Text="3. Preview — every value that will change is listed, from → to." />
+            <TextBlock Classes="body" Text="4. Approve — nothing is changed until you confirm." />
+            <TextBlock Classes="body" Text="5. Back up, apply, verify — the previous state is saved first and the result is checked afterwards." />
+            <TextBlock Classes="body" Text="6. Roll back — reversible changes can be undone here or from Change History." />
+            <TextBlock Classes="muted small wrap" Margin="0,6,0,0" Text="There are no 'FPS boost' switches, blanket service disabling, or debloat scripts. Actions only appear when they are known to help in a specific situation, and are marked 'not applicable' when they would not." />
+          </StackPanel>
+        </Border>
+
+        <Border Classes="card" IsVisible="{Binding HasSelection}">
+          <StackPanel Spacing="12">
+            <StackPanel Spacing="4">
+              <TextBlock Classes="label" Text="{Binding Selected.Action.Category, FallbackValue='', Converter={x:Static app:Converters.Upper}}" Foreground="{StaticResource AccentBrush}" />
+              <TextBlock Classes="h2" Text="{Binding Selected.Title, FallbackValue=''}" TextWrapping="Wrap" />
+              <TextBlock Classes="body" Text="{Binding Selected.Description, FallbackValue=''}" />
+              <Border Classes="pill" HorizontalAlignment="Left" Margin="0,4,0,0"><TextBlock Text="{Binding Selected.Badges, FallbackValue=''}" /></Border>
+            </StackPanel>
+            <Grid ColumnDefinitions="*,20,*">
+              <StackPanel Spacing="3">
+                <TextBlock Classes="label" Text="EXPECTED BENEFIT" />
+                <TextBlock Classes="body" Text="{Binding Selected.Action.ExpectedBenefit, FallbackValue=''}" />
+              </StackPanel>
+              <StackPanel Grid.Column="2" Spacing="3">
+                <TextBlock Classes="label" Text="RISKS" />
+                <TextBlock Classes="body" Text="{Binding Selected.Action.Risks, FallbackValue=''}" />
+              </StackPanel>
+            </Grid>
+            <StackPanel Spacing="3">
+              <TextBlock Classes="label" Text="HOW THE RESULT IS MEASURED" />
+              <TextBlock Classes="body" Text="{Binding Selected.Action.Measurement, FallbackValue=''}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="card" IsVisible="{Binding HasSelection}">
+          <StackPanel Spacing="12">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="h3" Text="Current state on this PC" />
+              <Button Grid.Column="1" Classes="ghost small" Content="Re-inspect" Command="{Binding InspectCommand}" />
+            </Grid>
+            <ProgressBar IsIndeterminate="True" IsVisible="{Binding Inspecting}" />
+            <TextBlock Classes="body" Text="{Binding StateText}" x:Name="StateText" />
+            <Border Classes="soft" IsVisible="{Binding Inspection.AlreadyOptimal, FallbackValue=False}">
+              <TextBlock Classes="body" Text="Already in the recommended state. No change is needed." />
+            </Border>
+
+            <StackPanel Spacing="6" IsVisible="{Binding HasOptions}">
+              <TextBlock Classes="label" Text="CHOOSE" />
+              <ItemsControl ItemsSource="{Binding Options}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:OptionItem">
+                    <RadioButton GroupName="ActionOptions" IsChecked="{Binding IsSelected}" Margin="0,1"
+                                 Command="{Binding $parent[UserControl].((vm:OptimizationViewModel)DataContext).ChooseOptionCommand}" CommandParameter="{Binding}">
+                      <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="{Binding Label}" TextWrapping="Wrap" MaxWidth="560" />
+                        <TextBlock Classes="muted small" Text="{Binding Hint}" VerticalAlignment="Center" />
+                      </StackPanel>
+                    </RadioButton>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+
+            <StackPanel Spacing="6" IsVisible="{Binding HasItems}">
+              <Grid ColumnDefinitions="*,Auto,Auto">
+                <TextBlock Classes="label" Text="ITEMS" VerticalAlignment="Center" />
+                <Button Grid.Column="1" Classes="ghost small" Content="Select all" Command="{Binding SelectAllItemsCommand}" />
+                <Button Grid.Column="2" Classes="ghost small" Content="Select none" Command="{Binding SelectNoItemsCommand}" />
+              </Grid>
+              <ItemsControl ItemsSource="{Binding Items}" x:Name="ActionItems">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:SelectableItem">
+                    <Border Classes="soft" Margin="0,0,0,6" Padding="10,8">
+                      <CheckBox IsChecked="{Binding IsSelected}" IsEnabled="{Binding Selectable}">
+                        <StackPanel Spacing="1">
+                          <TextBlock Text="{Binding Label}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" TextWrapping="Wrap" />
+                          <TextBlock Classes="muted small wrap" Text="{Binding Detail}" IsVisible="{Binding Detail, Converter={x:Static app:Converters.NotEmpty}}" />
+                          <TextBlock Classes="small wrap" Text="{Binding State}" IsVisible="{Binding State, Converter={x:Static app:Converters.NotEmpty}}" Foreground="{StaticResource TextBrush}" />
+                          <TextBlock Classes="small wrap" Text="{Binding Recommendation}" IsVisible="{Binding Recommendation, Converter={x:Static app:Converters.NotEmpty}}" Foreground="{StaticResource AccentDarkBrush}" />
+                          <TextBlock Classes="small wrap" Text="{Binding Warning}" IsVisible="{Binding Warning, Converter={x:Static app:Converters.NotEmpty}}" Foreground="{StaticResource WarningBrush}" />
+                        </StackPanel>
+                      </CheckBox>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+
+            <ItemsControl ItemsSource="{Binding Notes}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="x:String"><TextBlock Classes="muted small wrap" Text="{Binding StringFormat='• {0}'}" Margin="0,1" /></DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Classes="primary" Content="Preview and apply…" Command="{Binding ApplyCommand}" IsEnabled="{Binding Applicable}" x:Name="ApplyActionButton" />
+              <Button Classes="secondary" Content="Undo last change" Command="{Binding RollbackLastCommand}" IsVisible="{Binding CanRollbackLast}" x:Name="RollbackLastButton" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="card" IsVisible="{Binding LastRecord, Converter={x:Static app:Converters.NotNull}}">
+          <StackPanel Spacing="6">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="h3" Text="Last change" />
+              <Border Grid.Column="1" CornerRadius="999" Padding="10,3" Background="{Binding LastRecord.Status, Converter={x:Static app:Converters.StatusBackground}, FallbackValue=Transparent}">
+                <TextBlock Text="{Binding LastRecord.Status, FallbackValue=''}" FontSize="11.5" FontWeight="SemiBold" Foreground="{Binding LastRecord.Status, Converter={x:Static app:Converters.StatusForeground}, FallbackValue=Black}" />
+              </Border>
+            </Grid>
+            <TextBlock Classes="body" Text="{Binding LastRecord.Title, FallbackValue=''}" FontWeight="SemiBold" />
+            <ItemsControl ItemsSource="{Binding LastRecord.ChangesApplied, FallbackValue={x:Null}}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="x:String"><TextBlock Classes="muted small wrap" Text="{Binding StringFormat='• {0}'}" /></DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Classes="muted small wrap" Text="{Binding LastRecord.VerificationMessage, FallbackValue=''}" />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

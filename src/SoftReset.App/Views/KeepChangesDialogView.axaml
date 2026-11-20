@@ -5,10 +5,10 @@
     <TextBlock Classes="h2" Text="Keep these display settings?" />
     <TextBlock Classes="body" Text="If the picture looks correct and stable, keep the new setting. If the screen is blank or flickering, do nothing — the previous mode is restored automatically." />
     <TextBlock Classes="h3">
-      <Run Text="Reverting in" /> <Run Text="{Binding SecondsLeft}" /> <Run Text="seconds" />
+      <Run Text="Reverting in" /> <Run Text="{Binding SecondsLeft, Mode=OneWay}" /> <Run Text="seconds" />
     </TextBlock>
     <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
-      <Button Classes="secondary" Content="Revert now" Command="{Binding CancelCommand}" />
+      <Button Classes="secondary" Content="Revert now" Command="{Binding CancelCommand}" x:Name="RevertButton" />
       <Button Classes="primary" Content="Keep changes" Command="{Binding KeepCommand}" x:Name="KeepButton" />
     </StackPanel>
   </StackPanel>

@@ -6,7 +6,7 @@
     <TextBlock Classes="body" Text="{Binding Message}" />
     <StackPanel Spacing="6" IsVisible="{Binding HasTypedRequirement}">
       <TextBlock Classes="muted">
-        <Run Text="Type" /> <Run Text="{Binding RequireTypedText}" FontWeight="Bold" /> <Run Text="to confirm." />
+        <Run Text="Type" /> <Run Text="{Binding RequireTypedText, Mode=OneWay}" FontWeight="Bold" /> <Run Text="to confirm." />
       </TextBlock>
       <TextBox Text="{Binding TypedText}" x:Name="TypedBox" />
     </StackPanel>

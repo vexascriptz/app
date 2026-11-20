@@ -85,6 +85,14 @@ public static class Converters
     public static readonly IValueConverter LocalTime = new FuncValueConverter<DateTimeOffset, string>(d => d.LocalDateTime.ToString("g", CultureInfo.CurrentCulture));
     public static readonly IValueConverter LocalTimeN = new FuncValueConverter<DateTimeOffset?, string>(d => d is { } v ? v.LocalDateTime.ToString("g", CultureInfo.CurrentCulture) : "—");
     public static readonly IValueConverter ToastIsSuccess = new FuncValueConverter<ViewModels.ToastKind, bool>(k => k == ViewModels.ToastKind.Success);
+    public static readonly IValueConverter ToastIsWarning = new FuncValueConverter<ViewModels.ToastKind, bool>(k => k is ViewModels.ToastKind.Warning or ViewModels.ToastKind.Error);
+    public static readonly IValueConverter YesNo = new FuncValueConverter<bool, string>(b => b ? "Yes" : "No");
+    public static readonly IValueConverter AssessmentBrush = new FuncValueConverter<string, IBrush>(a => a switch
+    {
+        "Improved" => B("SuccessBrush"),
+        "Worse" => B("DangerBrush"),
+        _ => B("MutedBrush"),
+    });
     public static readonly IValueConverter HealthBrush = new FuncValueConverter<int, IBrush>(v => v >= 80 ? B("SuccessBrush") : v >= 55 ? B("WarningBrush") : B("DangerBrush"));
 }
 

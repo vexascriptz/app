@@ -755,7 +755,7 @@ public sealed class SettingRegistrySetAction : OptimizationAction, IDynamicAdmin
         var (def, c) = Resolve(ctx, request);
         var v = ctx.Platform.Registry.GetValue(RegistryBackup.ParseHive(def.Read.Hive!), def.Read.Path!, def.Read.Value!);
         var ok = c.Type == "registry-delete" ? v is null : v is not null && RegistryBackup.Encode(v) == RegistryBackup.Encode(RegistryBackup.Decode(Enum.Parse<RegKind>(c.Kind ?? "DWord", true), c.Data ?? ""));
-        return Task.FromResult(ok ? VerificationResult.Ok($"Confirmed. {def.RestartText}.") : VerificationResult.Fail("The stored value does not match — policy may override this setting."));
+        return Task.FromResult(ok ? VerificationResult.Ok(def.Restart == "none" ? "Confirmed: Windows now reports the new value." : $"Confirmed: the new value is stored. {def.RestartText} for it to take effect.") : VerificationResult.Fail("The stored value does not match — policy may override this setting."));
     }
 
     protected override void AfterRegistryChange(ActionContext ctx) => ctx.Platform.Maintenance.BroadcastSettingsChanged();

@@ -68,6 +68,12 @@ public sealed class SimulatedPlatform : ISystemPlatform, IDisposable
 
     /// <summary>When true, the next elevation request behaves as if the user clicked "No" on the UAC prompt.</summary>
     public bool SimulateUacDecline { get; set; }
+
+    /// <summary>
+    /// The demo PC's programs are not real files. One startup entry is a deliberate leftover from an
+    /// uninstalled program (Opera GX's assistant), a common real-world case the startup tools detect.
+    /// </summary>
+    public bool FileExists(string path) => !path.Contains("Opera GX", StringComparison.OrdinalIgnoreCase);
     public List<LaunchTarget> LaunchedTargets { get; } = new();
     public List<string> CommandLog { get; } = new();
 
