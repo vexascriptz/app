@@ -47,6 +47,10 @@ jobs:
       - name: Publish portable executable
         run: dotnet publish src/SoftReset.App/SoftReset.App.csproj -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o artifacts/SoftResetConsole
 
+      - name: Add launch instructions to the package
+        shell: pwsh
+        run: Copy-Item packaging/START-HERE.txt artifacts/SoftResetConsole/
+
       - name: Self-test of the published executable (read-only)
         shell: pwsh
         run: |

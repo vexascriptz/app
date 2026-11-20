@@ -90,7 +90,7 @@ Legend for the **Verified by** column:
 | Uninstall only via the app's own uninstaller; essential components protected | UI page; code path verified in sim; real uninstaller launch: **Not yet** |
 | winget upgrade of selected apps | Core (`Winget_ListsAndUpgradesSelected`, parser tests); real winget: **Not yet** |
 
-## Optimization engine (43 actions)
+## Optimization engine (40 actions, plus 3 used by the Settings explorer)
 
 | Category | Actions | Verified by |
 |---|---|---|
