@@ -1,0 +1,18 @@
+<Project>
+  <ItemGroup>
+    <PackageVersion Include="Avalonia" Version="11.3.23" />
+    <PackageVersion Include="Avalonia.Desktop" Version="11.3.23" />
+    <PackageVersion Include="Avalonia.Themes.Fluent" Version="11.3.23" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.3.23" />
+    <PackageVersion Include="Avalonia.Headless" Version="11.3.23" />
+    <PackageVersion Include="Avalonia.Headless.XUnit" Version="11.3.23" />
+    <PackageVersion Include="Avalonia.Skia" Version="11.3.23" />
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageVersion Include="System.Management" Version="10.0.15" />
+    <PackageVersion Include="System.Diagnostics.EventLog" Version="10.0.15" />
+    <PackageVersion Include="System.ServiceProcess.ServiceController" Version="10.0.15" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.12.0" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
+  </ItemGroup>
+</Project>

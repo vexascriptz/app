@@ -1,0 +1,12 @@
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.idea/
+TestResults/
+artifacts/
+publish/
+*.trx
+softreset-data/
+/build/out/
