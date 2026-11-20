@@ -1,0 +1,273 @@
+using System.Collections.ObjectModel;
+using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using SoftReset.Core.Diagnostics;
+using SoftReset.Core.Models;
+using SoftReset.Core.Optimization;
+using SoftReset.Core.Platform;
+using SoftReset.Core.Reports;
+using SoftReset.Core.Sessions;
+
+namespace SoftReset.App.ViewModels;
+
+public sealed partial class DashboardViewModel : PageViewModel
+{
+    private DispatcherTimer? _timer;
+
+    public DashboardViewModel(Shell shell) : base(shell) { }
+    public override string Title => "Welcome";
+    public override string Subtitle => "Diagnose, explain, and fix — with the customer's approval for every change.";
+
+    [ObservableProperty] private IReadOnlyList<double> _cpuHistory = Array.Empty<double>();
+    [ObservableProperty] private IReadOnlyList<double> _memoryHistory = Array.Empty<double>();
+    [ObservableProperty] private double _cpuNow;
+    [ObservableProperty] private double _memoryNow;
+    [ObservableProperty] private string _memoryText = "";
+    [ObservableProperty] private DiagnosticReport? _lastReport;
+    public ObservableCollection<CustomerSession> RecentSessions { get; } = new();
+    public ObservableCollection<Finding> TopFindings { get; } = new();
+
+    public int InterruptedCount => S.InterruptedChanges.Count;
+    public bool HasInterrupted => InterruptedCount > 0;
+    public bool HasReport => LastReport is not null;
+    public string PlatformText => S.DemoMode ? "Demo mode: a simulated customer PC. Run on Windows for real diagnostics." : $"Running on {Environment.MachineName} · Windows build {S.Platform.OsBuild}";
+    public string DataLocation => S.Paths.IsPortable ? $"Portable data folder: {S.Paths.Root}" : $"Data folder: {S.Paths.Root}";
+
+    private readonly List<double> _cpu = new();
+    private readonly List<double> _mem = new();
+
+    public override Task OnActivatedAsync()
+    {
+        LastReport = S.LastReport;
+        OnPropertyChanged(nameof(HasReport));
+        TopFindings.Clear();
+        foreach (var f in LastReport?.Findings.Take(4) ?? Enumerable.Empty<Finding>()) TopFindings.Add(f);
+        RecentSessions.Clear();
+        foreach (var s in S.Sessions.List().Take(5)) RecentSessions.Add(s);
+        if (_timer is null)
+        {
+            S.Platform.Live.Sample();
+            _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            _timer.Tick += (_, _) => Tick();
+            _timer.Start();
+        }
+        return Task.CompletedTask;
+    }
+
+    internal void Tick()
+    {
+        var s = S.Platform.Live.Sample();
+        _cpu.Add(s.CpuPercent);
+        _mem.Add(s.MemoryUsedPercent);
+        if (_cpu.Count > 60) _cpu.RemoveAt(0);
+        if (_mem.Count > 60) _mem.RemoveAt(0);
+        CpuHistory = _cpu.ToArray();
+        MemoryHistory = _mem.ToArray();
+        CpuNow = Math.Round(s.CpuPercent);
+        MemoryNow = Math.Round(s.MemoryUsedPercent);
+        MemoryText = s.MemoryTotalBytes > 0 ? $"{Core.Parsing.ToolOutputParsers.FormatBytes(s.MemoryTotalBytes - s.MemoryAvailableBytes)} of {Core.Parsing.ToolOutputParsers.FormatBytes(s.MemoryTotalBytes)}" : "";
+    }
+
+    [RelayCommand] private void StartSession() => Shell.Main.Navigate(Shell.Main.Session);
+    [RelayCommand] private async Task RunDiagnostics() { Shell.Main.Navigate(Shell.Main.Diagnostics); await Shell.Main.Diagnostics.ScanCommand.ExecuteAsync(null); }
+    [RelayCommand] private void OpenHistory() => Shell.Main.Navigate(Shell.Main.History);
+    [RelayCommand] private void OpenSettings() => Shell.Main.Navigate(Shell.Main.SettingsExplorer);
+    [RelayCommand] private void OpenProcesses() => Shell.Main.Navigate(Shell.Main.Processes);
+    [RelayCommand] private void OpenOptimization() => Shell.Main.Navigate(Shell.Main.Optimization);
+
+    [RelayCommand]
+    private void ResumeSession(CustomerSession s)
+    {
+        Shell.Main.Session.Resume(s.Id);
+        Shell.Main.Navigate(Shell.Main.Session);
+    }
+}
+
+/// <summary>A finding with UI actions for its recommendations.</summary>
+public sealed partial class FindingItem : ObservableObject
+{
+    public FindingItem(Finding f, Shell shell)
+    {
+        Finding = f;
+        Recommendations = f.Recommendations.Select(r => new RecommendationItem(r, shell)).ToList();
+    }
+
+    public Finding Finding { get; }
+    public IReadOnlyList<RecommendationItem> Recommendations { get; }
+    [ObservableProperty] private bool _isExpanded;
+    public string ConfidenceText => $"{Finding.Confidence} confidence";
+    public string CategoryText => Finding.Category.ToString();
+    public bool HasCauses => Finding.LikelyCauses.Count > 0;
+    public bool HasUncertainties => Finding.Uncertainties.Count > 0;
+
+    [RelayCommand] private void Toggle() => IsExpanded = !IsExpanded;
+}
+
+public sealed partial class RecommendationItem : ObservableObject
+{
+    private readonly Shell _shell;
+    public RecommendationItem(Recommendation r, Shell shell) { Recommendation = r; _shell = shell; }
+    public Recommendation Recommendation { get; }
+    public string Text => Recommendation.Text;
+    public bool HasAction => Recommendation.ActionId is not null && _shell.Services.Actions.TryGet(Recommendation.ActionId, out _);
+    public bool HasShortcut => Recommendation.ShortcutTarget is not null;
+    public string ActionLabel => Recommendation.ActionId is { } id && _shell.Services.Actions.TryGet(id, out var a)
+        ? (NeedsSelection(id) ? "Review…" : "Fix…")
+        : "";
+    public string ShortcutLabel => Recommendation.ShortcutLabel ?? "Open";
+
+    internal static bool NeedsSelection(string actionId) => actionId is ActionIds.StartupUserItems or ActionIds.StartupMachineItems or ActionIds.StartupLogonTasks
+        or ActionIds.EndProcesses or ActionIds.GpuPreference or ActionIds.WingetUpgrade or ActionIds.ClearAppCache or ActionIds.VisualEffects;
+
+    [RelayCommand]
+    private async Task Run()
+    {
+        var id = Recommendation.ActionId!;
+        if (NeedsSelection(id) && Recommendation.ActionParameters is null)
+        {
+            _shell.Main.Navigate(_shell.Main.Optimization);
+            await _shell.Main.Optimization.SelectActionAsync(id);
+            return;
+        }
+        await _shell.Runner.RunAsync(new ActionRequest { ActionId = id, Parameters = new(Recommendation.ActionParameters ?? new()) });
+    }
+
+    [RelayCommand]
+    private void Open()
+    {
+        var t = Recommendation.ShortcutTarget!;
+        var target = ShortcutParser.Parse(t);
+        var r = _shell.Services.Platform.Shell.Launch(target);
+        if (!r.Success) _shell.Main.Toast(r.Message, ToastKind.Warning);
+        else if (_shell.Services.DemoMode) _shell.Main.Toast(r.Message);
+    }
+}
+
+public static class ShortcutParser
+{
+    /// <summary>Turns a finding shortcut ("ms-settings:…", "devmgmt.msc", "perfmon.exe /rel") into a validated launch target.</summary>
+    public static LaunchTarget Parse(string s)
+    {
+        if (s.Contains(':') && !s.Contains('\\')) return new LaunchTarget(LaunchKind.Uri, s);
+        var parts = s.Split(' ', 2);
+        var exe = parts[0];
+        if (exe.EndsWith(".msc", StringComparison.OrdinalIgnoreCase)) return new LaunchTarget(LaunchKind.Msc, exe);
+        if (exe.EndsWith(".cpl", StringComparison.OrdinalIgnoreCase)) return new LaunchTarget(LaunchKind.ControlPanelApplet, exe);
+        return new LaunchTarget(LaunchKind.SystemTool, exe, parts.Length > 1 ? parts[1] : null);
+    }
+}
+
+public sealed partial class DiagnosticsViewModel : PageViewModel
+{
+    public DiagnosticsViewModel(Shell shell) : base(shell)
+    {
+        _sampleSeconds = S.Settings.ScanSampleSeconds;
+        _includeConnectivity = S.Settings.IncludeConnectivityTests;
+    }
+
+    public override string Title => "Diagnostics";
+    public override string Subtitle => "Read-only scan of performance, stability, storage, drivers, updates, network, security, and gaming configuration.";
+
+    public int[] SampleOptions { get; } = { 3, 5, 10, 20 };
+    [ObservableProperty] private int _sampleSeconds;
+    [ObservableProperty] private bool _includeConnectivity;
+    [ObservableProperty] private bool _includeSignatures = true;
+    [ObservableProperty] private bool _isScanning;
+    [ObservableProperty] private int _progress;
+    [ObservableProperty] private string _stage = "";
+    [ObservableProperty] private DiagnosticReport? _report;
+    [ObservableProperty] private string _severityFilter = "All findings";
+    [ObservableProperty] private string _categoryFilter = "All categories";
+    public string[] SeverityFilters { get; } = { "All findings", "Critical and high", "Medium and above", "Low and info" };
+    public ObservableCollection<string> CategoryFilters { get; } = new() { "All categories" };
+    public ObservableCollection<FindingItem> Findings { get; } = new();
+    public ObservableCollection<CollectionIssue> Issues { get; } = new();
+    private List<FindingItem> _all = new();
+
+    public bool HasReport => Report is not null;
+    public bool NoReport => Report is null && !IsScanning;
+    public string Summary => Report is null ? "" : $"{Report.Findings.Count} findings from {Report.RulesEvaluated} checks · scanned {Report.CreatedAt.LocalDateTime:g} in {Report.Snapshot.CollectionDuration.TotalSeconds:0} s";
+    public int CriticalHigh => Report?.Findings.Count(f => f.Severity >= Severity.High) ?? 0;
+    public int MediumCount => Report?.Count(Severity.Medium) ?? 0;
+    public int LowCount => (Report?.Count(Severity.Low) ?? 0) + (Report?.Count(Severity.Info) ?? 0);
+    public string MachineLine => Report is null ? "" : $"{Report.Snapshot.Os.FriendlyName} · {Report.Snapshot.Hardware.CpuName} · {Core.Parsing.ToolOutputParsers.FormatBytes(Report.Snapshot.Hardware.TotalMemoryBytes)} RAM";
+
+    partial void OnReportChanged(DiagnosticReport? value)
+    {
+        OnPropertyChanged(nameof(HasReport)); OnPropertyChanged(nameof(NoReport)); OnPropertyChanged(nameof(Summary));
+        OnPropertyChanged(nameof(CriticalHigh)); OnPropertyChanged(nameof(MediumCount)); OnPropertyChanged(nameof(LowCount)); OnPropertyChanged(nameof(MachineLine));
+    }
+    partial void OnIsScanningChanged(bool value) => OnPropertyChanged(nameof(NoReport));
+    partial void OnSeverityFilterChanged(string value) => ApplyFilter();
+    partial void OnCategoryFilterChanged(string value) => ApplyFilter();
+
+    public static async Task<DiagnosticReport> CollectAndAnalyzeAsync(Shell shell, CollectionOptions options, IProgress<CollectionProgress> progress, CancellationToken ct = default)
+    {
+        var snap = await shell.Services.Platform.Collector.CollectAsync(options, progress, ct);
+        var report = await Task.Run(() => shell.Services.Engine.Analyze(snap), ct);
+        shell.Services.LastReport = report;
+        Core.Storage.Json.WriteFile(Path.Combine(shell.Services.Paths.Scans, $"scan-{report.CreatedAt:yyyyMMdd-HHmmss}.json"), report);
+        return report;
+    }
+
+    [RelayCommand]
+    private async Task Scan()
+    {
+        if (IsScanning) return;
+        IsScanning = true;
+        Progress = 0;
+        Stage = "Starting…";
+        try
+        {
+            var progress = new Progress<CollectionProgress>(p => { Progress = p.Percent; Stage = p.Stage; });
+            var options = new CollectionOptions { CpuSampleDuration = TimeSpan.FromSeconds(SampleSeconds), IncludeConnectivityTests = IncludeConnectivity, IncludeSignatureChecks = IncludeSignatures };
+            Report = await CollectAndAnalyzeAsync(Shell, options, progress);
+            Load(Report);
+            Dialogs.Toast($"Scan complete: {Report.Findings.Count} findings.", ToastKind.Success);
+        }
+        catch (Exception ex)
+        {
+            S.Log($"Scan failed: {ex}");
+            await Dialogs.ShowMessageAsync("Scan failed", ex.Message);
+        }
+        finally { IsScanning = false; }
+    }
+
+    public void Load(DiagnosticReport report)
+    {
+        Report = report;
+        _all = report.Findings.Select(f => new FindingItem(f, Shell)).ToList();
+        if (_all.Count > 0) _all[0].IsExpanded = true;
+        CategoryFilters.Clear();
+        CategoryFilters.Add("All categories");
+        foreach (var c in report.Findings.Select(f => f.Category.ToString()).Distinct().OrderBy(c => c)) CategoryFilters.Add(c);
+        CategoryFilter = "All categories";
+        Issues.Clear();
+        foreach (var i in report.Snapshot.CollectionIssues) Issues.Add(i);
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        Findings.Clear();
+        foreach (var f in _all.Where(f => SeverityFilter switch
+                 {
+                     "Critical and high" => f.Finding.Severity >= Severity.High,
+                     "Medium and above" => f.Finding.Severity >= Severity.Medium,
+                     "Low and info" => f.Finding.Severity <= Severity.Low,
+                     _ => true,
+                 } && (CategoryFilter == "All categories" || f.CategoryText == CategoryFilter)))
+            Findings.Add(f);
+    }
+
+    [RelayCommand]
+    private async Task ExportPdf()
+    {
+        if (Report is null) return;
+        var file = Path.Combine(S.Paths.Reports, $"diagnostic-report-{Report.CreatedAt:yyyyMMdd-HHmm}.pdf");
+        await File.WriteAllBytesAsync(file, ReportBuilder.BuildDiagnosticReport(Report));
+        Dialogs.Toast($"Saved {Path.GetFileName(file)} to the reports folder.", ToastKind.Success);
+        S.Platform.Shell.Launch(new LaunchTarget(LaunchKind.RevealFile, file));
+    }
+}

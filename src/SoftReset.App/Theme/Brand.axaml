@@ -1,0 +1,66 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- softreset brand: white surfaces, light-blue gradients, navy typography -->
+  <Color x:Key="Navy">#0B2545</Color>
+  <Color x:Key="NavySoft">#1B365D</Color>
+  <Color x:Key="Text">#2B3A55</Color>
+  <Color x:Key="Muted">#5B6B84</Color>
+  <Color x:Key="Subtle">#8A99B0</Color>
+  <Color x:Key="Accent">#2F80ED</Color>
+  <Color x:Key="AccentDark">#1F66CC</Color>
+  <Color x:Key="SkyLight">#EAF4FF</Color>
+  <Color x:Key="Sky">#D6EBFF</Color>
+  <Color x:Key="Line">#DCE7F5</Color>
+
+  <SolidColorBrush x:Key="NavyBrush" Color="{StaticResource Navy}" />
+  <SolidColorBrush x:Key="NavySoftBrush" Color="{StaticResource NavySoft}" />
+  <SolidColorBrush x:Key="TextBrush" Color="{StaticResource Text}" />
+  <SolidColorBrush x:Key="MutedBrush" Color="{StaticResource Muted}" />
+  <SolidColorBrush x:Key="SubtleBrush" Color="{StaticResource Subtle}" />
+  <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource Accent}" />
+  <SolidColorBrush x:Key="AccentDarkBrush" Color="{StaticResource AccentDark}" />
+  <SolidColorBrush x:Key="SkyLightBrush" Color="{StaticResource SkyLight}" />
+  <SolidColorBrush x:Key="SkyBrush" Color="{StaticResource Sky}" />
+  <SolidColorBrush x:Key="LineBrush" Color="{StaticResource Line}" />
+  <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF" />
+  <SolidColorBrush x:Key="PageBrush" Color="#FFFFFF" />
+  <SolidColorBrush x:Key="SoftPanelBrush" Color="#F5F9FF" />
+
+  <SolidColorBrush x:Key="SuccessBrush" Color="#1E8E5A" />
+  <SolidColorBrush x:Key="SuccessBgBrush" Color="#E6F6EE" />
+  <SolidColorBrush x:Key="WarningBrush" Color="#9A6200" />
+  <SolidColorBrush x:Key="WarningBgBrush" Color="#FFF6DD" />
+  <SolidColorBrush x:Key="DangerBrush" Color="#C62828" />
+  <SolidColorBrush x:Key="DangerBgBrush" Color="#FDECEC" />
+  <SolidColorBrush x:Key="HighBrush" Color="#C2410C" />
+  <SolidColorBrush x:Key="HighBgBrush" Color="#FFF0E5" />
+  <SolidColorBrush x:Key="InfoBrush" Color="#5B6B84" />
+  <SolidColorBrush x:Key="InfoBgBrush" Color="#EEF2F7" />
+
+  <LinearGradientBrush x:Key="SidebarGradient" StartPoint="0%,0%" EndPoint="0%,100%">
+    <GradientStop Color="#E3F0FF" Offset="0" />
+    <GradientStop Color="#F3F8FF" Offset="0.55" />
+    <GradientStop Color="#FFFFFF" Offset="1" />
+  </LinearGradientBrush>
+  <LinearGradientBrush x:Key="HeroGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+    <GradientStop Color="#DCEEFF" Offset="0" />
+    <GradientStop Color="#F2F8FF" Offset="0.6" />
+    <GradientStop Color="#FFFFFF" Offset="1" />
+  </LinearGradientBrush>
+  <LinearGradientBrush x:Key="CloudGradient" StartPoint="0%,0%" EndPoint="0%,100%">
+    <GradientStop Color="#A0D6FF" Offset="0" />
+    <GradientStop Color="#2F80ED" Offset="1" />
+  </LinearGradientBrush>
+  <LinearGradientBrush x:Key="PrimaryGradient" StartPoint="0%,0%" EndPoint="100%,0%">
+    <GradientStop Color="#123A6B" Offset="0" />
+    <GradientStop Color="#0B2545" Offset="1" />
+  </LinearGradientBrush>
+  <LinearGradientBrush x:Key="MeterGradient" StartPoint="0%,0%" EndPoint="100%,0%">
+    <GradientStop Color="#7CC4FF" Offset="0" />
+    <GradientStop Color="#2F80ED" Offset="1" />
+  </LinearGradientBrush>
+
+  <BoxShadows x:Key="CardShadow">0 2 14 0 #140B2545</BoxShadows>
+  <BoxShadows x:Key="RaisedShadow">0 6 24 0 #1F0B2545</BoxShadows>
+  <CornerRadius x:Key="CardRadius">16</CornerRadius>
+</ResourceDictionary>
