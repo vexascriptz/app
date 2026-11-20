@@ -64,6 +64,7 @@ public sealed class SimulatedPlatform : ISystemPlatform, IDisposable
     public IMaintenanceService Maintenance { get; }
     public IElevationService Elevation { get; }
     public ISettingProbe SettingProbe { get; }
+    public ILiveMetrics Live { get; } = new SimLive();
 
     /// <summary>When true, the next elevation request behaves as if the user clicked "No" on the UAC prompt.</summary>
     public bool SimulateUacDecline { get; set; }
@@ -102,6 +103,17 @@ public sealed class SimState
     public HashSet<int> ProtectedPids { get; } = new();
     public int BroadcastCount { get; set; }
     public int ExplorerRestarts { get; set; }
+}
+
+internal sealed class SimLive : ILiveMetrics
+{
+    private int _t;
+    public LiveSample Sample()
+    {
+        _t++;
+        var cpu = 18 + 9 * Math.Sin(_t / 3.0) + 5 * Math.Sin(_t / 1.3);
+        return new LiveSample(Math.Round(Math.Clamp(cpu, 2, 100), 1), 16L * 1024 * 1024 * 1024, (long)((3.4 + 0.2 * Math.Sin(_t / 5.0)) * 1024 * 1024 * 1024));
+    }
 }
 
 internal sealed class SimFolders : IKnownFolders

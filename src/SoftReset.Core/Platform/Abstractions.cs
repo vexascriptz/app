@@ -25,6 +25,18 @@ public interface ISystemPlatform
     IMaintenanceService Maintenance { get; }
     IElevationService Elevation { get; }
     ISettingProbe SettingProbe { get; }
+    ILiveMetrics Live { get; }
+}
+
+/// <summary>Cheap, frequently sampled system load for live graphs.</summary>
+public interface ILiveMetrics
+{
+    LiveSample Sample();
+}
+
+public readonly record struct LiveSample(double CpuPercent, long MemoryTotalBytes, long MemoryAvailableBytes)
+{
+    public double MemoryUsedPercent => MemoryTotalBytes > 0 ? 100.0 * (MemoryTotalBytes - MemoryAvailableBytes) / MemoryTotalBytes : 0;
 }
 
 // ---------------------------------------------------------------- Registry
@@ -338,6 +350,8 @@ public sealed class InstalledApp
     public bool NoRemove { get; set; }
     public bool NoRepair { get; set; } = true;
     public string? DisplayIcon { get; set; }
+    /// <summary>For Store apps: the AppUserModelID used to launch the app.</summary>
+    public string? AppUserModelId { get; set; }
 }
 
 public sealed class OptionalFeatureInfo
