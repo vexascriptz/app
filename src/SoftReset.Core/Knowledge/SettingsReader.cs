@@ -106,6 +106,13 @@ public sealed class SettingsReader
             }
             case "probe":
                 return _platform.SettingProbe.Read(spec.Probe ?? "");
+            case "task":
+            {
+                var task = _platform.Tasks.GetTasks().FirstOrDefault(t => t.Path.Equals(spec.Path, StringComparison.OrdinalIgnoreCase));
+                if (task is null) return SettingReadResult.Unreadable("This scheduled task does not exist on this PC.");
+                var last = task.LastRun is { } lr ? $", last run {lr.LocalDateTime:g} (result {task.LastResult})" : "";
+                return SettingReadResult.Value((task.Enabled ? "Enabled" : "Disabled") + last, task.Enabled ? "1" : "0");
+            }
             default:
                 return SettingReadResult.Unreadable(spec.Reason ?? "Windows does not expose this value through a documented interface. Use the control below to view it.");
         }

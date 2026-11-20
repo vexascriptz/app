@@ -1,0 +1,2808 @@
+[
+ {
+  "key": "discord",
+  "name": "Discord",
+  "match": [
+   "^Discord$"
+  ],
+  "matchPackages": [],
+  "category": "Communication",
+  "purpose": "Voice, video, and text chat widely used by gamers and communities.",
+  "relevantSettings": [
+   "Hardware acceleration (Settings → Advanced)",
+   "Overlay (Settings → Game Overlay)",
+   "Open Discord on startup (Settings → Windows Settings)",
+   "Voice input/output devices (Settings → Voice & Video)"
+  ],
+  "startupBehavior": "Starts at sign-in by default (Run key 'Discord'), minimised to the tray.",
+  "startupEntryNames": [
+   "Discord"
+  ],
+  "processNames": [
+   "Discord.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Black or grey screen / UI glitches",
+    "fixes": [
+     "Toggle Settings → Advanced → Hardware Acceleration and restart Discord.",
+     "Clear the Discord cache (console action).",
+     "Update the GPU driver."
+    ]
+   },
+   {
+    "problem": "Microphone not working",
+    "fixes": [
+     "Windows Settings → Privacy & security → Microphone: allow desktop apps.",
+     "Discord → Voice & Video: choose the correct input device and run Mic Test.",
+     "Turn off 'Exclusive mode' for the mic in the Sound control panel if another app grabs it."
+    ]
+   },
+   {
+    "problem": "Stuck on 'Checking for updates' / update loop",
+    "fixes": [
+     "Close Discord fully (tray icon → Quit).",
+     "Clear the cache.",
+     "Reinstall from discord.com — settings are stored in the account."
+    ]
+   },
+   {
+    "problem": "Game audio quietens during calls",
+    "fixes": [
+     "Windows Sound → Communications tab → 'Do nothing' (Settings Explorer → Sound → Communications activity)."
+    ]
+   },
+   {
+    "problem": "Stutter while gaming",
+    "fixes": [
+     "Disable the in-game overlay for that game.",
+     "Turn off hardware acceleration if the GPU is low-end."
+    ]
+   }
+  ],
+  "repair": [
+   "Clear the cache, then restart Discord.",
+   "Reinstall: uninstall, then download the installer from discord.com."
+  ],
+  "reset": [
+   "Clearing the cache keeps login and settings.",
+   "A full reset (sign-out + removing %APPDATA%\\discord) should only be done with the customer present."
+  ],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement.",
+   "Discord installs per user in %LOCALAPPDATA%\\Discord — no admin needed."
+  ],
+  "links": [
+   {
+    "label": "Discord Support",
+    "url": "https://support.discord.com"
+   },
+   {
+    "label": "Discord download",
+    "url": "https://discord.com/download"
+   }
+  ],
+  "caches": [
+   {
+    "path": "%APPDATA%\\discord\\Cache",
+    "description": "Web cache"
+   },
+   {
+    "path": "%APPDATA%\\discord\\Code Cache",
+    "description": "Compiled script cache"
+   },
+   {
+    "path": "%APPDATA%\\discord\\GPUCache",
+    "description": "GPU shader cache"
+   }
+  ],
+  "essential": false
+ },
+ {
+  "key": "teams",
+  "name": "Microsoft Teams",
+  "match": [
+   "^Microsoft Teams",
+   "^Teams Machine-Wide Installer$"
+  ],
+  "matchPackages": [
+   "MSTeams_"
+  ],
+  "category": "Communication",
+  "purpose": "Chat, meetings, and collaboration for work and school.",
+  "relevantSettings": [
+   "Auto-start (Teams → Settings → General)",
+   "Devices (Settings → Devices)",
+   "GPU acceleration"
+  ],
+  "startupBehavior": "Starts at sign-in by default.",
+  "startupEntryNames": [
+   "com.squirrel.Teams.Teams",
+   "MSTeams"
+  ],
+  "processNames": [
+   "ms-teams.exe",
+   "Teams.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Camera or mic not detected",
+    "fixes": [
+     "Allow camera/microphone for desktop apps in Windows privacy settings.",
+     "Select the device in Teams → Settings → Devices."
+    ]
+   },
+   {
+    "problem": "Teams very slow or won't load",
+    "fixes": [
+     "Quit Teams fully and restart.",
+     "Reset the new Teams app from Installed apps → Microsoft Teams → Advanced options → Reset (signs out)."
+    ]
+   },
+   {
+    "problem": "Two Teams installed (classic and new)",
+    "fixes": [
+     "Classic Teams is retired; uninstall 'Microsoft Teams classic' and the 'Teams Machine-Wide Installer'."
+    ]
+   }
+  ],
+  "repair": [
+   "Installed apps → Microsoft Teams → Advanced options → Repair."
+  ],
+  "reset": [
+   "Advanced options → Reset (requires signing in again)."
+  ],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Teams help",
+    "url": "https://support.microsoft.com/teams"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "zoom",
+  "name": "Zoom Workplace",
+  "match": [
+   "^Zoom"
+  ],
+  "matchPackages": [],
+  "category": "Communication",
+  "purpose": "Video meetings and webinars.",
+  "relevantSettings": [
+   "Start Zoom when I start Windows (Settings → General)",
+   "Audio/Video devices",
+   "Hardware acceleration (Video → Advanced)"
+  ],
+  "startupBehavior": "Can start at sign-in (optional).",
+  "startupEntryNames": [
+   "ZoomUMX"
+  ],
+  "processNames": [
+   "Zoom.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Camera black in Zoom",
+    "fixes": [
+     "Close other apps using the camera.",
+     "Allow camera access for desktop apps.",
+     "Zoom → Video → Advanced: toggle hardware acceleration."
+    ]
+   },
+   {
+    "problem": "Echo or bad audio",
+    "fixes": [
+     "Use a headset.",
+     "Zoom → Audio: enable 'Suppress background noise' and choose the correct speaker."
+    ]
+   }
+  ],
+  "repair": [
+   "Reinstall the latest version from zoom.us/download."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Zoom Support",
+    "url": "https://support.zoom.com"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "slack",
+  "name": "Slack",
+  "match": [
+   "^Slack"
+  ],
+  "matchPackages": [],
+  "category": "Communication",
+  "purpose": "Team messaging.",
+  "relevantSettings": [
+   "Launch at login (Preferences → Advanced)",
+   "Hardware acceleration"
+  ],
+  "startupBehavior": "Optional at sign-in.",
+  "startupEntryNames": [
+   "com.squirrel.slack.slack"
+  ],
+  "processNames": [
+   "slack.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Blank window",
+    "fixes": [
+     "Help → Troubleshooting → Clear Cache and Restart."
+    ]
+   }
+  ],
+  "repair": [
+   "Reinstall from slack.com."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Slack Help Center",
+    "url": "https://slack.com/help"
+   }
+  ],
+  "caches": [
+   {
+    "path": "%APPDATA%\\Slack\\Cache",
+    "description": "Web cache"
+   },
+   {
+    "path": "%APPDATA%\\Slack\\Code Cache",
+    "description": "Script cache"
+   },
+   {
+    "path": "%APPDATA%\\Slack\\GPUCache",
+    "description": "GPU cache"
+   }
+  ],
+  "essential": false
+ },
+ {
+  "key": "whatsapp",
+  "name": "WhatsApp",
+  "match": [
+   "^WhatsApp"
+  ],
+  "matchPackages": [
+   "5319275A.WhatsAppDesktop"
+  ],
+  "category": "Communication",
+  "purpose": "Messaging linked to the customer's phone.",
+  "relevantSettings": [
+   "Start at login (Settings → General)"
+  ],
+  "startupBehavior": "Optional at sign-in.",
+  "startupEntryNames": [],
+  "processNames": [
+   "WhatsApp.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Not syncing",
+    "fixes": [
+     "Re-link the device from the phone: Linked devices."
+    ]
+   }
+  ],
+  "repair": [
+   "Installed apps → WhatsApp → Advanced options → Repair."
+  ],
+  "reset": [
+   "Advanced options → Reset (unlinks the PC)."
+  ],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "WhatsApp Help",
+    "url": "https://faq.whatsapp.com"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "telegram",
+  "name": "Telegram Desktop",
+  "match": [
+   "^Telegram"
+  ],
+  "matchPackages": [],
+  "category": "Communication",
+  "purpose": "Messaging.",
+  "relevantSettings": [],
+  "startupBehavior": "Optional at sign-in.",
+  "startupEntryNames": [
+   "Telegram Desktop"
+  ],
+  "processNames": [
+   "Telegram.exe"
+  ],
+  "commonProblems": [],
+  "repair": [
+   "Reinstall from desktop.telegram.org."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Telegram FAQ",
+    "url": "https://telegram.org/faq"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "spotify",
+  "name": "Spotify",
+  "match": [
+   "^Spotify"
+  ],
+  "matchPackages": [
+   "SpotifyAB.SpotifyMusic"
+  ],
+  "category": "Media",
+  "purpose": "Music and podcast streaming.",
+  "relevantSettings": [
+   "Open Spotify automatically after you log into the computer (Settings → Startup and window behaviour)",
+   "Hardware acceleration (Settings → Compatibility)",
+   "Offline storage location"
+  ],
+  "startupBehavior": "Starts at sign-in by default (minimised).",
+  "startupEntryNames": [
+   "Spotify"
+  ],
+  "processNames": [
+   "Spotify.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Black window / UI not loading",
+    "fixes": [
+     "Turn off hardware acceleration in Settings → Compatibility.",
+     "Clear the cache (console action)."
+    ]
+   },
+   {
+    "problem": "Downloads use lots of disk",
+    "fixes": [
+     "Settings → Storage: change offline storage location or clear cache."
+    ]
+   },
+   {
+    "problem": "No sound",
+    "fixes": [
+     "Check the output device in Spotify (Connect icon) and the Windows Volume mixer."
+    ]
+   }
+  ],
+  "repair": [
+   "Clear cache, then restart.",
+   "Reinstall from spotify.com/download (desktop) or the Microsoft Store."
+  ],
+  "reset": [
+   "Sign out and back in (Settings → Log out)."
+  ],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Spotify Support",
+    "url": "https://support.spotify.com"
+   }
+  ],
+  "caches": [
+   {
+    "path": "%LOCALAPPDATA%\\Spotify\\Storage",
+    "description": "Streaming cache (rebuilds automatically)"
+   },
+   {
+    "path": "%LOCALAPPDATA%\\Spotify\\Data",
+    "description": "Downloaded song cache data"
+   }
+  ],
+  "essential": false
+ },
+ {
+  "key": "vlc",
+  "name": "VLC media player",
+  "match": [
+   "^VLC media player"
+  ],
+  "matchPackages": [],
+  "category": "Media",
+  "purpose": "Plays almost any audio/video format without extra codecs.",
+  "relevantSettings": [
+   "Hardware-accelerated decoding (Tools → Preferences → Input/Codecs)"
+  ],
+  "startupBehavior": "Does not start with Windows.",
+  "startupEntryNames": [],
+  "processNames": [
+   "vlc.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Video stutters",
+    "fixes": [
+     "Tools → Preferences → Input/Codecs → Hardware-accelerated decoding: Automatic."
+    ]
+   },
+   {
+    "problem": "Outdated version",
+    "fixes": [
+     "Update from Help → Check for updates or via winget."
+    ]
+   }
+  ],
+  "repair": [
+   "Tools → Preferences → Reset Preferences."
+  ],
+  "reset": [
+   "Reset Preferences restores defaults."
+  ],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "VLC Support",
+    "url": "https://www.videolan.org/support/"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "obs",
+  "name": "OBS Studio",
+  "match": [
+   "^OBS Studio"
+  ],
+  "matchPackages": [],
+  "category": "Creative",
+  "purpose": "Free streaming and recording software.",
+  "relevantSettings": [
+   "Output → Encoder (use NVENC/AMF/QSV)",
+   "Video → Base/Output resolution and FPS",
+   "Run as administrator for game capture priority"
+  ],
+  "startupBehavior": "Does not start with Windows.",
+  "startupEntryNames": [],
+  "processNames": [
+   "obs64.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Encoding overloaded / lag",
+    "fixes": [
+     "Switch to the hardware encoder (NVENC, AMD AMF, Intel QSV).",
+     "Lower output resolution or FPS.",
+     "Cap the game's frame rate so the GPU has headroom."
+    ]
+   },
+   {
+    "problem": "Black screen in Display Capture on laptops",
+    "fixes": [
+     "Set OBS to the same GPU as the display in Settings → Display → Graphics."
+    ]
+   }
+  ],
+  "repair": [
+   "Help → Check file integrity (Windows installer)."
+  ],
+  "reset": [
+   "Profile/Scene collection reset from the menus."
+  ],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "OBS Help",
+    "url": "https://obsproject.com/help"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "itunes",
+  "name": "Apple Music / iTunes / Apple Devices",
+  "match": [
+   "^iTunes$",
+   "^Apple Music",
+   "^Apple Devices",
+   "^Apple Mobile Device Support"
+  ],
+  "matchPackages": [],
+  "category": "Media",
+  "purpose": "Music library and iPhone/iPad sync.",
+  "relevantSettings": [],
+  "startupBehavior": "Apple helper services start with Windows.",
+  "startupEntryNames": [],
+  "processNames": [
+   "iTunes.exe",
+   "AppleMobileDeviceProcess.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "iPhone not detected",
+    "fixes": [
+     "Unlock the phone and tap Trust.",
+     "Repair Apple Mobile Device Support.",
+     "Try another cable/port."
+    ]
+   }
+  ],
+  "repair": [
+   "Repair from Installed apps (Advanced options) for Store versions."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Apple Support",
+    "url": "https://support.apple.com"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "steam",
+  "name": "Steam",
+  "match": [
+   "^Steam$"
+  ],
+  "matchPackages": [],
+  "category": "Gaming",
+  "purpose": "Valve's game store, launcher, and community.",
+  "relevantSettings": [
+   "Run Steam when my computer starts (Settings → Interface)",
+   "Shader pre-caching (Settings → Downloads)",
+   "In-game overlay (Settings → In Game)",
+   "GPU accelerated rendering in web views (Settings → Interface)"
+  ],
+  "startupBehavior": "Starts at sign-in by default (Run key 'Steam').",
+  "startupEntryNames": [
+   "Steam"
+  ],
+  "processNames": [
+   "steam.exe",
+   "steamwebhelper.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Store/library pages blank",
+    "fixes": [
+     "Settings → Downloads → Clear Download Cache.",
+     "Clear the web browser cache (console action).",
+     "Disable GPU accelerated rendering in web views."
+    ]
+   },
+   {
+    "problem": "Game won't launch or crashes",
+    "fixes": [
+     "Library → right-click game → Properties → Installed Files → Verify integrity of game files.",
+     "Update GPU drivers.",
+     "Disable overlays (Steam, Discord, NVIDIA) to test."
+    ]
+   },
+   {
+    "problem": "Slow downloads",
+    "fixes": [
+     "Settings → Downloads → change download region; clear download cache."
+    ]
+   },
+   {
+    "problem": "High memory use from steamwebhelper",
+    "fixes": [
+     "Disable GPU accelerated rendering and animated avatars in Settings → Interface."
+    ]
+   }
+  ],
+  "repair": [
+   "Verify game files from each game's Properties.",
+   "Reinstall Steam into the same folder to keep games (do not delete steamapps)."
+  ],
+  "reset": [
+   "Settings → Downloads → Clear Download Cache (requires signing in again)."
+  ],
+  "safeUninstall": [
+   "Uninstalling Steam deletes installed games inside its folder — move 'steamapps' first if the customer wants to keep them.",
+   "Use Installed apps → Steam → Uninstall."
+  ],
+  "links": [
+   {
+    "label": "Steam Support",
+    "url": "https://help.steampowered.com"
+   }
+  ],
+  "caches": [
+   {
+    "path": "%LOCALAPPDATA%\\Steam\\htmlcache",
+    "description": "Web view cache"
+   }
+  ],
+  "essential": false
+ },
+ {
+  "key": "epic",
+  "name": "Epic Games Launcher",
+  "match": [
+   "^Epic Games Launcher$"
+  ],
+  "matchPackages": [],
+  "category": "Gaming",
+  "purpose": "Epic Games Store launcher (Fortnite, free games).",
+  "relevantSettings": [
+   "Run when my computer starts (Settings)",
+   "Minimize to system tray",
+   "Throttle downloads"
+  ],
+  "startupBehavior": "Starts at sign-in by default.",
+  "startupEntryNames": [
+   "EpicGamesLauncher"
+  ],
+  "processNames": [
+   "EpicGamesLauncher.exe",
+   "EpicWebHelper.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Launcher stuck loading",
+    "fixes": [
+     "Clear the web cache (console action).",
+     "Run the launcher as administrator once."
+    ]
+   },
+   {
+    "problem": "High CPU while idle",
+    "fixes": [
+     "Close the launcher after starting games; disable 'Run when my computer starts'."
+    ]
+   },
+   {
+    "problem": "Game crashes (e.g. Fortnite)",
+    "fixes": [
+     "Library → ⋯ → Manage → Verify files.",
+     "Update GPU drivers; remove GPU overclocks."
+    ]
+   }
+  ],
+  "repair": [
+   "Verify game files from the Library.",
+   "Repair the launcher from Installed apps (MSI) → Modify/Repair."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement.",
+   "Uninstalling the launcher also removes installed Epic games."
+  ],
+  "links": [
+   {
+    "label": "Epic Games Help",
+    "url": "https://www.epicgames.com/help"
+   }
+  ],
+  "caches": [
+   {
+    "path": "%LOCALAPPDATA%\\EpicGamesLauncher\\Saved\\webcache",
+    "description": "Launcher web cache"
+   }
+  ],
+  "essential": false
+ },
+ {
+  "key": "battlenet",
+  "name": "Battle.net",
+  "match": [
+   "^Battle\\.net$"
+  ],
+  "matchPackages": [],
+  "category": "Gaming",
+  "purpose": "Blizzard games launcher.",
+  "relevantSettings": [
+   "When I start my computer, launch Battle.net"
+  ],
+  "startupBehavior": "Optional at sign-in.",
+  "startupEntryNames": [
+   "Battle.net"
+  ],
+  "processNames": [
+   "Battle.net.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Stuck updating",
+    "fixes": [
+     "Close Battle.net and delete the cache folder (console action).",
+     "Run Scan and Repair from the game's options."
+    ]
+   }
+  ],
+  "repair": [
+   "Game options → Scan and Repair."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Blizzard Support",
+    "url": "https://us.battle.net/support"
+   }
+  ],
+  "caches": [
+   {
+    "path": "%ProgramData%\\Blizzard Entertainment\\Battle.net\\Cache",
+    "description": "Launcher cache"
+   }
+  ],
+  "essential": false
+ },
+ {
+  "key": "ea",
+  "name": "EA app",
+  "match": [
+   "^EA app$",
+   "^EA Desktop"
+  ],
+  "matchPackages": [],
+  "category": "Gaming",
+  "purpose": "Electronic Arts games launcher.",
+  "relevantSettings": [
+   "Launch on startup"
+  ],
+  "startupBehavior": "Optional at sign-in.",
+  "startupEntryNames": [],
+  "processNames": [
+   "EADesktop.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "App not loading",
+    "fixes": [
+     "Use Help → App recovery → Clear cache inside the EA app."
+    ]
+   }
+  ],
+  "repair": [
+   "Game → Repair."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "EA Help",
+    "url": "https://help.ea.com"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "ubisoft",
+  "name": "Ubisoft Connect",
+  "match": [
+   "^Ubisoft Connect"
+  ],
+  "matchPackages": [],
+  "category": "Gaming",
+  "purpose": "Ubisoft games launcher.",
+  "relevantSettings": [],
+  "startupBehavior": "Optional at sign-in.",
+  "startupEntryNames": [],
+  "processNames": [
+   "upc.exe",
+   "UbisoftConnect.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Game won't launch",
+    "fixes": [
+     "Verify files from the game's Properties."
+    ]
+   }
+  ],
+  "repair": [
+   "Verify files."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Ubisoft Help",
+    "url": "https://www.ubisoft.com/help"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "xbox",
+  "name": "Xbox app (PC Game Pass)",
+  "match": [
+   "^Xbox$"
+  ],
+  "matchPackages": [
+   "Microsoft.GamingApp_"
+  ],
+  "category": "Gaming",
+  "purpose": "Microsoft's PC games app for Game Pass.",
+  "relevantSettings": [
+   "Gaming Services must be installed and running"
+  ],
+  "startupBehavior": "Does not start at sign-in.",
+  "startupEntryNames": [],
+  "processNames": [
+   "XboxPcApp.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Games won't install or launch",
+    "fixes": [
+     "Update the Xbox app and Gaming Services from the Microsoft Store.",
+     "Repair Gaming Services from Installed apps.",
+     "Make sure Windows Update is working."
+    ]
+   }
+  ],
+  "repair": [
+   "Installed apps → Xbox → Advanced options → Repair."
+  ],
+  "reset": [
+   "Advanced options → Reset."
+  ],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Xbox Support",
+    "url": "https://support.xbox.com"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "riot",
+  "name": "Riot Client and Vanguard",
+  "match": [
+   "^Riot Vanguard",
+   "^Riot Client",
+   "^VALORANT",
+   "^League of Legends"
+  ],
+  "matchPackages": [],
+  "category": "Gaming",
+  "purpose": "Launcher for Valorant/League; Vanguard is a kernel-level anti-cheat that starts with Windows.",
+  "relevantSettings": [
+   "Secure Boot and TPM 2.0 (required on Windows 11)",
+   "Vanguard tray icon"
+  ],
+  "startupBehavior": "Vanguard (vgc service) starts at boot.",
+  "startupEntryNames": [
+   "Riot Vanguard"
+  ],
+  "processNames": [
+   "RiotClientServices.exe",
+   "vgc.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "VAN 9003 / VAN 9001 errors",
+    "fixes": [
+     "Enable Secure Boot and TPM 2.0 in firmware (Settings Explorer → Security)."
+    ]
+   },
+   {
+    "problem": "Game crashes with other tools running",
+    "fixes": [
+     "Close overlays and RGB/monitoring tools; Vanguard blocks some drivers."
+    ]
+   }
+  ],
+  "repair": [
+   "Reinstall Vanguard from the Riot Client."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Uninstall 'Riot Vanguard' from Installed apps if the customer no longer plays Riot games."
+  ],
+  "links": [
+   {
+    "label": "Valorant Support",
+    "url": "https://support-valorant.riotgames.com"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "minecraft",
+  "name": "Minecraft Launcher",
+  "match": [
+   "^Minecraft Launcher"
+  ],
+  "matchPackages": [
+   "Microsoft.4297127D64EC6_"
+  ],
+  "category": "Gaming",
+  "purpose": "Launcher for Minecraft Java and Bedrock.",
+  "relevantSettings": [
+   "Allocated memory (Java edition installations)"
+  ],
+  "startupBehavior": "Does not start at sign-in.",
+  "startupEntryNames": [],
+  "processNames": [
+   "Minecraft.exe",
+   "javaw.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Low FPS in Java edition",
+    "fixes": [
+     "Make sure the game uses the dedicated GPU (Graphics preference per app).",
+     "Use the default memory allocation unless running large modpacks."
+    ]
+   }
+  ],
+  "repair": [
+   "Installed apps → Minecraft Launcher → Repair."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Minecraft Help",
+    "url": "https://help.minecraft.net"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "roblox",
+  "name": "Roblox",
+  "match": [
+   "^Roblox"
+  ],
+  "matchPackages": [],
+  "category": "Gaming",
+  "purpose": "Online game platform.",
+  "relevantSettings": [
+   "Graphics mode (in-game settings)"
+  ],
+  "startupBehavior": "Does not start at sign-in.",
+  "startupEntryNames": [],
+  "processNames": [
+   "RobloxPlayerBeta.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Crashes or won't start",
+    "fixes": [
+     "Clear the Roblox temporary cache (console action).",
+     "Reinstall from roblox.com."
+    ]
+   }
+  ],
+  "repair": [
+   "Reinstall from roblox.com."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Roblox Help",
+    "url": "https://en.help.roblox.com"
+   }
+  ],
+  "caches": [
+   {
+    "path": "%TEMP%\\Roblox",
+    "description": "Temporary game cache"
+   }
+  ],
+  "essential": false
+ },
+ {
+  "key": "overwolf",
+  "name": "Overwolf / CurseForge",
+  "match": [
+   "^Overwolf",
+   "^CurseForge"
+  ],
+  "matchPackages": [],
+  "category": "Gaming",
+  "purpose": "Platform for in-game overlay apps; also used by CurseForge.",
+  "relevantSettings": [],
+  "startupBehavior": "Starts at sign-in by default.",
+  "startupEntryNames": [
+   "Overwolf"
+  ],
+  "processNames": [
+   "Overwolf.exe",
+   "OverwolfBrowser.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "High memory and stutter",
+    "fixes": [
+     "Uninstall unused Overwolf apps.",
+     "Disable Overwolf's overlay for competitive games."
+    ]
+   }
+  ],
+  "repair": [
+   "Reinstall from overwolf.com."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Overwolf Support",
+    "url": "https://support.overwolf.com"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "faceit",
+  "name": "FACEIT",
+  "match": [
+   "^FACEIT"
+  ],
+  "matchPackages": [],
+  "category": "Gaming",
+  "purpose": "Competitive platform with its own anti-cheat driver.",
+  "relevantSettings": [],
+  "startupBehavior": "Anti-cheat runs only while FACEIT is open.",
+  "startupEntryNames": [],
+  "processNames": [
+   "FACEIT.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Anti-cheat errors",
+    "fixes": [
+     "Disable unsigned drivers/tools flagged by FACEIT; update Windows."
+    ]
+   }
+  ],
+  "repair": [],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "FACEIT Support",
+    "url": "https://support.faceit.com"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "chrome",
+  "name": "Google Chrome",
+  "match": [
+   "^Google Chrome$"
+  ],
+  "matchPackages": [],
+  "category": "Browser",
+  "purpose": "Google's web browser.",
+  "relevantSettings": [
+   "Continue running background apps when Chrome is closed (chrome://settings/system)",
+   "Graphics acceleration",
+   "Memory Saver (chrome://settings/performance)"
+  ],
+  "startupBehavior": "Not in startup by default; background apps can keep it running.",
+  "startupEntryNames": [],
+  "processNames": [
+   "chrome.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Slow browsing / high memory",
+    "fixes": [
+     "Open the browser's task manager (Shift+Esc) and close heavy tabs.",
+     "Disable unused extensions.",
+     "Clear the cache (console action) with the browser closed."
+    ]
+   },
+   {
+    "problem": "Pop-ups, redirected searches, or unknown extensions",
+    "fixes": [
+     "Remove unknown extensions.",
+     "Reset settings from the browser's Reset settings page.",
+     "Check for a manual proxy (Settings Explorer → Network → Proxy).",
+     "Run a Microsoft Defender scan."
+    ]
+   },
+   {
+    "problem": "Videos stutter / black video",
+    "fixes": [
+     "Toggle 'Use graphics acceleration when available'.",
+     "Update the GPU driver."
+    ]
+   }
+  ],
+  "repair": [
+   "Reset settings: chrome://settings/reset.",
+   "Reinstall from google.com/chrome."
+  ],
+  "reset": [
+   "chrome://settings/reset restores defaults without deleting bookmarks or passwords."
+  ],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement.",
+   "Bookmarks/passwords are kept if the customer signs in to sync before uninstalling."
+  ],
+  "links": [
+   {
+    "label": "Chrome Help",
+    "url": "https://support.google.com/chrome"
+   }
+  ],
+  "caches": [
+   {
+    "path": "%LOCALAPPDATA%\\Google\\Chrome\\User Data\\Default\\Cache",
+    "description": "Web cache"
+   },
+   {
+    "path": "%LOCALAPPDATA%\\Google\\Chrome\\User Data\\Default\\Code Cache",
+    "description": "Script cache"
+   },
+   {
+    "path": "%LOCALAPPDATA%\\Google\\Chrome\\User Data\\Default\\GPUCache",
+    "description": "GPU cache"
+   },
+   {
+    "path": "%LOCALAPPDATA%\\Google\\Chrome\\User Data\\ShaderCache",
+    "description": "Shader cache"
+   }
+  ],
+  "essential": false
+ },
+ {
+  "key": "edge",
+  "name": "Microsoft Edge",
+  "match": [
+   "^Microsoft Edge$"
+  ],
+  "matchPackages": [],
+  "category": "Browser",
+  "purpose": "Microsoft's web browser, built into Windows.",
+  "relevantSettings": [
+   "Startup boost (edge://settings/system)",
+   "Continue running background extensions and apps",
+   "Efficiency mode"
+  ],
+  "startupBehavior": "Startup boost keeps Edge pre-loaded at sign-in.",
+  "startupEntryNames": [
+   "MicrosoftEdgeAutoLaunch"
+  ],
+  "processNames": [
+   "msedge.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Slow browsing / high memory",
+    "fixes": [
+     "Open the browser's task manager (Shift+Esc) and close heavy tabs.",
+     "Disable unused extensions.",
+     "Clear the cache (console action) with the browser closed."
+    ]
+   },
+   {
+    "problem": "Pop-ups, redirected searches, or unknown extensions",
+    "fixes": [
+     "Remove unknown extensions.",
+     "Reset settings from the browser's Reset settings page.",
+     "Check for a manual proxy (Settings Explorer → Network → Proxy).",
+     "Run a Microsoft Defender scan."
+    ]
+   },
+   {
+    "problem": "Videos stutter / black video",
+    "fixes": [
+     "Toggle 'Use graphics acceleration when available'.",
+     "Update the GPU driver."
+    ]
+   }
+  ],
+  "repair": [
+   "Installed apps → Microsoft Edge → Modify → Repair (downloads a fresh copy, keeps data)."
+  ],
+  "reset": [
+   "edge://settings/reset."
+  ],
+  "safeUninstall": [
+   "Edge is part of Windows and cannot be uninstalled in most regions. Do not attempt to force-remove it — it breaks Windows features and WebView2-based apps."
+  ],
+  "links": [
+   {
+    "label": "Edge support",
+    "url": "https://support.microsoft.com/microsoft-edge"
+   }
+  ],
+  "caches": [
+   {
+    "path": "%LOCALAPPDATA%\\Microsoft\\Edge\\User Data\\Default\\Cache",
+    "description": "Web cache"
+   },
+   {
+    "path": "%LOCALAPPDATA%\\Microsoft\\Edge\\User Data\\Default\\Code Cache",
+    "description": "Script cache"
+   },
+   {
+    "path": "%LOCALAPPDATA%\\Microsoft\\Edge\\User Data\\Default\\GPUCache",
+    "description": "GPU cache"
+   }
+  ],
+  "essential": true,
+  "essentialReason": "Microsoft Edge is a Windows component; removing it can break Windows features."
+ },
+ {
+  "key": "firefox",
+  "name": "Mozilla Firefox",
+  "match": [
+   "^Mozilla Firefox"
+  ],
+  "matchPackages": [],
+  "category": "Browser",
+  "purpose": "Mozilla's web browser.",
+  "relevantSettings": [
+   "about:preferences → Performance",
+   "about:processes"
+  ],
+  "startupBehavior": "Not in startup.",
+  "startupEntryNames": [],
+  "processNames": [
+   "firefox.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Slow browsing / high memory",
+    "fixes": [
+     "Open the browser's task manager (Shift+Esc) and close heavy tabs.",
+     "Disable unused extensions.",
+     "Clear the cache (console action) with the browser closed."
+    ]
+   },
+   {
+    "problem": "Pop-ups, redirected searches, or unknown extensions",
+    "fixes": [
+     "Remove unknown extensions.",
+     "Reset settings from the browser's Reset settings page.",
+     "Check for a manual proxy (Settings Explorer → Network → Proxy).",
+     "Run a Microsoft Defender scan."
+    ]
+   },
+   {
+    "problem": "Videos stutter / black video",
+    "fixes": [
+     "Toggle 'Use graphics acceleration when available'.",
+     "Update the GPU driver."
+    ]
+   }
+  ],
+  "repair": [
+   "Help → More troubleshooting information → Refresh Firefox (keeps bookmarks/passwords)."
+  ],
+  "reset": [
+   "Refresh Firefox."
+  ],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Firefox Support",
+    "url": "https://support.mozilla.org"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "brave",
+  "name": "Brave",
+  "match": [
+   "^Brave"
+  ],
+  "matchPackages": [],
+  "category": "Browser",
+  "purpose": "Privacy-focused Chromium browser.",
+  "relevantSettings": [],
+  "startupBehavior": "Not in startup.",
+  "startupEntryNames": [],
+  "processNames": [
+   "brave.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Slow browsing / high memory",
+    "fixes": [
+     "Open the browser's task manager (Shift+Esc) and close heavy tabs.",
+     "Disable unused extensions.",
+     "Clear the cache (console action) with the browser closed."
+    ]
+   },
+   {
+    "problem": "Pop-ups, redirected searches, or unknown extensions",
+    "fixes": [
+     "Remove unknown extensions.",
+     "Reset settings from the browser's Reset settings page.",
+     "Check for a manual proxy (Settings Explorer → Network → Proxy).",
+     "Run a Microsoft Defender scan."
+    ]
+   },
+   {
+    "problem": "Videos stutter / black video",
+    "fixes": [
+     "Toggle 'Use graphics acceleration when available'.",
+     "Update the GPU driver."
+    ]
+   }
+  ],
+  "repair": [
+   "Reset settings at brave://settings/reset."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Brave Help",
+    "url": "https://support.brave.com"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "opera",
+  "name": "Opera / Opera GX",
+  "match": [
+   "^Opera"
+  ],
+  "matchPackages": [],
+  "category": "Browser",
+  "purpose": "Chromium-based browsers; Opera GX targets gamers.",
+  "relevantSettings": [
+   "GX Control (RAM/CPU limiters)",
+   "Browser assistant startup entry"
+  ],
+  "startupBehavior": "Installs a 'browser assistant' startup item and auto-update tasks.",
+  "startupEntryNames": [
+   "Opera GX Browser Assistant",
+   "Opera Browser Assistant"
+  ],
+  "processNames": [
+   "opera.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Slow browsing / high memory",
+    "fixes": [
+     "Open the browser's task manager (Shift+Esc) and close heavy tabs.",
+     "Disable unused extensions.",
+     "Clear the cache (console action) with the browser closed."
+    ]
+   },
+   {
+    "problem": "Pop-ups, redirected searches, or unknown extensions",
+    "fixes": [
+     "Remove unknown extensions.",
+     "Reset settings from the browser's Reset settings page.",
+     "Check for a manual proxy (Settings Explorer → Network → Proxy).",
+     "Run a Microsoft Defender scan."
+    ]
+   },
+   {
+    "problem": "Videos stutter / black video",
+    "fixes": [
+     "Toggle 'Use graphics acceleration when available'.",
+     "Update the GPU driver."
+    ]
+   }
+  ],
+  "repair": [
+   "Reinstall from opera.com."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Opera Help",
+    "url": "https://help.opera.com"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "office",
+  "name": "Microsoft 365 / Office",
+  "match": [
+   "^Microsoft 365",
+   "^Microsoft Office",
+   "^Office 16 Click-to-Run"
+  ],
+  "matchPackages": [],
+  "category": "Productivity",
+  "purpose": "Word, Excel, PowerPoint, Outlook.",
+  "relevantSettings": [
+   "File → Account → Update Options",
+   "Add-ins (File → Options → Add-ins)"
+  ],
+  "startupBehavior": "Click-to-Run service runs in the background.",
+  "startupEntryNames": [],
+  "processNames": [
+   "WINWORD.EXE",
+   "EXCEL.EXE",
+   "OUTLOOK.EXE",
+   "OfficeClickToRun.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Office apps crash or won't open",
+    "fixes": [
+     "Installed apps → Microsoft 365 → Modify → Quick Repair, then Online Repair if needed.",
+     "Start the app in safe mode (hold Ctrl) to test add-ins."
+    ]
+   },
+   {
+    "problem": "Outlook slow or not syncing",
+    "fixes": [
+     "Start 'outlook.exe /safe' to test add-ins.",
+     "Repair the profile from Control Panel → Mail."
+    ]
+   },
+   {
+    "problem": "Activation errors",
+    "fixes": [
+     "Sign in with the account that owns the licence (File → Account)."
+    ]
+   }
+  ],
+  "repair": [
+   "Quick Repair (offline) → Online Repair (full reinstall)."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Uninstall from Installed apps; for stubborn installs use Microsoft's Office uninstall support tool."
+  ],
+  "links": [
+   {
+    "label": "Office support",
+    "url": "https://support.microsoft.com/office"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "onedrive",
+  "name": "Microsoft OneDrive",
+  "match": [
+   "^Microsoft OneDrive"
+  ],
+  "matchPackages": [],
+  "category": "Cloud storage",
+  "purpose": "Cloud backup and sync for files, built into Windows.",
+  "relevantSettings": [
+   "Files On-Demand",
+   "Backup of Desktop/Documents/Pictures",
+   "Start OneDrive automatically when I sign in"
+  ],
+  "startupBehavior": "Starts at sign-in.",
+  "startupEntryNames": [
+   "OneDrive"
+  ],
+  "processNames": [
+   "OneDrive.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Sync stuck",
+    "fixes": [
+     "Click the OneDrive icon to see errors; pause and resume sync.",
+     "Reset OneDrive: run 'onedrive.exe /reset' (re-syncs everything, keeps files)."
+    ]
+   },
+   {
+    "problem": "Files missing after setup",
+    "fixes": [
+     "Check the OneDrive folder — Desktop/Documents may have moved into OneDrive by Folder Backup."
+    ]
+   },
+   {
+    "problem": "Disk full",
+    "fixes": [
+     "Enable Files On-Demand and 'Free up space' on large folders."
+    ]
+   }
+  ],
+  "repair": [
+   "Reset OneDrive (onedrive.exe /reset)."
+  ],
+  "reset": [
+   "onedrive.exe /reset re-syncs without deleting cloud files."
+  ],
+  "safeUninstall": [
+   "Before uninstalling, turn off Folder Backup so Desktop/Documents return to the PC; confirm cloud-only files are downloaded."
+  ],
+  "links": [
+   {
+    "label": "OneDrive help",
+    "url": "https://support.microsoft.com/onedrive"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "dropbox",
+  "name": "Dropbox",
+  "match": [
+   "^Dropbox"
+  ],
+  "matchPackages": [],
+  "category": "Cloud storage",
+  "purpose": "Cloud file sync.",
+  "relevantSettings": [
+   "Online-only files",
+   "Start Dropbox on system startup"
+  ],
+  "startupBehavior": "Starts at sign-in.",
+  "startupEntryNames": [
+   "Dropbox"
+  ],
+  "processNames": [
+   "Dropbox.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "High CPU while syncing",
+    "fixes": [
+     "Wait for initial sync; exclude large folders with selective sync."
+    ]
+   }
+  ],
+  "repair": [
+   "Reinstall from dropbox.com."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement.",
+   "Confirm online-only files are not needed locally before uninstalling."
+  ],
+  "links": [
+   {
+    "label": "Dropbox Help",
+    "url": "https://help.dropbox.com"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "googledrive",
+  "name": "Google Drive for desktop",
+  "match": [
+   "^Google Drive"
+  ],
+  "matchPackages": [],
+  "category": "Cloud storage",
+  "purpose": "Google Drive sync.",
+  "relevantSettings": [
+   "Streaming vs mirroring"
+  ],
+  "startupBehavior": "Starts at sign-in.",
+  "startupEntryNames": [],
+  "processNames": [
+   "GoogleDriveFS.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Drive letter missing",
+    "fixes": [
+     "Restart Google Drive; check its settings for the drive letter."
+    ]
+   }
+  ],
+  "repair": [
+   "Reinstall from google.com/drive/download."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Google Drive Help",
+    "url": "https://support.google.com/drive"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "adobecc",
+  "name": "Adobe Creative Cloud",
+  "match": [
+   "^Adobe Creative Cloud"
+  ],
+  "matchPackages": [],
+  "category": "Creative",
+  "purpose": "Manages Adobe apps, fonts, and cloud files.",
+  "relevantSettings": [
+   "Launch Creative Cloud at login",
+   "File sync"
+  ],
+  "startupBehavior": "Starts at sign-in by default with several helper processes.",
+  "startupEntryNames": [
+   "Adobe Creative Cloud"
+  ],
+  "processNames": [
+   "Creative Cloud.exe",
+   "CCXProcess.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Many background processes",
+    "fixes": [
+     "Disable 'Launch at login' if the customer rarely uses Adobe apps."
+    ]
+   },
+   {
+    "problem": "App updates fail",
+    "fixes": [
+     "Sign out and in; use Adobe's Creative Cloud Cleaner Tool as a last resort."
+    ]
+   }
+  ],
+  "repair": [
+   "Reinstall Creative Cloud desktop."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Use Adobe's Creative Cloud uninstaller; uninstall individual Adobe apps first."
+  ],
+  "links": [
+   {
+    "label": "Adobe Creative Cloud help",
+    "url": "https://helpx.adobe.com/creative-cloud.html"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "acrobat",
+  "name": "Adobe Acrobat / Reader",
+  "match": [
+   "^Adobe Acrobat"
+  ],
+  "matchPackages": [],
+  "category": "Productivity",
+  "purpose": "PDF viewer/editor.",
+  "relevantSettings": [
+   "Default PDF app",
+   "Protected Mode"
+  ],
+  "startupBehavior": "Update service runs in the background.",
+  "startupEntryNames": [],
+  "processNames": [
+   "Acrobat.exe",
+   "AcroRd32.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "PDFs open in the wrong app",
+    "fixes": [
+     "Set the default app for .pdf in Settings → Default apps."
+    ]
+   }
+  ],
+  "repair": [
+   "Help → Repair installation."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Acrobat help",
+    "url": "https://helpx.adobe.com/acrobat.html"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "7zip",
+  "name": "7-Zip",
+  "match": [
+   "^7-Zip"
+  ],
+  "matchPackages": [],
+  "category": "Utilities",
+  "purpose": "Free archive tool (zip, 7z, rar extraction).",
+  "relevantSettings": [],
+  "startupBehavior": "Does not start with Windows.",
+  "startupEntryNames": [],
+  "processNames": [
+   "7zFM.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Outdated version",
+    "fixes": [
+     "Update via winget or 7-zip.org — old versions had security issues."
+    ]
+   }
+  ],
+  "repair": [],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "7-Zip",
+    "url": "https://www.7-zip.org"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "winrar",
+  "name": "WinRAR",
+  "match": [
+   "^WinRAR"
+  ],
+  "matchPackages": [],
+  "category": "Utilities",
+  "purpose": "Archive tool.",
+  "relevantSettings": [],
+  "startupBehavior": "Does not start with Windows.",
+  "startupEntryNames": [],
+  "processNames": [
+   "WinRAR.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Outdated version",
+    "fixes": [
+     "Update — older versions had serious vulnerabilities."
+    ]
+   }
+  ],
+  "repair": [],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "WinRAR",
+    "url": "https://www.win-rar.com"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "powertoys",
+  "name": "Microsoft PowerToys",
+  "match": [
+   "^PowerToys"
+  ],
+  "matchPackages": [],
+  "category": "Utilities",
+  "purpose": "Productivity utilities from Microsoft.",
+  "relevantSettings": [
+   "Run at startup"
+  ],
+  "startupBehavior": "Optional at sign-in.",
+  "startupEntryNames": [],
+  "processNames": [
+   "PowerToys.exe"
+  ],
+  "commonProblems": [],
+  "repair": [
+   "Reinstall from the Microsoft Store or GitHub releases."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "PowerToys docs",
+    "url": "https://learn.microsoft.com/windows/powertoys/"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "terminal",
+  "name": "Windows Terminal",
+  "match": [
+   "^Windows Terminal"
+  ],
+  "matchPackages": [
+   "Microsoft.WindowsTerminal_"
+  ],
+  "category": "Utilities",
+  "purpose": "Modern terminal for PowerShell/Command Prompt.",
+  "relevantSettings": [],
+  "startupBehavior": "Does not start with Windows.",
+  "startupEntryNames": [],
+  "processNames": [
+   "WindowsTerminal.exe"
+  ],
+  "commonProblems": [],
+  "repair": [
+   "Installed apps → Windows Terminal → Advanced options → Repair."
+  ],
+  "reset": [
+   "Advanced options → Reset."
+  ],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Windows Terminal docs",
+    "url": "https://learn.microsoft.com/windows/terminal/"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "ccleaner",
+  "name": "CCleaner",
+  "match": [
+   "^CCleaner"
+  ],
+  "matchPackages": [],
+  "category": "Utilities",
+  "purpose": "Third-party cleaning tool.",
+  "relevantSettings": [
+   "Smart Cleaning (Settings)",
+   "Performance Optimizer"
+  ],
+  "startupBehavior": "Installs a startup entry, a service, and update tasks.",
+  "startupEntryNames": [
+   "CCleaner Smart Cleaning",
+   "CCleaner Monitoring"
+  ],
+  "processNames": [
+   "CCleaner64.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Background monitoring and pop-ups",
+    "fixes": [
+     "Turn off Smart Cleaning and Performance Optimizer, or uninstall — Windows Storage Sense covers temp cleanup."
+    ]
+   },
+   {
+    "problem": "Registry cleaner side effects",
+    "fixes": [
+     "Avoid registry cleaners on customer PCs; they provide no measurable benefit and can break apps."
+    ]
+   }
+  ],
+  "repair": [],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "CCleaner Support",
+    "url": "https://support.ccleaner.com"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "nvidia",
+  "name": "NVIDIA App / GeForce Experience / Control Panel",
+  "match": [
+   "^NVIDIA app",
+   "^NVIDIA GeForce Experience",
+   "^NVIDIA Graphics Driver",
+   "^NVIDIA Control Panel"
+  ],
+  "matchPackages": [
+   "NVIDIACorp.NVIDIAControlPanel"
+  ],
+  "category": "Drivers",
+  "purpose": "NVIDIA driver, control panel, and optional app for updates/overlay.",
+  "relevantSettings": [
+   "See the console's Graphics → NVIDIA section for driver settings",
+   "Overlay and Instant Replay (NVIDIA App)",
+   "Shader cache size (NVIDIA Control Panel)"
+  ],
+  "startupBehavior": "Driver services start with Windows; the NVIDIA App overlay is optional.",
+  "startupEntryNames": [],
+  "processNames": [
+   "NVIDIA app.exe",
+   "NVIDIA Overlay.exe",
+   "nvcontainer.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Stutter or graphical corruption after a driver update",
+    "fixes": [
+     "Clear the NVIDIA shader cache (console action) — games rebuild it.",
+     "Clean-install the driver (NVIDIA App → Drivers → Reinstall → Clean install)."
+    ]
+   },
+   {
+    "problem": "'Display driver stopped responding'",
+    "fixes": [
+     "Clean-install the latest driver; remove GPU overclocks; check temperatures."
+    ]
+   },
+   {
+    "problem": "NVIDIA Control Panel missing",
+    "fixes": [
+     "Install 'NVIDIA Control Panel' from the Microsoft Store (DCH drivers)."
+    ]
+   }
+  ],
+  "repair": [
+   "Reinstall the driver with 'Clean install'."
+  ],
+  "reset": [
+   "NVIDIA Control Panel → Manage 3D settings → Restore."
+  ],
+  "safeUninstall": [
+   "Do not uninstall the NVIDIA Graphics Driver without a replacement ready — the display falls back to a basic driver.",
+   "The NVIDIA App itself can be uninstalled safely; drivers keep working."
+  ],
+  "links": [
+   {
+    "label": "NVIDIA drivers",
+    "url": "https://www.nvidia.com/en-us/drivers/"
+   },
+   {
+    "label": "NVIDIA App",
+    "url": "https://www.nvidia.com/en-us/software/nvidia-app/"
+   }
+  ],
+  "caches": [
+   {
+    "path": "%LOCALAPPDATA%\\NVIDIA\\DXCache",
+    "description": "DirectX shader cache"
+   },
+   {
+    "path": "%LOCALAPPDATA%\\NVIDIA\\GLCache",
+    "description": "OpenGL/Vulkan shader cache"
+   }
+  ],
+  "essential": false
+ },
+ {
+  "key": "amd",
+  "name": "AMD Software: Adrenalin Edition",
+  "match": [
+   "^AMD Software",
+   "^AMD Radeon Software",
+   "^AMD Chipset Software"
+  ],
+  "matchPackages": [],
+  "category": "Drivers",
+  "purpose": "AMD graphics driver, control panel, and overlay.",
+  "relevantSettings": [
+   "Radeon Anti-Lag, Chill, Boost, Image Sharpening (see Graphics → AMD)",
+   "Instant Replay",
+   "Factory reset option during install"
+  ],
+  "startupBehavior": "Driver services start with Windows.",
+  "startupEntryNames": [],
+  "processNames": [
+   "RadeonSoftware.exe",
+   "AMDRSServ.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Driver timeout errors",
+    "fixes": [
+     "Clean install with the 'Factory Reset' option or AMD Cleanup Utility.",
+     "Disable tuning/undervolts in Adrenalin's Performance tab."
+    ]
+   },
+   {
+    "problem": "Stutter after driver update",
+    "fixes": [
+     "Clear the AMD shader cache (console action or Adrenalin → Graphics → Reset Shader Cache)."
+    ]
+   }
+  ],
+  "repair": [
+   "Reinstall with Factory Reset."
+  ],
+  "reset": [
+   "Adrenalin → Settings → System → Factory reset."
+  ],
+  "safeUninstall": [
+   "Use AMD Cleanup Utility only before reinstalling a driver."
+  ],
+  "links": [
+   {
+    "label": "AMD Support",
+    "url": "https://www.amd.com/en/support"
+   }
+  ],
+  "caches": [
+   {
+    "path": "%LOCALAPPDATA%\\AMD\\DxCache",
+    "description": "DirectX shader cache"
+   },
+   {
+    "path": "%LOCALAPPDATA%\\AMD\\DxcCache",
+    "description": "DXC shader cache"
+   },
+   {
+    "path": "%LOCALAPPDATA%\\AMD\\VkCache",
+    "description": "Vulkan shader cache"
+   }
+  ],
+  "essential": false
+ },
+ {
+  "key": "intelgfx",
+  "name": "Intel Graphics Software / Arc Control",
+  "match": [
+   "^Intel\\(R\\) Graphics",
+   "^Intel Graphics Software",
+   "^Intel\\(R\\) Arc",
+   "^Intel Driver"
+  ],
+  "matchPackages": [],
+  "category": "Drivers",
+  "purpose": "Intel graphics driver and control software.",
+  "relevantSettings": [
+   "Graphics settings per game",
+   "Driver updates (Intel Driver & Support Assistant)"
+  ],
+  "startupBehavior": "Driver services start with Windows.",
+  "startupEntryNames": [],
+  "processNames": [
+   "IntelGraphicsSoftware.exe",
+   "igfxEM.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Laptop display issues after updating",
+    "fixes": [
+     "Use the laptop manufacturer's driver if the generic Intel driver causes problems."
+    ]
+   }
+  ],
+  "repair": [
+   "Reinstall the driver."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Do not remove the graphics driver without a replacement."
+  ],
+  "links": [
+   {
+    "label": "Intel graphics support",
+    "url": "https://www.intel.com/content/www/us/en/support/products/80939/graphics.html"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "razer",
+  "name": "Razer Synapse",
+  "match": [
+   "^Razer Synapse"
+  ],
+  "matchPackages": [],
+  "category": "Peripherals",
+  "purpose": "Razer device configuration (lighting, macros, DPI).",
+  "relevantSettings": [
+   "Start on boot"
+  ],
+  "startupBehavior": "Starts at boot with services.",
+  "startupEntryNames": [
+   "Razer Synapse"
+  ],
+  "processNames": [
+   "Razer Synapse 3.exe",
+   "RazerCentralService.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Service keeps crashing",
+    "fixes": [
+     "Update Synapse; reinstall using Razer's clean reinstall guide."
+    ]
+   },
+   {
+    "problem": "Slow boot",
+    "fixes": [
+     "Synapse services delay startup; keep only if lighting/macros are needed."
+    ]
+   }
+  ],
+  "repair": [
+   "Repair from the Razer installer."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Razer Support",
+    "url": "https://mysupport.razer.com"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "ghub",
+  "name": "Logitech G HUB",
+  "match": [
+   "^Logitech G HUB"
+  ],
+  "matchPackages": [],
+  "category": "Peripherals",
+  "purpose": "Logitech gaming peripheral software.",
+  "relevantSettings": [
+   "Start at login"
+  ],
+  "startupBehavior": "Starts at sign-in.",
+  "startupEntryNames": [
+   "LGHUB"
+  ],
+  "processNames": [
+   "lghub.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Stuck on loading",
+    "fixes": [
+     "Restart the LGHUB services or reinstall."
+    ]
+   }
+  ],
+  "repair": [
+   "Reinstall."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Logitech Support",
+    "url": "https://support.logi.com"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "icue",
+  "name": "Corsair iCUE",
+  "match": [
+   "^iCUE",
+   "^Corsair iCUE"
+  ],
+  "matchPackages": [],
+  "category": "Peripherals",
+  "purpose": "Corsair RGB, fans, and peripherals.",
+  "relevantSettings": [
+   "Start on system startup",
+   "Fan curves"
+  ],
+  "startupBehavior": "Starts at sign-in.",
+  "startupEntryNames": [
+   "Corsair iCUE5 Software"
+  ],
+  "processNames": [
+   "iCUE.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "High CPU",
+    "fixes": [
+     "Reduce lighting effects; update iCUE."
+    ]
+   },
+   {
+    "problem": "Fans loud after disabling",
+    "fixes": [
+     "iCUE may control fan curves — keep it at startup if it manages fans."
+    ]
+   }
+  ],
+  "repair": [
+   "Repair from Installed apps."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "Corsair Help",
+    "url": "https://help.corsair.com"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "afterburner",
+  "name": "MSI Afterburner",
+  "match": [
+   "^MSI Afterburner"
+  ],
+  "matchPackages": [],
+  "category": "Utilities",
+  "purpose": "GPU overclocking and monitoring.",
+  "relevantSettings": [
+   "Start with Windows",
+   "Apply overclocking at system startup"
+  ],
+  "startupBehavior": "Optional at sign-in.",
+  "startupEntryNames": [],
+  "processNames": [
+   "MSIAfterburner.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Crashes in games",
+    "fixes": [
+     "Reset to defaults (the ↺ button) — overclocks are a common cause."
+    ]
+   }
+  ],
+  "repair": [],
+  "reset": [],
+  "safeUninstall": [
+   "Close the application first.",
+   "Uninstall from Settings → Apps → Installed apps (or from its page in the Application Library), using the vendor's own uninstaller.",
+   "Restart if the uninstaller asks.",
+   "Leftover user data (if any) stays in AppData — remove only with the customer's agreement."
+  ],
+  "links": [
+   {
+    "label": "MSI Afterburner",
+    "url": "https://www.msi.com/Landing/afterburner/graphics-cards"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "malwarebytes",
+  "name": "Malwarebytes",
+  "match": [
+   "^Malwarebytes"
+  ],
+  "matchPackages": [],
+  "category": "Security",
+  "purpose": "Anti-malware scanner (free on-demand, paid real-time).",
+  "relevantSettings": [
+   "Real-time protection",
+   "Register with Windows Security Center"
+  ],
+  "startupBehavior": "Starts with Windows.",
+  "startupEntryNames": [],
+  "processNames": [
+   "MBAMService.exe",
+   "mbamtray.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Conflicts with another antivirus",
+    "fixes": [
+     "Keep only one real-time product; use Malwarebytes free as an on-demand scanner."
+    ]
+   }
+  ],
+  "repair": [
+   "Use the Malwarebytes Support Tool to repair."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Use Malwarebytes Support Tool → Advanced → Clean for complete removal."
+  ],
+  "links": [
+   {
+    "label": "Malwarebytes Support",
+    "url": "https://support.malwarebytes.com"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "mcafee",
+  "name": "McAfee",
+  "match": [
+   "^McAfee"
+  ],
+  "matchPackages": [],
+  "category": "Security",
+  "purpose": "Antivirus suite, often pre-installed as a trial.",
+  "relevantSettings": [],
+  "startupBehavior": "Starts with Windows.",
+  "startupEntryNames": [],
+  "processNames": [
+   "mcshield.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Expired trial nagging",
+    "fixes": [
+     "Uninstall and rely on Microsoft Defender, which turns back on automatically."
+    ]
+   }
+  ],
+  "repair": [],
+  "reset": [],
+  "safeUninstall": [
+   "Uninstall via Installed apps, then McAfee's Consumer Product Removal tool if remnants remain."
+  ],
+  "links": [
+   {
+    "label": "McAfee Support",
+    "url": "https://www.mcafee.com/support"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "norton",
+  "name": "Norton",
+  "match": [
+   "^Norton"
+  ],
+  "matchPackages": [],
+  "category": "Security",
+  "purpose": "Antivirus suite.",
+  "relevantSettings": [],
+  "startupBehavior": "Starts with Windows.",
+  "startupEntryNames": [],
+  "processNames": [
+   "NortonSecurity.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Expired subscription",
+    "fixes": [
+     "Uninstall with Norton Remove and Reinstall tool → Advanced options → Remove only."
+    ]
+   }
+  ],
+  "repair": [],
+  "reset": [],
+  "safeUninstall": [
+   "Use the Norton Remove and Reinstall tool."
+  ],
+  "links": [
+   {
+    "label": "Norton Support",
+    "url": "https://support.norton.com"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "avast",
+  "name": "Avast / AVG",
+  "match": [
+   "^Avast",
+   "^AVG"
+  ],
+  "matchPackages": [],
+  "category": "Security",
+  "purpose": "Antivirus suites (same company).",
+  "relevantSettings": [],
+  "startupBehavior": "Starts with Windows.",
+  "startupEntryNames": [],
+  "processNames": [
+   "AvastSvc.exe",
+   "AVGSvc.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Bundled browser/cleaner add-ons",
+    "fixes": [
+     "Remove optional components the customer doesn't need."
+    ]
+   }
+  ],
+  "repair": [],
+  "reset": [],
+  "safeUninstall": [
+   "Use avastclear / AVG Clear in Safe Mode for complete removal."
+  ],
+  "links": [
+   {
+    "label": "Avast Support",
+    "url": "https://support.avast.com"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ },
+ {
+  "key": "vcredist",
+  "name": "Microsoft Visual C++ Redistributables",
+  "match": [
+   "^Microsoft Visual C\\+\\+"
+  ],
+  "matchPackages": [],
+  "category": "Runtime",
+  "purpose": "Shared runtime libraries required by many games and applications.",
+  "relevantSettings": [],
+  "startupBehavior": "Not a running program.",
+  "startupEntryNames": [],
+  "processNames": [],
+  "commonProblems": [
+   {
+    "problem": "'MSVCP140.dll / VCRUNTIME140.dll is missing'",
+    "fixes": [
+     "Install the latest supported Visual C++ Redistributable (x64 and x86) from Microsoft."
+    ]
+   }
+  ],
+  "repair": [
+   "Installed apps → the redistributable → Modify → Repair."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Do NOT uninstall — many programs depend on specific versions, and duplicates of different years are normal."
+  ],
+  "links": [
+   {
+    "label": "Latest supported Visual C++ downloads",
+    "url": "https://learn.microsoft.com/cpp/windows/latest-supported-vc-redist"
+   }
+  ],
+  "caches": [],
+  "essential": true,
+  "essentialReason": "Required by many applications; multiple versions side by side are normal."
+ },
+ {
+  "key": "dotnet",
+  "name": ".NET runtimes",
+  "match": [
+   "^Microsoft \\.NET",
+   "^Microsoft Windows Desktop Runtime",
+   "^Microsoft ASP\\.NET Core"
+  ],
+  "matchPackages": [],
+  "category": "Runtime",
+  "purpose": "Runtime for .NET applications.",
+  "relevantSettings": [],
+  "startupBehavior": "Not a running program.",
+  "startupEntryNames": [],
+  "processNames": [],
+  "commonProblems": [
+   {
+    "problem": "App asks for .NET",
+    "fixes": [
+     "Install the exact runtime version the app requests from dotnet.microsoft.com."
+    ]
+   }
+  ],
+  "repair": [
+   "Reinstall the runtime version."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Only remove versions confirmed unused; apps break silently otherwise."
+  ],
+  "links": [
+   {
+    "label": ".NET downloads",
+    "url": "https://dotnet.microsoft.com/download"
+   }
+  ],
+  "caches": [],
+  "essential": true,
+  "essentialReason": "Applications depend on specific runtime versions."
+ },
+ {
+  "key": "webview2",
+  "name": "Microsoft Edge WebView2 Runtime",
+  "match": [
+   "^Microsoft Edge WebView2"
+  ],
+  "matchPackages": [],
+  "category": "Runtime",
+  "purpose": "Embedded browser engine used by Widgets, Teams, Outlook, and many launchers.",
+  "relevantSettings": [],
+  "startupBehavior": "Runs inside the apps that use it.",
+  "startupEntryNames": [],
+  "processNames": [
+   "msedgewebview2.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Apps show blank windows",
+    "fixes": [
+     "Repair WebView2 from Installed apps → Modify."
+    ]
+   }
+  ],
+  "repair": [
+   "Installed apps → WebView2 Runtime → Modify → Repair."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Do NOT uninstall — Windows and many apps depend on it."
+  ],
+  "links": [
+   {
+    "label": "WebView2",
+    "url": "https://developer.microsoft.com/microsoft-edge/webview2/"
+   }
+  ],
+  "caches": [],
+  "essential": true,
+  "essentialReason": "Windows features and many apps depend on it."
+ },
+ {
+  "key": "store",
+  "name": "Microsoft Store",
+  "match": [
+   "^Microsoft Store$"
+  ],
+  "matchPackages": [
+   "Microsoft.WindowsStore_"
+  ],
+  "category": "Windows component",
+  "purpose": "Installs and updates Store apps.",
+  "relevantSettings": [],
+  "startupBehavior": "Not a startup app.",
+  "startupEntryNames": [],
+  "processNames": [
+   "WinStore.App.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Store won't open or download",
+    "fixes": [
+     "Run wsreset.exe (clears the Store cache).",
+     "Installed apps → Microsoft Store → Advanced options → Repair/Reset.",
+     "Check date/time and Windows Update."
+    ]
+   }
+  ],
+  "repair": [
+   "Advanced options → Repair."
+  ],
+  "reset": [
+   "wsreset.exe or Advanced options → Reset."
+  ],
+  "safeUninstall": [
+   "Do NOT remove the Microsoft Store — app updates and many features depend on it."
+  ],
+  "links": [
+   {
+    "label": "Store troubleshooting",
+    "url": "https://support.microsoft.com/account-billing/troubleshoot-problems-with-installing-games-and-apps-from-microsoft-store-ea36b8ad-7e5f-4dc3-ba8f-35f7d44ae7d6"
+   }
+  ],
+  "caches": [],
+  "essential": true,
+  "essentialReason": "Required for Store app updates and some Windows features."
+ },
+ {
+  "key": "java",
+  "name": "Java Runtime (Oracle/OpenJDK)",
+  "match": [
+   "^Java( \\d+)? Update",
+   "^Java\\(TM\\)",
+   "^Eclipse Temurin",
+   "^Microsoft Build of OpenJDK"
+  ],
+  "matchPackages": [],
+  "category": "Runtime",
+  "purpose": "Runtime for Java applications (e.g. Minecraft mods, some business apps).",
+  "relevantSettings": [],
+  "startupBehavior": "Java Update Scheduler may start with Windows.",
+  "startupEntryNames": [],
+  "processNames": [
+   "jusched.exe",
+   "javaw.exe"
+  ],
+  "commonProblems": [
+   {
+    "problem": "Outdated Java",
+    "fixes": [
+     "Remove versions no app needs; old versions are a security risk."
+    ]
+   }
+  ],
+  "repair": [
+   "Reinstall the required version."
+  ],
+  "reset": [],
+  "safeUninstall": [
+   "Confirm no application requires the version before removing it."
+  ],
+  "links": [
+   {
+    "label": "Java help",
+    "url": "https://www.java.com/en/download/help/"
+   }
+  ],
+  "caches": [],
+  "essential": false
+ }
+]

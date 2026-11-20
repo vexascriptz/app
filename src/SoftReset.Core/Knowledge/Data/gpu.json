@@ -1,0 +1,1220 @@
+[
+ {
+  "id": "nv.low-latency",
+  "vendor": "NVIDIA",
+  "category": "Low latency",
+  "name": "Low Latency Mode",
+  "description": "Limits how many frames the CPU queues ahead of the GPU (formerly 'Maximum pre-rendered frames').",
+  "effects": "On (1 frame) reduces input latency when the GPU is the bottleneck. Ultra additionally schedules frames just in time.",
+  "tradeoffs": "Can slightly reduce average FPS or increase stutter in CPU-bound games. Games with NVIDIA Reflex ignore it — use Reflex in-game instead.",
+  "recommendations": [
+   {
+    "useCase": "Competitive games without Reflex",
+    "value": "On or Ultra",
+    "why": "Lower input latency when GPU-bound."
+   },
+   {
+    "useCase": "Games with Reflex",
+    "value": "Off (use Reflex)",
+    "why": "Reflex is more effective and overrides this."
+   },
+   {
+    "useCase": "Single-player/cinematic",
+    "value": "Off",
+    "why": "Smoothest frame pacing."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics.",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x007BA09E",
+  "valueNames": {
+   "0": "Off (application-controlled)",
+   "1": "On (1 frame) — Ultra also reads as 1"
+  },
+  "defaultValue": "0",
+  "valueFormat": "frames",
+  "notes": "Ultra uses an additional internal driver flag that the public NVAPI headers don't document, so On and Ultra both read as '1 frame'."
+ },
+ {
+  "id": "nv.vsync",
+  "vendor": "NVIDIA",
+  "category": "Vertical synchronization",
+  "name": "Vertical sync",
+  "description": "Synchronises frame presentation to the display refresh to prevent tearing.",
+  "effects": "On removes tearing; Fast Sync allows uncapped rendering without tearing (needs FPS well above refresh).",
+  "tradeoffs": "Adds input latency when FPS reaches the refresh rate. With G-SYNC, use V-Sync On in NVCP + Off in-game + a frame cap ~3 FPS below refresh.",
+  "recommendations": [
+   {
+    "useCase": "G-SYNC/VRR monitor",
+    "value": "On (with a frame cap below refresh)",
+    "why": "Tear-free with minimal latency inside the VRR range."
+   },
+   {
+    "useCase": "Competitive, fixed-refresh monitor",
+    "value": "Off",
+    "why": "Lowest latency, accepts tearing."
+   },
+   {
+    "useCase": "General",
+    "value": "Use the 3D application setting",
+    "why": "Let each game decide."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics.",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x00A879CF",
+  "valueNames": {
+   "0x60925292": "Use the 3D application setting",
+   "0x08416747": "Off",
+   "0x47814940": "On",
+   "0x32610244": "1/2 refresh rate",
+   "0x71271021": "1/3 refresh rate",
+   "0x13245256": "1/4 refresh rate",
+   "0x18888888": "Fast"
+  },
+  "defaultValue": "0x60925292"
+ },
+ {
+  "id": "nv.max-frame-rate",
+  "vendor": "NVIDIA",
+  "category": "Frame-rate limits",
+  "name": "Max Frame Rate",
+  "description": "Driver-level frame-rate cap.",
+  "effects": "Caps FPS to reduce power, heat, and fan noise; keeps G-SYNC active when capped below refresh.",
+  "tradeoffs": "In-game limiters and Reflex usually have lower latency than the driver limiter.",
+  "recommendations": [
+   {
+    "useCase": "G-SYNC monitor",
+    "value": "~3 FPS below refresh (e.g. 141 for 144 Hz)",
+    "why": "Stays inside the VRR range."
+   },
+   {
+    "useCase": "Laptops/quiet PCs",
+    "value": "60–90 FPS for light games",
+    "why": "Less heat and noise."
+   },
+   {
+    "useCase": "Competitive",
+    "value": "Off (use in-game cap/Reflex)",
+    "why": "Lowest latency."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics.",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x10835002",
+  "valueNames": {
+   "0": "Off"
+  },
+  "defaultValue": "0",
+  "valueFormat": "fps"
+ },
+ {
+  "id": "nv.background-fps",
+  "vendor": "NVIDIA",
+  "category": "Frame-rate limits",
+  "name": "Background Application Max Frame Rate",
+  "description": "Caps FPS for games running in the background (alt-tabbed).",
+  "effects": "Saves power and heat when a game is minimised.",
+  "tradeoffs": "None for the foreground game.",
+  "recommendations": [
+   {
+    "useCase": "Most users",
+    "value": "20–30 FPS",
+    "why": "Prevents a background game from heating the PC."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics.",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "nv.vrr-mode",
+  "vendor": "NVIDIA",
+  "category": "G-SYNC",
+  "name": "G-SYNC application mode",
+  "description": "Which applications may use variable refresh (G-SYNC / G-SYNC Compatible).",
+  "effects": "Fullscreen and windowed allows VRR in borderless games.",
+  "tradeoffs": "Windowed mode can cause flicker or slowdowns in some desktop apps on certain monitors.",
+  "recommendations": [
+   {
+    "useCase": "Gaming with borderless windows",
+    "value": "Fullscreen and windowed",
+    "why": "VRR in most games."
+   },
+   {
+    "useCase": "Flicker in apps",
+    "value": "Fullscreen only",
+    "why": "Restricts VRR to exclusive fullscreen."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → Display → Set up G-SYNC (enable per display and choose fullscreen/windowed).",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x1194F158",
+  "valueNames": {
+   "0": "Disabled",
+   "1": "Fullscreen only",
+   "2": "Fullscreen and windowed"
+  },
+  "defaultValue": "1",
+  "notes": "G-SYNC must also be enabled per monitor in 'Set up G-SYNC', which is not exposed through the DRS profile settings."
+ },
+ {
+  "id": "nv.monitor-technology",
+  "vendor": "NVIDIA",
+  "category": "G-SYNC",
+  "name": "Monitor technology",
+  "description": "Per-application override of variable refresh (G-SYNC vs fixed refresh).",
+  "effects": "Forcing fixed refresh disables VRR for that application.",
+  "tradeoffs": "Fixed refresh reintroduces tearing/stutter in games below refresh.",
+  "recommendations": [
+   {
+    "useCase": "Most games",
+    "value": "G-SYNC (Allow)",
+    "why": "Smooth frame delivery."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics.",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x10A879CF",
+  "valueNames": {
+   "0": "G-SYNC / VRR allowed",
+   "1": "Force off",
+   "2": "Disallow",
+   "3": "ULMB",
+   "4": "Fixed refresh"
+  },
+  "defaultValue": "0"
+ },
+ {
+  "id": "nv.power-management",
+  "vendor": "NVIDIA",
+  "category": "Power management",
+  "name": "Power management mode",
+  "description": "How aggressively the GPU drops clocks when lightly loaded.",
+  "effects": "'Prefer maximum performance' keeps clocks high, avoiding brief clock ramp-up stutters in some games.",
+  "tradeoffs": "Higher idle power and heat; on multi-monitor desktops the GPU may never idle down. Laptops lose battery life.",
+  "recommendations": [
+   {
+    "useCase": "Most users",
+    "value": "Normal / Optimal power (default)",
+    "why": "Clocks ramp up instantly under load anyway."
+   },
+   {
+    "useCase": "Specific game with clock-related stutter",
+    "value": "Prefer maximum performance (that game's profile only)",
+    "why": "Avoid applying globally."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics.",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x1057EB71",
+  "valueNames": {
+   "0": "Adaptive",
+   "1": "Prefer maximum performance",
+   "2": "Driver controlled",
+   "3": "Prefer consistent performance",
+   "4": "Prefer minimum power",
+   "5": "Normal (Optimal power)"
+  },
+  "defaultValue": "5"
+ },
+ {
+  "id": "nv.texture-quality",
+  "vendor": "NVIDIA",
+  "category": "Texture filtering",
+  "name": "Texture filtering - Quality",
+  "description": "Overall texture filtering quality/performance trade-off.",
+  "effects": "Higher performance settings apply filtering optimisations.",
+  "tradeoffs": "Performance gains are negligible on modern GPUs; High performance can cause shimmering.",
+  "recommendations": [
+   {
+    "useCase": "All modern GPUs",
+    "value": "Quality or High quality",
+    "why": "No meaningful FPS gain from lower settings."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics.",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x00CE2691",
+  "valueNames": {
+   "0xFFFFFFF6": "High quality",
+   "0": "Quality",
+   "0x0000000A": "Performance",
+   "0x00000014": "High performance"
+  },
+  "defaultValue": "0"
+ },
+ {
+  "id": "nv.aniso-level",
+  "vendor": "NVIDIA",
+  "category": "Texture filtering",
+  "name": "Anisotropic filtering",
+  "description": "Sharpens textures viewed at angles.",
+  "effects": "16x looks noticeably sharper on floors/roads.",
+  "tradeoffs": "Very small performance cost on modern GPUs.",
+  "recommendations": [
+   {
+    "useCase": "Most games",
+    "value": "Application-controlled, or 16x override",
+    "why": "Cheap quality improvement."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics.",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x101E61A9",
+  "valueNames": {
+   "0": "Off (point)",
+   "1": "Off (application-controlled)",
+   "2": "2x",
+   "4": "4x",
+   "8": "8x",
+   "16": "16x"
+  },
+  "defaultValue": "1"
+ },
+ {
+  "id": "nv.aniso-mode",
+  "vendor": "NVIDIA",
+  "category": "Texture filtering",
+  "name": "Anisotropic filtering mode",
+  "description": "Whether the driver overrides the game's anisotropic filtering.",
+  "effects": "Override forces the level above.",
+  "tradeoffs": "Can conflict with games that already use AF.",
+  "recommendations": [
+   {
+    "useCase": "Most users",
+    "value": "Application-controlled",
+    "why": "Avoids double filtering."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics.",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x10D2BB16",
+  "valueNames": {
+   "0": "Application-controlled",
+   "1": "User-defined (override)",
+   "2": "Conditional"
+  },
+  "defaultValue": "0"
+ },
+ {
+  "id": "nv.neg-lod-bias",
+  "vendor": "NVIDIA",
+  "category": "Texture filtering",
+  "name": "Texture filtering - Negative LOD bias",
+  "description": "Allows or clamps negative level-of-detail bias.",
+  "effects": "Clamp reduces shimmering when anisotropic filtering is forced.",
+  "tradeoffs": "None significant.",
+  "recommendations": [
+   {
+    "useCase": "Forced AF",
+    "value": "Clamp",
+    "why": "Less shimmer."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics.",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x0019BB68",
+  "valueNames": {
+   "0": "Allow",
+   "1": "Clamp"
+  },
+  "defaultValue": "0"
+ },
+ {
+  "id": "nv.trilinear-opt",
+  "vendor": "NVIDIA",
+  "category": "Texture filtering",
+  "name": "Texture filtering - Trilinear optimization",
+  "description": "Uses bilinear filtering where differences are invisible.",
+  "effects": "Tiny performance gain.",
+  "tradeoffs": "Ignored when Quality is High quality.",
+  "recommendations": [
+   {
+    "useCase": "All",
+    "value": "Default",
+    "why": "No measurable impact."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics.",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x002ECAF2",
+  "valueNames": {
+   "0": "On",
+   "1": "Off"
+  },
+  "defaultValue": "0"
+ },
+ {
+  "id": "nv.aniso-sample-opt",
+  "vendor": "NVIDIA",
+  "category": "Texture filtering",
+  "name": "Texture filtering - Anisotropic sample optimization",
+  "description": "Reduces anisotropic samples for performance.",
+  "effects": "Tiny gain.",
+  "tradeoffs": "Can cause shimmering.",
+  "recommendations": [
+   {
+    "useCase": "All",
+    "value": "Off",
+    "why": "Quality over negligible gains."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics.",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x0084CD70",
+  "valueNames": {
+   "0": "Off",
+   "1": "On"
+  },
+  "defaultValue": "0"
+ },
+ {
+  "id": "nv.aa-mode",
+  "vendor": "NVIDIA",
+  "category": "Antialiasing",
+  "name": "Antialiasing - Mode",
+  "description": "Whether the driver overrides or enhances in-game antialiasing.",
+  "effects": "Driver AA only works in older DirectX 9/OpenGL titles.",
+  "tradeoffs": "Overriding can break modern deferred-rendering games; use in-game AA/DLSS instead.",
+  "recommendations": [
+   {
+    "useCase": "Modern games",
+    "value": "Application-controlled",
+    "why": "Use in-game TAA/DLAA/DLSS."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics.",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x107EFC5B",
+  "valueNames": {
+   "0": "Application-controlled",
+   "1": "Override any application setting",
+   "2": "Enhance the application setting"
+  },
+  "defaultValue": "0"
+ },
+ {
+  "id": "nv.fxaa",
+  "vendor": "NVIDIA",
+  "category": "Antialiasing",
+  "name": "Antialiasing - FXAA",
+  "description": "Post-process antialiasing applied by the driver.",
+  "effects": "Smooths edges cheaply.",
+  "tradeoffs": "Blurs text and UI; stacks with in-game AA.",
+  "recommendations": [
+   {
+    "useCase": "Most users",
+    "value": "Off",
+    "why": "Prefer in-game AA."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics.",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x1074C972",
+  "valueNames": {
+   "0": "Off",
+   "1": "On"
+  },
+  "defaultValue": "0"
+ },
+ {
+  "id": "nv.image-scaling",
+  "vendor": "NVIDIA",
+  "category": "Display scaling",
+  "name": "Image Scaling (NVIDIA Image Scaling)",
+  "description": "Driver-level upscaling and sharpening for games that lack DLSS.",
+  "effects": "Render below native resolution and upscale for higher FPS.",
+  "tradeoffs": "Softer image than DLSS; also changes desktop resolution list when enabled.",
+  "recommendations": [
+   {
+    "useCase": "Games without DLSS on lower-end GPUs",
+    "value": "On with 85% render scale",
+    "why": "Cheap FPS boost."
+   },
+   {
+    "useCase": "Games with DLSS",
+    "value": "Off",
+    "why": "DLSS is better."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → Manage 3D settings → Image Scaling, or NVIDIA App → Graphics.",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x10444444",
+  "valueNames": {
+   "0": "Off",
+   "1": "On"
+  },
+  "defaultValue": "0"
+ },
+ {
+  "id": "nv.shader-cache",
+  "vendor": "NVIDIA",
+  "category": "Shader caches",
+  "name": "Shader Cache",
+  "description": "Stores compiled shaders on disk so games don't recompile them each launch.",
+  "effects": "Reduces stutter and load times after the first run.",
+  "tradeoffs": "Corrupt caches can cause stutter/glitches — clear them after driver updates if problems appear.",
+  "recommendations": [
+   {
+    "useCase": "All",
+    "value": "On",
+    "why": "Less compilation stutter."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics.",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x00198FFF",
+  "valueNames": {
+   "0": "Off",
+   "1": "On"
+  },
+  "defaultValue": "1"
+ },
+ {
+  "id": "nv.shader-cache-size",
+  "vendor": "NVIDIA",
+  "category": "Shader caches",
+  "name": "Shader Cache Size",
+  "description": "Maximum disk space for the shader cache.",
+  "effects": "Larger caches avoid evicting shaders for big game libraries.",
+  "tradeoffs": "Uses disk space.",
+  "recommendations": [
+   {
+    "useCase": "Gamers with large libraries",
+    "value": "10 GB or Unlimited on SSDs with free space",
+    "why": "Fewer recompiles."
+   },
+   {
+    "useCase": "Small SSD",
+    "value": "Driver default",
+    "why": "Saves space."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics.",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x00AC8497",
+  "valueNames": {
+   "4294967295": "Unlimited",
+   "0": "Disabled"
+  },
+  "valueFormat": "mb",
+  "notes": "Shown as stored by the driver (megabytes). The cache folders can be cleared with the NVIDIA app guide's 'Clear cache' action."
+ },
+ {
+  "id": "nv.threaded-optimization",
+  "vendor": "NVIDIA",
+  "category": "3D settings",
+  "name": "Threaded optimization",
+  "description": "Lets the OpenGL driver use multiple CPU threads.",
+  "effects": "Can improve FPS in CPU-bound OpenGL games.",
+  "tradeoffs": "Rarely causes instability in old OpenGL titles.",
+  "recommendations": [
+   {
+    "useCase": "All",
+    "value": "Auto",
+    "why": "Driver decides per game."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics.",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x20C1221E",
+  "valueNames": {
+   "0": "Auto",
+   "1": "On",
+   "2": "Off"
+  },
+  "defaultValue": "0"
+ },
+ {
+  "id": "nv.triple-buffering",
+  "vendor": "NVIDIA",
+  "category": "3D settings",
+  "name": "Triple buffering (OpenGL)",
+  "description": "Third frame buffer for OpenGL games with V-Sync.",
+  "effects": "Smoother FPS with V-Sync on in OpenGL.",
+  "tradeoffs": "Adds a frame of latency; only affects OpenGL.",
+  "recommendations": [
+   {
+    "useCase": "All",
+    "value": "Off unless using V-Sync in OpenGL games",
+    "why": "Lower latency."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics.",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x20FDD1F9",
+  "valueNames": {
+   "0": "Off",
+   "1": "On"
+  },
+  "defaultValue": "0"
+ },
+ {
+  "id": "nv.ansel",
+  "vendor": "NVIDIA",
+  "category": "3D settings",
+  "name": "Ansel / Photo mode",
+  "description": "NVIDIA's in-game photo mode.",
+  "effects": "Enables photo mode in supported games.",
+  "tradeoffs": "None while unused.",
+  "recommendations": [
+   {
+    "useCase": "All",
+    "value": "Default",
+    "why": "No performance cost unless used."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics.",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x1075D972",
+  "valueNames": {
+   "0": "Off",
+   "1": "On"
+  },
+  "defaultValue": "1"
+ },
+ {
+  "id": "nv.preferred-gpu",
+  "vendor": "NVIDIA",
+  "category": "3D settings",
+  "name": "Preferred graphics processor (laptops)",
+  "description": "On hybrid-graphics laptops, which GPU runs an application.",
+  "effects": "High-performance NVIDIA processor runs games on the dedicated GPU.",
+  "tradeoffs": "Higher power use.",
+  "recommendations": [
+   {
+    "useCase": "Gaming laptops",
+    "value": "Per game: High-performance NVIDIA processor",
+    "why": "Ensures the dedicated GPU is used."
+   },
+   {
+    "useCase": "Battery",
+    "value": "Auto-select",
+    "why": "iGPU for light apps."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics. Windows' own per-app setting (Settings → Display → Graphics) takes priority on recent Windows versions.",
+  "readability": "Read from the driver (NVAPI DRS)",
+  "drsSettingId": "0x10F9DC80",
+  "valueNames": {
+   "0": "Integrated graphics",
+   "1": "High-performance NVIDIA processor",
+   "16": "Auto-select"
+  },
+  "defaultValue": "16"
+ },
+ {
+  "id": "nv.color-range",
+  "vendor": "NVIDIA",
+  "category": "Color settings",
+  "name": "Output dynamic range and colour format",
+  "description": "RGB Full vs Limited range, colour depth, and format per display.",
+  "effects": "Full range shows true blacks on PC monitors; Limited range causes washed-out greys.",
+  "tradeoffs": "TVs may expect Limited; mismatches crush blacks or wash them out.",
+  "recommendations": [
+   {
+    "useCase": "PC monitors over HDMI",
+    "value": "Use NVIDIA colour settings: RGB, Full, highest bit depth",
+    "why": "Fixes washed-out colours."
+   },
+   {
+    "useCase": "TVs",
+    "value": "Match the TV's black level setting",
+    "why": "Correct black levels."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → Display → Change resolution → Use NVIDIA colour settings.",
+  "readability": "Not readable through a documented interface — open the vendor control panel",
+  "openTarget": "nvcp"
+ },
+ {
+  "id": "nv.digital-vibrance",
+  "vendor": "NVIDIA",
+  "category": "Color settings",
+  "name": "Digital vibrance",
+  "description": "Boosts colour saturation.",
+  "effects": "More vivid colours (popular in competitive shooters).",
+  "tradeoffs": "Inaccurate colours for photo/video work.",
+  "recommendations": [
+   {
+    "useCase": "Competitive gamers",
+    "value": "Personal preference (~60–70%)",
+    "why": "Visibility."
+   },
+   {
+    "useCase": "Creative work",
+    "value": "50% (default)",
+    "why": "Accurate colour."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → Display → Adjust desktop colour settings.",
+  "readability": "Not readable through a documented interface — open the vendor control panel",
+  "openTarget": "nvcp"
+ },
+ {
+  "id": "nv.refresh-rate",
+  "vendor": "NVIDIA",
+  "category": "Refresh rates",
+  "name": "Refresh rate (NVIDIA)",
+  "description": "Refresh rate per display; mirrors the Windows setting.",
+  "effects": "Higher refresh = smoother motion.",
+  "tradeoffs": "Cable/port bandwidth limits.",
+  "recommendations": [
+   {
+    "useCase": "All",
+    "value": "Highest supported",
+    "why": "See the console's Display findings."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → Display → Change resolution, or Windows Advanced display settings.",
+  "readability": "Not readable through a documented interface — open the vendor control panel",
+  "openTarget": "nvcp"
+ },
+ {
+  "id": "nv.display-scaling",
+  "vendor": "NVIDIA",
+  "category": "Display scaling",
+  "name": "Scaling mode (GPU vs display)",
+  "description": "Where non-native resolutions are scaled.",
+  "effects": "GPU scaling gives consistent results and enables integer scaling.",
+  "tradeoffs": "Display scaling may add less latency on some monitors.",
+  "recommendations": [
+   {
+    "useCase": "Stretched resolutions in games",
+    "value": "GPU scaling, Full-screen",
+    "why": "Predictable."
+   },
+   {
+    "useCase": "Pixel-art/retro",
+    "value": "Integer scaling",
+    "why": "Sharp pixels."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → Display → Adjust desktop size and position.",
+  "readability": "Not readable through a documented interface — open the vendor control panel",
+  "openTarget": "nvcp"
+ },
+ {
+  "id": "nv.dsr",
+  "vendor": "NVIDIA",
+  "category": "Display scaling",
+  "name": "DSR / DLDSR factors",
+  "description": "Renders above native resolution and downsamples.",
+  "effects": "Sharper image.",
+  "tradeoffs": "Large performance cost.",
+  "recommendations": [
+   {
+    "useCase": "Older games with spare GPU power",
+    "value": "DLDSR 1.78x",
+    "why": "Image quality."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Manage 3D settings (Global or Program Settings), or NVIDIA App → Graphics.",
+  "readability": "Not readable through a documented interface — open the vendor control panel",
+  "openTarget": "nvcp"
+ },
+ {
+  "id": "nv.physx",
+  "vendor": "NVIDIA",
+  "category": "PhysX",
+  "name": "PhysX processor",
+  "description": "Which processor runs GPU PhysX effects in supported (mostly older) games.",
+  "effects": "Auto-select uses the GPU.",
+  "tradeoffs": "Forcing CPU tanks FPS in PhysX titles.",
+  "recommendations": [
+   {
+    "useCase": "All",
+    "value": "Auto-select",
+    "why": "Driver picks the GPU."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → 3D Settings → Configure Surround, PhysX.",
+  "readability": "Not readable through a documented interface — open the vendor control panel",
+  "notes": "PhysX configuration uses a separate NVAPI interface that is not read by the console.",
+  "openTarget": "nvcp"
+ },
+ {
+  "id": "nv.rtx-video",
+  "vendor": "NVIDIA",
+  "category": "3D settings",
+  "name": "RTX Video Super Resolution / HDR",
+  "description": "AI upscaling and SDR-to-HDR for browser video on RTX GPUs.",
+  "effects": "Sharper streamed video.",
+  "tradeoffs": "Higher GPU power use during video playback.",
+  "recommendations": [
+   {
+    "useCase": "RTX owners watching low-res video",
+    "value": "On (Quality 1–2)",
+    "why": "Visible improvement."
+   },
+   {
+    "useCase": "Laptops on battery",
+    "value": "Off",
+    "why": "Power."
+   }
+  ],
+  "whereToChange": "NVIDIA Control Panel → Video → Adjust video image settings, or NVIDIA App → System → Video.",
+  "readability": "Not readable through a documented interface — open the vendor control panel",
+  "openTarget": "nvcp"
+ },
+ {
+  "id": "nv.reflex",
+  "vendor": "NVIDIA",
+  "category": "Low latency",
+  "name": "NVIDIA Reflex (in-game)",
+  "description": "In-game latency reduction technology.",
+  "effects": "Lowest system latency in supported games.",
+  "tradeoffs": "Reflex 'On + Boost' raises power use slightly.",
+  "recommendations": [
+   {
+    "useCase": "Supported competitive games",
+    "value": "On",
+    "why": "Better than driver Low Latency Mode."
+   }
+  ],
+  "whereToChange": "Inside each supported game's video settings.",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "amd.anti-lag",
+  "vendor": "AMD",
+  "category": "Low latency",
+  "name": "Radeon Anti-Lag / Anti-Lag 2",
+  "description": "Reduces input latency by pacing CPU work.",
+  "effects": "Lower latency when GPU-bound.",
+  "tradeoffs": "Slight FPS cost in some games; Anti-Lag 2 must be integrated by the game.",
+  "recommendations": [
+   {
+    "useCase": "Competitive games",
+    "value": "On",
+    "why": "Lower latency."
+   }
+  ],
+  "whereToChange": "AMD Software: Adrenalin Edition → Gaming → Graphics (Global or per-game).",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "amd.chill",
+  "vendor": "AMD",
+  "category": "Frame-rate limits",
+  "name": "Radeon Chill",
+  "description": "Dynamically lowers FPS when there's little movement.",
+  "effects": "Large power/heat savings.",
+  "tradeoffs": "Variable FPS can feel inconsistent; adds latency at low FPS.",
+  "recommendations": [
+   {
+    "useCase": "Laptops / quiet PCs",
+    "value": "On with min/max near refresh",
+    "why": "Saves power."
+   },
+   {
+    "useCase": "Competitive",
+    "value": "Off",
+    "why": "Consistent FPS."
+   }
+  ],
+  "whereToChange": "AMD Software: Adrenalin Edition → Gaming → Graphics (Global or per-game).",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "amd.frtc",
+  "vendor": "AMD",
+  "category": "Frame-rate limits",
+  "name": "Frame Rate Target Control",
+  "description": "Driver frame-rate cap.",
+  "effects": "Reduces power and heat.",
+  "tradeoffs": "In-game caps usually have lower latency.",
+  "recommendations": [
+   {
+    "useCase": "FreeSync monitor",
+    "value": "A few FPS below refresh",
+    "why": "Stays in VRR range."
+   }
+  ],
+  "whereToChange": "AMD Software: Adrenalin Edition → Gaming → Graphics (Global or per-game).",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "amd.boost",
+  "vendor": "AMD",
+  "category": "3D settings",
+  "name": "Radeon Boost",
+  "description": "Lowers resolution dynamically during fast motion.",
+  "effects": "Higher FPS during motion.",
+  "tradeoffs": "Blurrier image while moving.",
+  "recommendations": [
+   {
+    "useCase": "Low-end GPUs",
+    "value": "On",
+    "why": "FPS gains in supported games."
+   },
+   {
+    "useCase": "High-end",
+    "value": "Off",
+    "why": "Image quality."
+   }
+  ],
+  "whereToChange": "AMD Software: Adrenalin Edition → Gaming → Graphics (Global or per-game).",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "amd.ris",
+  "vendor": "AMD",
+  "category": "3D settings",
+  "name": "Radeon Image Sharpening",
+  "description": "Contrast-adaptive sharpening.",
+  "effects": "Crisper image, especially with upscaling.",
+  "tradeoffs": "Over-sharpening adds halos.",
+  "recommendations": [
+   {
+    "useCase": "TAA-blurry games",
+    "value": "On, 50–80%",
+    "why": "Restores detail."
+   }
+  ],
+  "whereToChange": "AMD Software: Adrenalin Edition → Gaming → Graphics (Global or per-game).",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "amd.enhanced-sync",
+  "vendor": "AMD",
+  "category": "Vertical synchronization",
+  "name": "Enhanced Sync",
+  "description": "Tear-free presentation without V-Sync latency at high FPS.",
+  "effects": "Less tearing above refresh.",
+  "tradeoffs": "Can cause stutter/black screens on some systems.",
+  "recommendations": [
+   {
+    "useCase": "Problems with flicker/stutter",
+    "value": "Off",
+    "why": "Known to cause issues on some setups."
+   }
+  ],
+  "whereToChange": "AMD Software: Adrenalin Edition → Gaming → Graphics (Global or per-game).",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "amd.vsync",
+  "vendor": "AMD",
+  "category": "Vertical synchronization",
+  "name": "Wait for Vertical Refresh",
+  "description": "Driver V-Sync override.",
+  "effects": "Removes tearing.",
+  "tradeoffs": "Adds latency.",
+  "recommendations": [
+   {
+    "useCase": "FreeSync users",
+    "value": "Off, unless application specifies",
+    "why": "Use FreeSync + frame cap."
+   }
+  ],
+  "whereToChange": "AMD Software: Adrenalin Edition → Gaming → Graphics (Global or per-game).",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "amd.freesync",
+  "vendor": "AMD",
+  "category": "G-SYNC",
+  "name": "AMD FreeSync",
+  "description": "Variable refresh rate.",
+  "effects": "Smooth frame delivery without tearing.",
+  "tradeoffs": "Some monitors flicker at low FPS.",
+  "recommendations": [
+   {
+    "useCase": "FreeSync monitors",
+    "value": "On (also enable in the monitor's OSD)",
+    "why": "Smoothness."
+   }
+  ],
+  "whereToChange": "AMD Software → Gaming → Display → AMD FreeSync.",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "amd.afmf",
+  "vendor": "AMD",
+  "category": "3D settings",
+  "name": "AMD Fluid Motion Frames",
+  "description": "Driver frame generation.",
+  "effects": "Higher displayed FPS.",
+  "tradeoffs": "Adds latency and artifacts; needs a high base FPS (60+).",
+  "recommendations": [
+   {
+    "useCase": "Single-player games with 60+ FPS",
+    "value": "Optional",
+    "why": "Smoother motion."
+   }
+  ],
+  "whereToChange": "AMD Software: Adrenalin Edition → Gaming → Graphics (Global or per-game).",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "amd.rsr",
+  "vendor": "AMD",
+  "category": "Display scaling",
+  "name": "Radeon Super Resolution",
+  "description": "Driver upscaling for games without FSR.",
+  "effects": "Higher FPS at lower render resolution.",
+  "tradeoffs": "Softer image; requires exclusive fullscreen at lower resolution.",
+  "recommendations": [
+   {
+    "useCase": "Low-end GPUs",
+    "value": "On",
+    "why": "FPS gains."
+   }
+  ],
+  "whereToChange": "AMD Software: Adrenalin Edition → Gaming → Graphics (Global or per-game).",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "amd.texture-quality",
+  "vendor": "AMD",
+  "category": "Texture filtering",
+  "name": "Texture Filtering Quality",
+  "description": "Texture filtering trade-off.",
+  "effects": "Negligible performance difference.",
+  "tradeoffs": "Performance setting can shimmer.",
+  "recommendations": [
+   {
+    "useCase": "All",
+    "value": "Standard or High",
+    "why": "No real gain from lower."
+   }
+  ],
+  "whereToChange": "AMD Software: Adrenalin Edition → Gaming → Graphics (Global or per-game).",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "amd.tessellation",
+  "vendor": "AMD",
+  "category": "3D settings",
+  "name": "Tessellation Mode",
+  "description": "Override tessellation level.",
+  "effects": "Limiting can boost FPS in tessellation-heavy older titles.",
+  "tradeoffs": "Lower geometric detail.",
+  "recommendations": [
+   {
+    "useCase": "All",
+    "value": "AMD optimized",
+    "why": "Sensible default."
+   }
+  ],
+  "whereToChange": "AMD Software: Adrenalin Edition → Gaming → Graphics (Global or per-game).",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "amd.shader-cache",
+  "vendor": "AMD",
+  "category": "Shader caches",
+  "name": "Shader Cache / Reset Shader Cache",
+  "description": "On-disk compiled shaders.",
+  "effects": "Less stutter.",
+  "tradeoffs": "Corruption after updates causes stutter — reset it.",
+  "recommendations": [
+   {
+    "useCase": "Stutter after driver update",
+    "value": "Reset Shader Cache",
+    "why": "Rebuilds cleanly."
+   }
+  ],
+  "whereToChange": "AMD Software → Gaming → Graphics → Advanced → Reset Shader Cache.",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "amd.pixel-format",
+  "vendor": "AMD",
+  "category": "Color settings",
+  "name": "Pixel Format and colour depth",
+  "description": "RGB Full vs YCbCr and bit depth.",
+  "effects": "RGB 4:4:4 Full gives correct PC colours.",
+  "tradeoffs": "TVs may need Limited range.",
+  "recommendations": [
+   {
+    "useCase": "PC monitors",
+    "value": "RGB 4:4:4 Full RGB",
+    "why": "Fixes washed-out colours."
+   }
+  ],
+  "whereToChange": "AMD Software → Gaming → Display → Pixel Format.",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "amd.gpu-scaling",
+  "vendor": "AMD",
+  "category": "Display scaling",
+  "name": "GPU Scaling / Integer Scaling",
+  "description": "Where non-native resolutions are scaled.",
+  "effects": "Consistent scaling; integer for pixel art.",
+  "tradeoffs": "Minor latency differences.",
+  "recommendations": [
+   {
+    "useCase": "Stretched resolutions",
+    "value": "GPU Scaling: Full panel",
+    "why": "Predictable."
+   }
+  ],
+  "whereToChange": "AMD Software → Gaming → Display.",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "amd.sam",
+  "vendor": "AMD",
+  "category": "3D settings",
+  "name": "Smart Access Memory (Resizable BAR)",
+  "description": "Lets the CPU access all VRAM at once.",
+  "effects": "A few percent FPS in many games.",
+  "tradeoffs": "Requires Above 4G Decoding and Resizable BAR in BIOS + UEFI/CSM off.",
+  "recommendations": [
+   {
+    "useCase": "Supported Ryzen + Radeon systems",
+    "value": "On",
+    "why": "Free performance."
+   }
+  ],
+  "whereToChange": "BIOS (Resizable BAR) and AMD Software → Performance → Tuning.",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "amd.tuning",
+  "vendor": "AMD",
+  "category": "Power management",
+  "name": "Performance tuning (undervolt/overclock)",
+  "description": "GPU clock/voltage/fan/power limit tuning.",
+  "effects": "Can lower temperatures or raise performance.",
+  "tradeoffs": "Unstable tuning causes driver timeouts and crashes.",
+  "recommendations": [
+   {
+    "useCase": "Crashes/timeouts",
+    "value": "Reset tuning to default",
+    "why": "Common cause of instability."
+   }
+  ],
+  "whereToChange": "AMD Software → Performance → Tuning.",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "intel.low-latency",
+  "vendor": "Intel",
+  "category": "Low latency",
+  "name": "Intel XeLL / Low latency mode",
+  "description": "Reduces render queue latency.",
+  "effects": "Lower input latency.",
+  "tradeoffs": "Supported games only (XeLL is integrated per game).",
+  "recommendations": [
+   {
+    "useCase": "Competitive games",
+    "value": "On where available",
+    "why": "Latency."
+   }
+  ],
+  "whereToChange": "Intel Graphics Software (or Arc Control) → Graphics.",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "intel.frame-limiter",
+  "vendor": "Intel",
+  "category": "Frame-rate limits",
+  "name": "Frame Rate Limiter",
+  "description": "Driver FPS cap.",
+  "effects": "Power/heat savings.",
+  "tradeoffs": "Prefer in-game caps.",
+  "recommendations": [
+   {
+    "useCase": "Laptops",
+    "value": "Cap to refresh rate",
+    "why": "Battery life."
+   }
+  ],
+  "whereToChange": "Intel Graphics Software (or Arc Control) → Graphics.",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "intel.sync",
+  "vendor": "Intel",
+  "category": "Vertical synchronization",
+  "name": "Vertical Sync (Smooth Sync / Speed Sync)",
+  "description": "Sync modes; Smooth Sync dithers tear lines.",
+  "effects": "Less visible tearing.",
+  "tradeoffs": "Speed Sync adds variability.",
+  "recommendations": [
+   {
+    "useCase": "Most users",
+    "value": "Application choice",
+    "why": "Game decides."
+   }
+  ],
+  "whereToChange": "Intel Graphics Software (or Arc Control) → Graphics.",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "intel.adaptive-sync",
+  "vendor": "Intel",
+  "category": "G-SYNC",
+  "name": "Adaptive Sync",
+  "description": "Variable refresh rate on supported displays.",
+  "effects": "Smooth frame delivery.",
+  "tradeoffs": "Monitor must support VRR.",
+  "recommendations": [
+   {
+    "useCase": "VRR monitors",
+    "value": "On",
+    "why": "Smoothness."
+   }
+  ],
+  "whereToChange": "Intel Graphics Software (or Arc Control) → Graphics.",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "intel.panel-self-refresh",
+  "vendor": "Intel",
+  "category": "Power management",
+  "name": "Panel Self Refresh / Display Power Saving",
+  "description": "Laptop panel power-saving features.",
+  "effects": "Better battery life.",
+  "tradeoffs": "A common cause of laptop screen flicker.",
+  "recommendations": [
+   {
+    "useCase": "Laptop screen flickers",
+    "value": "Turn Panel Self Refresh off",
+    "why": "Known flicker fix."
+   }
+  ],
+  "whereToChange": "Intel Graphics Software → System → Power (laptop), or the laptop maker's utility.",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "intel.endurance-gaming",
+  "vendor": "Intel",
+  "category": "Power management",
+  "name": "Endurance Gaming",
+  "description": "Caps FPS and power on battery.",
+  "effects": "Longer gaming on battery.",
+  "tradeoffs": "Lower FPS.",
+  "recommendations": [
+   {
+    "useCase": "Laptop gaming on battery",
+    "value": "On",
+    "why": "Battery life."
+   }
+  ],
+  "whereToChange": "Intel Graphics Software (or Arc Control) → Graphics.",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ },
+ {
+  "id": "intel.sharpening",
+  "vendor": "Intel",
+  "category": "3D settings",
+  "name": "Image sharpening",
+  "description": "Driver sharpening filter.",
+  "effects": "Crisper image.",
+  "tradeoffs": "Halo artifacts if too strong.",
+  "recommendations": [
+   {
+    "useCase": "TAA-blurry games",
+    "value": "Light sharpening",
+    "why": "Detail."
+   }
+  ],
+  "whereToChange": "Intel Graphics Software (or Arc Control) → Graphics.",
+  "readability": "Not readable through a documented interface — open the vendor control panel"
+ }
+]

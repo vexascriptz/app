@@ -1,0 +1,2463 @@
+[
+ {
+  "name": "System",
+  "aliases": [],
+  "displayName": "System (NT kernel)",
+  "description": "The Windows kernel and drivers.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Hosts kernel threads, drivers, and hardware interrupts.",
+  "troubleshooting": [
+   "High CPU in 'System' usually means a driver problem: use Resource Monitor or Windows Performance Recorder to find the driver.",
+   "Update chipset, storage, network, and GPU drivers.",
+   "Check for failing disks (I/O retries show up as System CPU)."
+  ],
+  "safeToEnd": false,
+  "highCpu": "Driver activity: network, storage, or GPU drivers busy or misbehaving; also hardware interrupts from failing devices."
+ },
+ {
+  "name": "Registry",
+  "aliases": [],
+  "displayName": "Registry",
+  "description": "Holds registry hives in memory.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Holds registry hives in memory.",
+  "troubleshooting": [
+   "Normal; memory use reflects registry size."
+  ],
+  "safeToEnd": false
+ },
+ {
+  "name": "Memory Compression",
+  "aliases": [],
+  "displayName": "Memory Compression",
+  "description": "Stores compressed memory pages to avoid paging to disk.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Stores compressed memory pages to avoid paging to disk.",
+  "troubleshooting": [
+   "High memory here is a symptom of memory pressure, not a problem in itself."
+  ],
+  "safeToEnd": false,
+  "highMemory": "Normal when RAM is full — it is compressing other apps' memory. Add RAM or close apps if constantly high."
+ },
+ {
+  "name": "Secure System",
+  "aliases": [],
+  "displayName": "Secure System",
+  "description": "Virtualization-based security (VBS) process.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Virtualization-based security (VBS) process.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "Idle",
+  "aliases": [
+   "System Idle Process"
+  ],
+  "displayName": "System Idle Process",
+  "description": "Represents idle CPU time.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Not a real program — high values mean the CPU is free.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "smss.exe",
+  "aliases": [],
+  "displayName": "Session Manager",
+  "description": "Starts user sessions at boot.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Starts user sessions at boot.",
+  "troubleshooting": [
+   "Core Windows process. Ending it crashes Windows, signs the user out, or is blocked by Windows."
+  ],
+  "safeToEnd": false
+ },
+ {
+  "name": "csrss.exe",
+  "aliases": [],
+  "displayName": "Client Server Runtime",
+  "description": "Handles console windows and parts of the Win32 subsystem.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Handles console windows and parts of the Win32 subsystem.",
+  "troubleshooting": [
+   "Core Windows process. Ending it crashes Windows, signs the user out, or is blocked by Windows.",
+   "A csrss.exe outside System32 is a strong indicator of malware masquerading as Windows."
+  ],
+  "safeToEnd": false
+ },
+ {
+  "name": "wininit.exe",
+  "aliases": [],
+  "displayName": "Windows Start-Up Application",
+  "description": "Starts services.exe and lsass.exe at boot.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Starts services.exe and lsass.exe at boot.",
+  "troubleshooting": [
+   "Core Windows process. Ending it crashes Windows, signs the user out, or is blocked by Windows."
+  ],
+  "safeToEnd": false
+ },
+ {
+  "name": "winlogon.exe",
+  "aliases": [],
+  "displayName": "Windows Logon",
+  "description": "Handles sign-in, sign-out, and Ctrl+Alt+Del.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Handles sign-in, sign-out, and Ctrl+Alt+Del.",
+  "troubleshooting": [
+   "Core Windows process. Ending it crashes Windows, signs the user out, or is blocked by Windows."
+  ],
+  "safeToEnd": false
+ },
+ {
+  "name": "services.exe",
+  "aliases": [],
+  "displayName": "Service Control Manager",
+  "description": "Starts and stops Windows services.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Starts and stops Windows services.",
+  "troubleshooting": [
+   "Core Windows process. Ending it crashes Windows, signs the user out, or is blocked by Windows."
+  ],
+  "safeToEnd": false
+ },
+ {
+  "name": "lsass.exe",
+  "aliases": [],
+  "displayName": "Local Security Authority",
+  "description": "Validates sign-ins and enforces security policy.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Validates sign-ins and enforces security policy.",
+  "troubleshooting": [
+   "Core Windows process. Ending it crashes Windows, signs the user out, or is blocked by Windows.",
+   "High CPU can indicate many authentication requests (e.g. a misbehaving app or network scan)."
+  ],
+  "safeToEnd": false
+ },
+ {
+  "name": "LsaIso.exe",
+  "aliases": [],
+  "displayName": "Credential Guard (LSA isolated)",
+  "description": "Isolated LSA process used by Credential Guard.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Isolated LSA process used by Credential Guard.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "svchost.exe",
+  "aliases": [],
+  "displayName": "Service Host",
+  "description": "Hosts Windows services. There are always many instances.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-service",
+  "expectedPaths": [
+   "%SystemRoot%\\System32",
+   "%SystemRoot%\\SysWOW64"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Each instance runs one or more services; the Services column shows which.",
+  "troubleshooting": [
+   "Find which service is busy in the 'Services' column and look that service up.",
+   "Windows Update (wuauserv), Defender, and Delivery Optimization are common temporary CPU users.",
+   "svchost.exe anywhere other than System32/SysWOW64 should be investigated."
+  ],
+  "safeToEnd": false,
+  "highCpu": "One of its hosted services is busy — commonly Windows Update, Delivery Optimization, or Windows Search."
+ },
+ {
+  "name": "dwm.exe",
+  "aliases": [],
+  "displayName": "Desktop Window Manager",
+  "description": "Composes the desktop and window effects using the GPU.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-shell",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Composes the desktop and window effects using the GPU.",
+  "troubleshooting": [
+   "High GPU/CPU use often follows GPU driver problems or very high refresh/multiple monitors.",
+   "Update the GPU driver."
+  ],
+  "safeToEnd": false,
+  "highMemory": "Can grow with many monitors/high resolutions; a GPU driver leak can make it grow continuously — update the driver."
+ },
+ {
+  "name": "fontdrvhost.exe",
+  "aliases": [],
+  "displayName": "Usermode Font Driver Host",
+  "description": "Renders fonts in a sandbox.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Renders fonts in a sandbox.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "sihost.exe",
+  "aliases": [],
+  "displayName": "Shell Infrastructure Host",
+  "description": "Supports the Start menu, Action Center, and notifications.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-shell",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Supports the Start menu, Action Center, and notifications.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "explorer.exe",
+  "aliases": [],
+  "displayName": "Windows Explorer",
+  "description": "Taskbar, desktop, and File Explorer windows.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-shell",
+  "expectedPaths": [
+   "%SystemRoot%"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Taskbar, desktop, and File Explorer windows.",
+  "troubleshooting": [
+   "If the taskbar freezes, restart Explorer from the console's Desktop actions.",
+   "High CPU usually comes from shell extensions (cloud sync overlays, archive tools) or a folder with thousands of thumbnails."
+  ],
+  "safeToEnd": false,
+  "highCpu": "Shell extensions, thumbnail generation, or a stuck network drive."
+ },
+ {
+  "name": "taskhostw.exe",
+  "aliases": [],
+  "displayName": "Host Process for Windows Tasks",
+  "description": "Runs DLL-based scheduled and startup tasks.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Runs DLL-based scheduled and startup tasks.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "RuntimeBroker.exe",
+  "aliases": [],
+  "displayName": "Runtime Broker",
+  "description": "Manages permissions for Store apps.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Manages permissions for Store apps.",
+  "troubleshooting": [
+   "High usage is tied to a Store app (often Photos or Widgets) — close the related app."
+  ],
+  "safeToEnd": false,
+  "highCpu": "A Store app is busy (Photos indexing, Widgets, etc.)."
+ },
+ {
+  "name": "conhost.exe",
+  "aliases": [],
+  "displayName": "Console Window Host",
+  "description": "Hosts command-line windows.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Hosts command-line windows.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "dllhost.exe",
+  "aliases": [],
+  "displayName": "COM Surrogate",
+  "description": "Runs COM components such as thumbnail and media handlers.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [
+   "%SystemRoot%\\System32",
+   "%SystemRoot%\\SysWOW64"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Runs COM components such as thumbnail and media handlers.",
+  "troubleshooting": [],
+  "safeToEnd": false,
+  "highCpu": "Usually thumbnail/codec handlers processing a large media folder."
+ },
+ {
+  "name": "ctfmon.exe",
+  "aliases": [],
+  "displayName": "CTF Loader",
+  "description": "Text input services (keyboard layouts, IME, handwriting).",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Text input services (keyboard layouts, IME, handwriting).",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "audiodg.exe",
+  "aliases": [],
+  "displayName": "Windows Audio Device Graph Isolation",
+  "description": "Processes audio effects in isolation.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-service",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Processes audio effects in isolation.",
+  "troubleshooting": [
+   "High CPU usually comes from audio enhancements or vendor audio effects — disable enhancements for the device."
+  ],
+  "safeToEnd": false,
+  "highCpu": "Audio enhancements or a buggy audio driver effect."
+ },
+ {
+  "name": "spoolsv.exe",
+  "aliases": [],
+  "displayName": "Print Spooler",
+  "description": "Manages print jobs.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-service",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Manages print jobs.",
+  "troubleshooting": [
+   "High CPU or crashes are usually printer driver problems — restart the Print Spooler service and update/remove the printer driver."
+  ],
+  "safeToEnd": false,
+  "highCpu": "A stuck print job or bad printer driver."
+ },
+ {
+  "name": "WmiPrvSE.exe",
+  "aliases": [],
+  "displayName": "WMI Provider Host",
+  "description": "Answers system information queries (WMI).",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-service",
+  "expectedPaths": [
+   "%SystemRoot%\\System32\\wbem"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Answers system information queries (WMI).",
+  "troubleshooting": [
+   "Constant high CPU means an app is querying WMI heavily — vendor utilities (RGB, hardware monitors) are common causes."
+  ],
+  "safeToEnd": false,
+  "highCpu": "Another app is polling system information (RGB/hardware monitoring tools, scripts)."
+ },
+ {
+  "name": "WUDFHost.exe",
+  "aliases": [],
+  "displayName": "Windows Driver Foundation host",
+  "description": "Hosts user-mode drivers (sensors, fingerprint readers, MTP phones).",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Hosts user-mode drivers (sensors, fingerprint readers, MTP phones).",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "SearchIndexer.exe",
+  "aliases": [],
+  "displayName": "Microsoft Windows Search Indexer",
+  "description": "Indexes files for fast search.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-service",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Indexes files for fast search.",
+  "troubleshooting": [
+   "High usage after copying many files is normal and temporary.",
+   "If constant, rebuild the index from Indexing Options."
+  ],
+  "safeToEnd": false,
+  "highCpu": "Indexing new or changed files; constant use suggests a corrupt index — rebuild it."
+ },
+ {
+  "name": "SearchHost.exe",
+  "aliases": [],
+  "displayName": "Search (Windows 11)",
+  "description": "The Start/taskbar search interface.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-shell",
+  "expectedPaths": [
+   "%ProgramFiles%\\WindowsApps\\*",
+   "%SystemRoot%\\SystemApps\\*"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "The Start/taskbar search interface.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "SearchApp.exe",
+  "aliases": [],
+  "displayName": "Search (Windows 10)",
+  "description": "The taskbar search interface.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-shell",
+  "expectedPaths": [
+   "%SystemRoot%\\SystemApps\\*"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "The taskbar search interface.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "SearchProtocolHost.exe",
+  "aliases": [],
+  "displayName": "Search Protocol Host",
+  "description": "Reads files for the indexer.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-service",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Reads files for the indexer.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "SearchFilterHost.exe",
+  "aliases": [],
+  "displayName": "Search Filter Host",
+  "description": "Extracts text from files for indexing.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-service",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Extracts text from files for indexing.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "StartMenuExperienceHost.exe",
+  "aliases": [],
+  "displayName": "Start",
+  "description": "The Start menu.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-shell",
+  "expectedPaths": [
+   "%SystemRoot%\\SystemApps\\*"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "The Start menu.",
+  "troubleshooting": [
+   "If Start won't open, ending this process restarts it."
+  ],
+  "safeToEnd": false
+ },
+ {
+  "name": "ShellExperienceHost.exe",
+  "aliases": [],
+  "displayName": "Windows Shell Experience Host",
+  "description": "Notification area flyouts and system UI.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-shell",
+  "expectedPaths": [
+   "%SystemRoot%\\SystemApps\\*"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Notification area flyouts and system UI.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "TextInputHost.exe",
+  "aliases": [],
+  "displayName": "Text Input Application",
+  "description": "Touch keyboard, emoji panel, and IME UI.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-shell",
+  "expectedPaths": [
+   "%SystemRoot%\\SystemApps\\*"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Touch keyboard, emoji panel, and IME UI.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "ApplicationFrameHost.exe",
+  "aliases": [],
+  "displayName": "Application Frame Host",
+  "description": "Window frames for Store apps.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-shell",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Window frames for Store apps.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "SystemSettings.exe",
+  "aliases": [],
+  "displayName": "Settings",
+  "description": "The Windows Settings app.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-shell",
+  "expectedPaths": [
+   "%SystemRoot%\\ImmersiveControlPanel"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "The Windows Settings app.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "LockApp.exe",
+  "aliases": [],
+  "displayName": "Lock screen",
+  "description": "The lock screen.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-shell",
+  "expectedPaths": [
+   "%SystemRoot%\\SystemApps\\*"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "The lock screen.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "backgroundTaskHost.exe",
+  "aliases": [],
+  "displayName": "Background Task Host",
+  "description": "Runs background tasks for Store apps.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Runs background tasks for Store apps.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "smartscreen.exe",
+  "aliases": [],
+  "displayName": "Windows Defender SmartScreen",
+  "description": "Checks downloaded files and apps against reputation data.",
+  "publisher": "Microsoft Corporation",
+  "category": "security",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Checks downloaded files and apps against reputation data.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "TiWorker.exe",
+  "aliases": [],
+  "displayName": "Windows Modules Installer Worker",
+  "description": "Installs Windows updates and components.",
+  "publisher": "Microsoft Corporation",
+  "category": "updater",
+  "expectedPaths": [
+   "%SystemRoot%\\WinSxS\\*"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Installs Windows updates and components.",
+  "troubleshooting": [
+   "High CPU/disk is normal while updates install — let it finish and restart when asked."
+  ],
+  "safeToEnd": false,
+  "highCpu": "Installing or cleaning up updates. Normal for minutes to an hour after Patch Tuesday."
+ },
+ {
+  "name": "TrustedInstaller.exe",
+  "aliases": [],
+  "displayName": "Windows Modules Installer",
+  "description": "Servicing stack for updates.",
+  "publisher": "Microsoft Corporation",
+  "category": "updater",
+  "expectedPaths": [
+   "%SystemRoot%\\servicing"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Servicing stack for updates.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "MoUsoCoreWorker.exe",
+  "aliases": [],
+  "displayName": "Windows Update orchestrator worker",
+  "description": "Scans for and coordinates Windows updates.",
+  "publisher": "Microsoft Corporation",
+  "category": "updater",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Scans for and coordinates Windows updates.",
+  "troubleshooting": [
+   "Often blocks sleep while checking for updates — check Windows Update status."
+  ],
+  "safeToEnd": false,
+  "highCpu": "Scanning for updates; temporary."
+ },
+ {
+  "name": "usocoreworker.exe",
+  "aliases": [],
+  "displayName": "Update Session Orchestrator worker",
+  "description": "Windows Update coordination.",
+  "publisher": "Microsoft Corporation",
+  "category": "updater",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Windows Update coordination.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "CompatTelRunner.exe",
+  "aliases": [],
+  "displayName": "Microsoft Compatibility Telemetry",
+  "description": "Runs compatibility appraisal for upgrades.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-service",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Runs compatibility appraisal for upgrades.",
+  "troubleshooting": [
+   "Temporary high disk/CPU after updates; leave it to finish. The scheduled task can be reviewed in Settings Explorer → Scheduled tasks."
+  ],
+  "safeToEnd": true,
+  "highCpu": "Periodic compatibility scans; usually finishes within an hour."
+ },
+ {
+  "name": "sppsvc.exe",
+  "aliases": [],
+  "displayName": "Software Protection",
+  "description": "Windows licensing/activation service.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-service",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Windows licensing/activation service.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "SgrmBroker.exe",
+  "aliases": [],
+  "displayName": "System Guard Runtime Monitor",
+  "description": "Platform integrity monitoring.",
+  "publisher": "Microsoft Corporation",
+  "category": "security",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Platform integrity monitoring.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "dasHost.exe",
+  "aliases": [],
+  "displayName": "Device Association Framework",
+  "description": "Pairs wireless and network devices.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-service",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Pairs wireless and network devices.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "WidgetService.exe",
+  "aliases": [],
+  "displayName": "Widgets service",
+  "description": "Background service for Widgets.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-shell",
+  "expectedPaths": [
+   "%ProgramFiles%\\WindowsApps\\*"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Background service for Widgets.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "Widgets.exe",
+  "aliases": [],
+  "displayName": "Widgets",
+  "description": "News and weather widgets board.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-shell",
+  "expectedPaths": [
+   "%ProgramFiles%\\WindowsApps\\*"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "News and weather widgets board.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "startup": "Runs while the Widgets button is enabled. Turn the button off in Taskbar settings to stop it."
+ },
+ {
+  "name": "PhoneExperienceHost.exe",
+  "aliases": [
+   "YourPhone.exe"
+  ],
+  "displayName": "Phone Link",
+  "description": "Connects Android/iPhone to the PC.",
+  "publisher": "Microsoft Corporation",
+  "category": "app",
+  "expectedPaths": [
+   "%ProgramFiles%\\WindowsApps\\*"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Connects Android/iPhone to the PC.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "startup": "Starts at sign-in if Phone Link is set up; can be turned off inside Phone Link settings."
+ },
+ {
+  "name": "GameBar.exe",
+  "aliases": [],
+  "displayName": "Xbox Game Bar",
+  "description": "Game overlay and capture.",
+  "publisher": "Microsoft Corporation",
+  "category": "app",
+  "expectedPaths": [
+   "%ProgramFiles%\\WindowsApps\\*"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Game overlay and capture.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "GameBarPresenceWriter.exe",
+  "aliases": [],
+  "displayName": "Game Bar Presence Writer",
+  "description": "Reports the running game to Xbox services.",
+  "publisher": "Microsoft Corporation",
+  "category": "app",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Reports the running game to Xbox services.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "msedge.exe",
+  "aliases": [],
+  "displayName": "Microsoft Edge",
+  "description": "Microsoft's web browser.",
+  "publisher": "Microsoft Corporation",
+  "category": "browser",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\Microsoft\\Edge\\Application",
+   "%ProgramFiles%\\Microsoft\\Edge\\Application"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Microsoft's web browser.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "highMemory": "Each tab and extension uses memory; use Edge's own task manager (Shift+Esc) to find heavy tabs.",
+  "startup": "'Startup boost' keeps Edge running after sign-in; can be turned off in edge://settings/system."
+ },
+ {
+  "name": "msedgewebview2.exe",
+  "aliases": [],
+  "displayName": "Microsoft Edge WebView2",
+  "description": "Embedded browser engine used by many apps (Widgets, Teams, Outlook, games launchers).",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\Microsoft\\EdgeWebView\\Application\\*",
+   "%ProgramFiles%\\Microsoft\\EdgeWebView\\Application\\*"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Embedded browser engine used by many apps (Widgets, Teams, Outlook, games launchers).",
+  "troubleshooting": [
+   "Memory belongs to the app that embeds it — check the parent process.",
+   "Never uninstall the WebView2 Runtime; many apps need it."
+  ],
+  "safeToEnd": false
+ },
+ {
+  "name": "OneDrive.exe",
+  "aliases": [],
+  "displayName": "Microsoft OneDrive",
+  "description": "Cloud file sync.",
+  "publisher": "Microsoft Corporation",
+  "category": "cloud-sync",
+  "expectedPaths": [
+   "%LOCALAPPDATA%\\Microsoft\\OneDrive",
+   "%ProgramFiles%\\Microsoft OneDrive"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Cloud file sync.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "highCpu": "Syncing many files or stuck on a file — check the OneDrive icon for sync errors.",
+  "startup": "Needed at startup for continuous backup of Desktop/Documents. Disable only if the customer doesn't use OneDrive."
+ },
+ {
+  "name": "SecurityHealthSystray.exe",
+  "aliases": [],
+  "displayName": "Windows Security notification icon",
+  "description": "Tray icon for Windows Security.",
+  "publisher": "Microsoft Corporation",
+  "category": "security",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Tray icon for Windows Security.",
+  "troubleshooting": [],
+  "safeToEnd": false,
+  "startup": "Keep enabled — it surfaces security warnings."
+ },
+ {
+  "name": "SecurityHealthService.exe",
+  "aliases": [],
+  "displayName": "Windows Security Service",
+  "description": "Windows Security center.",
+  "publisher": "Microsoft Corporation",
+  "category": "security",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Windows Security center.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "MsMpEng.exe",
+  "aliases": [],
+  "displayName": "Microsoft Defender Antivirus",
+  "description": "Antivirus scanning engine.",
+  "publisher": "Microsoft Corporation",
+  "category": "security",
+  "expectedPaths": [
+   "%ProgramData%\\Microsoft\\Windows Defender\\Platform\\*",
+   "%ProgramFiles%\\Windows Defender"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Antivirus scanning engine.",
+  "troubleshooting": [
+   "High CPU during scheduled or first scans is normal.",
+   "Constant high CPU can come from scanning a folder that changes constantly (e.g. a game's shader cache, dev build folders) — review with the customer before adding exclusions."
+  ],
+  "safeToEnd": false,
+  "highCpu": "Scanning (scheduled scan, new downloads, or many changed files)."
+ },
+ {
+  "name": "NisSrv.exe",
+  "aliases": [],
+  "displayName": "Microsoft Network Realtime Inspection",
+  "description": "Network intrusion protection for Defender.",
+  "publisher": "Microsoft Corporation",
+  "category": "security",
+  "expectedPaths": [
+   "%ProgramData%\\Microsoft\\Windows Defender\\Platform\\*"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Network intrusion protection for Defender.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "MpDefenderCoreService.exe",
+  "aliases": [],
+  "displayName": "Defender Core Service",
+  "description": "Defender platform core service.",
+  "publisher": "Microsoft Corporation",
+  "category": "security",
+  "expectedPaths": [
+   "%ProgramData%\\Microsoft\\Windows Defender\\Platform\\*"
+  ],
+  "critical": true,
+  "windowsComponent": true,
+  "functionality": "Defender platform core service.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "MpCmdRun.exe",
+  "aliases": [],
+  "displayName": "Defender command-line utility",
+  "description": "Runs Defender maintenance tasks.",
+  "publisher": "Microsoft Corporation",
+  "category": "security",
+  "expectedPaths": [
+   "%ProgramData%\\Microsoft\\Windows Defender\\Platform\\*",
+   "%ProgramFiles%\\Windows Defender"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Runs Defender maintenance tasks.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "MRT.exe",
+  "aliases": [],
+  "displayName": "Malicious Software Removal Tool",
+  "description": "Monthly malware removal scan.",
+  "publisher": "Microsoft Corporation",
+  "category": "security",
+  "expectedPaths": [
+   "%SystemRoot%\\System32"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Monthly malware removal scan.",
+  "troubleshooting": [],
+  "safeToEnd": false,
+  "highCpu": "Monthly scan; finishes on its own."
+ },
+ {
+  "name": "wsappx",
+  "aliases": [],
+  "displayName": "AppX Deployment Service",
+  "description": "Installs and updates Store apps.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-service",
+  "expectedPaths": [],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Installs and updates Store apps.",
+  "troubleshooting": [],
+  "safeToEnd": false,
+  "highCpu": "Store app updates; temporary."
+ },
+ {
+  "name": "TabTip.exe",
+  "aliases": [],
+  "displayName": "Touch Keyboard and Handwriting",
+  "description": "Touch keyboard.",
+  "publisher": "Microsoft Corporation",
+  "category": "windows-core",
+  "expectedPaths": [
+   "%CommonProgramFiles%\\microsoft shared\\ink"
+  ],
+  "critical": false,
+  "windowsComponent": true,
+  "functionality": "Touch keyboard.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "Copilot.exe",
+  "aliases": [],
+  "displayName": "Microsoft Copilot",
+  "description": "Copilot app.",
+  "publisher": "Microsoft Corporation",
+  "category": "app",
+  "expectedPaths": [
+   "%ProgramFiles%\\WindowsApps\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Copilot app.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "NVDisplay.Container.exe",
+  "aliases": [],
+  "displayName": "NVIDIA Display Container",
+  "description": "Hosts NVIDIA Control Panel and display driver plugins.",
+  "publisher": "NVIDIA Corporation",
+  "category": "driver",
+  "expectedPaths": [
+   "%SystemRoot%\\System32\\DriverStore\\FileRepository\\*",
+   "%ProgramFiles%\\NVIDIA Corporation\\Display.NvContainer"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Hosts NVIDIA Control Panel and display driver plugins.",
+  "troubleshooting": [
+   "Required for NVIDIA Control Panel. If it uses high CPU, update or clean-install the driver."
+  ],
+  "safeToEnd": false
+ },
+ {
+  "name": "nvcontainer.exe",
+  "aliases": [],
+  "displayName": "NVIDIA Container",
+  "description": "Hosts NVIDIA App/GeForce Experience services.",
+  "publisher": "NVIDIA Corporation",
+  "category": "vendor-utility",
+  "expectedPaths": [
+   "%ProgramFiles%\\NVIDIA Corporation\\NvContainer"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Hosts NVIDIA App/GeForce Experience services.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "highCpu": "Overlay/recording features or driver update checks."
+ },
+ {
+  "name": "NVIDIA app.exe",
+  "aliases": [],
+  "displayName": "NVIDIA App",
+  "description": "Driver updates, game settings, and overlay.",
+  "publisher": "NVIDIA Corporation",
+  "category": "vendor-utility",
+  "expectedPaths": [
+   "%ProgramFiles%\\NVIDIA Corporation\\NVIDIA app\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Driver updates, game settings, and overlay.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "startup": "Not needed at startup unless the customer uses the overlay/recording; drivers still work without it."
+ },
+ {
+  "name": "NVIDIA Overlay.exe",
+  "aliases": [],
+  "displayName": "NVIDIA Overlay",
+  "description": "In-game overlay, recording, and Instant Replay.",
+  "publisher": "NVIDIA Corporation",
+  "category": "vendor-utility",
+  "expectedPaths": [
+   "%ProgramFiles%\\NVIDIA Corporation\\NVIDIA app\\*",
+   "%ProgramFiles%\\NVIDIA Corporation\\NVIDIA GeForce Experience"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "In-game overlay, recording, and Instant Replay.",
+  "troubleshooting": [
+   "Instant Replay continuously records — turn it off if not used."
+  ],
+  "safeToEnd": true
+ },
+ {
+  "name": "nvsphelper64.exe",
+  "aliases": [],
+  "displayName": "NVIDIA ShadowPlay Helper",
+  "description": "Recording/hotkey helper for the NVIDIA overlay.",
+  "publisher": "NVIDIA Corporation",
+  "category": "vendor-utility",
+  "expectedPaths": [
+   "%ProgramFiles%\\NVIDIA Corporation\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Recording/hotkey helper for the NVIDIA overlay.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "NVIDIA Web Helper.exe",
+  "aliases": [],
+  "displayName": "NVIDIA Web Helper",
+  "description": "GeForce Experience web component.",
+  "publisher": "NVIDIA Corporation",
+  "category": "vendor-utility",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\NVIDIA Corporation\\NvNode"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "GeForce Experience web component.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "nvidia-smi.exe",
+  "aliases": [],
+  "displayName": "NVIDIA System Management Interface",
+  "description": "Command-line GPU monitoring tool.",
+  "publisher": "NVIDIA Corporation",
+  "category": "driver",
+  "expectedPaths": [
+   "%SystemRoot%\\System32",
+   "%SystemRoot%\\System32\\DriverStore\\FileRepository\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Command-line GPU monitoring tool.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "RadeonSoftware.exe",
+  "aliases": [],
+  "displayName": "AMD Software: Adrenalin Edition",
+  "description": "AMD driver control panel and overlay.",
+  "publisher": "Advanced Micro Devices, Inc.",
+  "category": "vendor-utility",
+  "expectedPaths": [
+   "%ProgramFiles%\\AMD\\CNext\\CNext"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "AMD driver control panel and overlay.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "startup": "Needed for the AMD overlay/hotkeys and driver update notifications; graphics work without it."
+ },
+ {
+  "name": "AMDRSServ.exe",
+  "aliases": [],
+  "displayName": "AMD Radeon Settings service",
+  "description": "Background service for AMD Software features (ReLive, overlay).",
+  "publisher": "Advanced Micro Devices, Inc.",
+  "category": "vendor-utility",
+  "expectedPaths": [
+   "%ProgramFiles%\\AMD\\CNext\\CNext"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Background service for AMD Software features (ReLive, overlay).",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "atieclxx.exe",
+  "aliases": [],
+  "displayName": "AMD External Events Client",
+  "description": "Handles display hotkeys and events for the AMD driver.",
+  "publisher": "Advanced Micro Devices, Inc.",
+  "category": "driver",
+  "expectedPaths": [
+   "%SystemRoot%\\System32",
+   "%SystemRoot%\\System32\\DriverStore\\FileRepository\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Handles display hotkeys and events for the AMD driver.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "atiesrxx.exe",
+  "aliases": [],
+  "displayName": "AMD External Events Service",
+  "description": "AMD display event service.",
+  "publisher": "Advanced Micro Devices, Inc.",
+  "category": "driver",
+  "expectedPaths": [
+   "%SystemRoot%\\System32",
+   "%SystemRoot%\\System32\\DriverStore\\FileRepository\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "AMD display event service.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "amdfendrsr.exe",
+  "aliases": [],
+  "displayName": "AMD Crash Defender",
+  "description": "Driver crash recovery service.",
+  "publisher": "Advanced Micro Devices, Inc.",
+  "category": "driver",
+  "expectedPaths": [
+   "%SystemRoot%\\System32",
+   "%SystemRoot%\\System32\\DriverStore\\FileRepository\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Driver crash recovery service.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "igfxEM.exe",
+  "aliases": [],
+  "displayName": "Intel Graphics Event Monitor",
+  "description": "Intel graphics hotkeys and display events.",
+  "publisher": "Intel Corporation",
+  "category": "driver",
+  "expectedPaths": [
+   "%SystemRoot%\\System32",
+   "%SystemRoot%\\System32\\DriverStore\\FileRepository\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Intel graphics hotkeys and display events.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "IntelGraphicsSoftware.exe",
+  "aliases": [],
+  "displayName": "Intel Graphics Software",
+  "description": "Intel Arc/Iris Xe control panel.",
+  "publisher": "Intel Corporation",
+  "category": "vendor-utility",
+  "expectedPaths": [
+   "%ProgramFiles%\\Intel\\Intel Graphics Software"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Intel Arc/Iris Xe control panel.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "RtkAudUService64.exe",
+  "aliases": [],
+  "displayName": "Realtek HD Audio Universal Service",
+  "description": "Realtek audio jack detection and audio console support.",
+  "publisher": "Realtek Semiconductor",
+  "category": "driver",
+  "expectedPaths": [
+   "%SystemRoot%\\System32",
+   "%SystemRoot%\\System32\\DriverStore\\FileRepository\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Realtek audio jack detection and audio console support.",
+  "troubleshooting": [],
+  "safeToEnd": false,
+  "startup": "Supports jack detection and the Realtek Audio Console — leave enabled."
+ },
+ {
+  "name": "WavesSvc64.exe",
+  "aliases": [],
+  "displayName": "Waves MaxxAudio Service",
+  "description": "Laptop audio enhancement service.",
+  "publisher": "Waves Audio Ltd.",
+  "category": "driver",
+  "expectedPaths": [
+   "%SystemRoot%\\System32\\DriverStore\\FileRepository\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Laptop audio enhancement service.",
+  "troubleshooting": [],
+  "safeToEnd": false,
+  "highCpu": "Known to use CPU on some laptops; updating the audio driver from the laptop maker helps."
+ },
+ {
+  "name": "lghub.exe",
+  "aliases": [
+   "lghub_agent.exe",
+   "lghub_updater.exe"
+  ],
+  "displayName": "Logitech G HUB",
+  "description": "Logitech gaming peripheral software.",
+  "publisher": "Logitech",
+  "category": "peripheral",
+  "expectedPaths": [
+   "%ProgramFiles%\\LGHUB"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Logitech gaming peripheral software.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "startup": "Needed at startup only for on-the-fly profile switching and lighting; onboard-memory profiles work without it."
+ },
+ {
+  "name": "Razer Synapse 3.exe",
+  "aliases": [
+   "RazerCentralService.exe",
+   "Razer Synapse Service.exe",
+   "Razer Synapse Service Process.exe"
+  ],
+  "displayName": "Razer Synapse",
+  "description": "Razer peripheral configuration.",
+  "publisher": "Razer Inc.",
+  "category": "peripheral",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\Razer\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Razer peripheral configuration.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "highCpu": "Known to use CPU/memory; update Synapse or reinstall if constant.",
+  "startup": "Needed at startup for lighting/macros not stored on the device."
+ },
+ {
+  "name": "iCUE.exe",
+  "aliases": [
+   "Corsair.Service.exe",
+   "iCUE Launcher.exe"
+  ],
+  "displayName": "Corsair iCUE",
+  "description": "Corsair RGB, fan, and peripheral control.",
+  "publisher": "Corsair",
+  "category": "peripheral",
+  "expectedPaths": [
+   "%ProgramFiles%\\Corsair\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Corsair RGB, fan, and peripheral control.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "highCpu": "Lighting effects and hardware polling; reduce effect complexity or update iCUE.",
+  "startup": "Controls fan curves on some systems — confirm before disabling at startup."
+ },
+ {
+  "name": "SteelSeriesGG.exe",
+  "aliases": [
+   "SteelSeriesEngine.exe"
+  ],
+  "displayName": "SteelSeries GG",
+  "description": "SteelSeries peripheral software.",
+  "publisher": "SteelSeries ApS",
+  "category": "peripheral",
+  "expectedPaths": [
+   "%ProgramFiles%\\SteelSeries\\GG"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "SteelSeries peripheral software.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "MSIAfterburner.exe",
+  "aliases": [],
+  "displayName": "MSI Afterburner",
+  "description": "GPU overclocking and monitoring.",
+  "publisher": "MSI",
+  "category": "vendor-utility",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\MSI Afterburner"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "GPU overclocking and monitoring.",
+  "troubleshooting": [
+   "If the PC is unstable, reset Afterburner to defaults — GPU overclocks are a common cause of crashes."
+  ],
+  "safeToEnd": true
+ },
+ {
+  "name": "RTSS.exe",
+  "aliases": [],
+  "displayName": "RivaTuner Statistics Server",
+  "description": "On-screen display and frame limiter used with Afterburner.",
+  "publisher": "Unwinder",
+  "category": "vendor-utility",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\RivaTuner Statistics Server"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "On-screen display and frame limiter used with Afterburner.",
+  "troubleshooting": [
+   "Can conflict with other overlays and some anti-cheat systems."
+  ],
+  "safeToEnd": true
+ },
+ {
+  "name": "ArmouryCrate.exe",
+  "aliases": [
+   "ArmouryCrate.Service.exe",
+   "ArmouryCrateControlInterface.exe",
+   "AsusCertService.exe",
+   "LightingService.exe"
+  ],
+  "displayName": "ASUS Armoury Crate",
+  "description": "ASUS RGB, fan, and system control.",
+  "publisher": "ASUSTeK COMPUTER INC.",
+  "category": "vendor-utility",
+  "expectedPaths": [
+   "%ProgramFiles%\\WindowsApps\\*",
+   "%ProgramFiles%\\ASUS\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "ASUS RGB, fan, and system control.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "highCpu": "Lighting services are known to be heavy; update or use the official uninstall tool if not needed."
+ },
+ {
+  "name": "steam.exe",
+  "aliases": [],
+  "displayName": "Steam",
+  "description": "Valve's game store and launcher.",
+  "publisher": "Valve Corporation",
+  "category": "game-launcher",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\Steam",
+   "%ProgramFiles%\\Steam"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Valve's game store and launcher.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "startup": "Not needed at startup unless the customer wants downloads/updates in the background."
+ },
+ {
+  "name": "steamwebhelper.exe",
+  "aliases": [],
+  "displayName": "Steam Client WebHelper",
+  "description": "Steam's built-in browser (store, library UI).",
+  "publisher": "Valve Corporation",
+  "category": "game-launcher",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\Steam\\bin\\cef\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Steam's built-in browser (store, library UI).",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "highMemory": "The Steam UI; disable GPU acceleration in Steam's Interface settings on low-end PCs."
+ },
+ {
+  "name": "GameOverlayUI.exe",
+  "aliases": [],
+  "displayName": "Steam Overlay",
+  "description": "In-game Steam overlay.",
+  "publisher": "Valve Corporation",
+  "category": "game-launcher",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\Steam"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "In-game Steam overlay.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "EpicGamesLauncher.exe",
+  "aliases": [
+   "EpicWebHelper.exe"
+  ],
+  "displayName": "Epic Games Launcher",
+  "description": "Epic's game store and launcher.",
+  "publisher": "Epic Games, Inc.",
+  "category": "game-launcher",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\Epic Games\\Launcher\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Epic's game store and launcher.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "highCpu": "Known to use CPU while idle; close it after launching games.",
+  "startup": "Not needed at startup."
+ },
+ {
+  "name": "Battle.net.exe",
+  "aliases": [],
+  "displayName": "Battle.net",
+  "description": "Blizzard launcher.",
+  "publisher": "Blizzard Entertainment",
+  "category": "game-launcher",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\Battle.net"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Blizzard launcher.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "startup": "Not needed at startup."
+ },
+ {
+  "name": "EADesktop.exe",
+  "aliases": [
+   "EABackgroundService.exe"
+  ],
+  "displayName": "EA app",
+  "description": "Electronic Arts launcher.",
+  "publisher": "Electronic Arts",
+  "category": "game-launcher",
+  "expectedPaths": [
+   "%ProgramFiles%\\Electronic Arts\\EA Desktop\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Electronic Arts launcher.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "startup": "Not needed at startup."
+ },
+ {
+  "name": "upc.exe",
+  "aliases": [
+   "UbisoftConnect.exe"
+  ],
+  "displayName": "Ubisoft Connect",
+  "description": "Ubisoft launcher.",
+  "publisher": "Ubisoft",
+  "category": "game-launcher",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\Ubisoft\\Ubisoft Game Launcher"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Ubisoft launcher.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "startup": "Not needed at startup."
+ },
+ {
+  "name": "RiotClientServices.exe",
+  "aliases": [],
+  "displayName": "Riot Client",
+  "description": "Launcher for Valorant and League of Legends.",
+  "publisher": "Riot Games, Inc.",
+  "category": "game-launcher",
+  "expectedPaths": [
+   "C:\\Riot Games\\Riot Client"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Launcher for Valorant and League of Legends.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "vgc.exe",
+  "aliases": [
+   "vgtray.exe"
+  ],
+  "displayName": "Riot Vanguard",
+  "description": "Kernel-level anti-cheat for Valorant/League.",
+  "publisher": "Riot Games, Inc.",
+  "category": "anti-cheat",
+  "expectedPaths": [
+   "%ProgramFiles%\\Riot Vanguard"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Kernel-level anti-cheat for Valorant/League.",
+  "troubleshooting": [
+   "Requires TPM 2.0 and Secure Boot on Windows 11.",
+   "Uninstall via Installed apps if the customer no longer plays Riot games."
+  ],
+  "safeToEnd": false
+ },
+ {
+  "name": "EasyAntiCheat.exe",
+  "aliases": [
+   "EasyAntiCheat_EOS.exe"
+  ],
+  "displayName": "Easy Anti-Cheat",
+  "description": "Anti-cheat service used by many games.",
+  "publisher": "Epic Games, Inc.",
+  "category": "anti-cheat",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\EasyAntiCheat",
+   "%ProgramFiles(x86)%\\EasyAntiCheat_EOS"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Anti-cheat service used by many games.",
+  "troubleshooting": [
+   "Game won't launch: repair EAC from the game's install folder (EasyAntiCheat_Setup.exe)."
+  ],
+  "safeToEnd": false
+ },
+ {
+  "name": "BEService.exe",
+  "aliases": [],
+  "displayName": "BattlEye Service",
+  "description": "Anti-cheat service used by some games.",
+  "publisher": "BattlEye Innovations",
+  "category": "anti-cheat",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\Common Files\\BattlEye"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Anti-cheat service used by some games.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "FACEIT.exe",
+  "aliases": [],
+  "displayName": "FACEIT",
+  "description": "Competitive platform client with anti-cheat.",
+  "publisher": "FACEIT",
+  "category": "anti-cheat",
+  "expectedPaths": [
+   "%ProgramFiles%\\FACEIT AC",
+   "%LOCALAPPDATA%\\FACEIT"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Competitive platform client with anti-cheat.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "Overwolf.exe",
+  "aliases": [
+   "OverwolfBrowser.exe",
+   "OverwolfHelper.exe",
+   "OverwolfLauncher.exe"
+  ],
+  "displayName": "Overwolf",
+  "description": "In-game overlay apps platform.",
+  "publisher": "Overwolf Ltd.",
+  "category": "app",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\Overwolf\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "In-game overlay apps platform.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "highMemory": "Each Overwolf app is a browser process; uninstall unused apps inside Overwolf.",
+  "startup": "Not needed at startup; also bundled by CurseForge."
+ },
+ {
+  "name": "Discord.exe",
+  "aliases": [],
+  "displayName": "Discord",
+  "description": "Voice, video, and text chat.",
+  "publisher": "Discord Inc.",
+  "category": "communication",
+  "expectedPaths": [
+   "%LOCALAPPDATA%\\Discord\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Voice, video, and text chat.",
+  "troubleshooting": [
+   "Black screen/glitches: toggle Hardware Acceleration, then clear the cache."
+  ],
+  "safeToEnd": true,
+  "highCpu": "Hardware acceleration issues or streaming; try toggling hardware acceleration in Discord settings.",
+  "highMemory": "Electron app; several processes are normal.",
+  "startup": "Optional at startup — users who want instant notifications keep it; it can start minimised."
+ },
+ {
+  "name": "Spotify.exe",
+  "aliases": [],
+  "displayName": "Spotify",
+  "description": "Music streaming.",
+  "publisher": "Spotify AB",
+  "category": "communication",
+  "expectedPaths": [
+   "%APPDATA%\\Spotify",
+   "%ProgramFiles%\\WindowsApps\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Music streaming.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "startup": "Not needed at startup; turn off in Spotify → Settings → Startup and window behaviour."
+ },
+ {
+  "name": "Teams.exe",
+  "aliases": [
+   "ms-teams.exe"
+  ],
+  "displayName": "Microsoft Teams (classic)",
+  "description": "Chat and meetings.",
+  "publisher": "Microsoft Corporation",
+  "category": "communication",
+  "expectedPaths": [
+   "%LOCALAPPDATA%\\Microsoft\\Teams\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Chat and meetings.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "highMemory": "Large meetings and many chats use significant memory.",
+  "startup": "Workplace users usually keep it at startup."
+ },
+ {
+  "name": "Zoom.exe",
+  "aliases": [],
+  "displayName": "Zoom Workplace",
+  "description": "Video meetings.",
+  "publisher": "Zoom Video Communications, Inc.",
+  "category": "communication",
+  "expectedPaths": [
+   "%APPDATA%\\Zoom\\bin",
+   "%ProgramFiles%\\Zoom\\bin"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Video meetings.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "startup": "Not needed at startup unless the customer joins many meetings."
+ },
+ {
+  "name": "slack.exe",
+  "aliases": [],
+  "displayName": "Slack",
+  "description": "Team chat.",
+  "publisher": "Slack Technologies",
+  "category": "communication",
+  "expectedPaths": [
+   "%LOCALAPPDATA%\\slack\\*",
+   "%ProgramFiles%\\WindowsApps\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Team chat.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "WhatsApp.exe",
+  "aliases": [],
+  "displayName": "WhatsApp",
+  "description": "Messaging.",
+  "publisher": "WhatsApp LLC",
+  "category": "communication",
+  "expectedPaths": [
+   "%ProgramFiles%\\WindowsApps\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Messaging.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "Telegram.exe",
+  "aliases": [],
+  "displayName": "Telegram",
+  "description": "Messaging.",
+  "publisher": "Telegram FZ-LLC",
+  "category": "communication",
+  "expectedPaths": [
+   "%APPDATA%\\Telegram Desktop"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Messaging.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "obs64.exe",
+  "aliases": [],
+  "displayName": "OBS Studio",
+  "description": "Streaming and recording.",
+  "publisher": "OBS Project",
+  "category": "creative",
+  "expectedPaths": [
+   "%ProgramFiles%\\obs-studio\\bin\\64bit"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Streaming and recording.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "highCpu": "Software (x264) encoding; switch to the GPU encoder (NVENC/AMF/QSV) in Output settings."
+ },
+ {
+  "name": "vlc.exe",
+  "aliases": [],
+  "displayName": "VLC media player",
+  "description": "Media player.",
+  "publisher": "VideoLAN",
+  "category": "app",
+  "expectedPaths": [
+   "%ProgramFiles%\\VideoLAN\\VLC"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Media player.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "chrome.exe",
+  "aliases": [],
+  "displayName": "Google Chrome",
+  "description": "Web browser.",
+  "publisher": "Google LLC",
+  "category": "browser",
+  "expectedPaths": [
+   "%ProgramFiles%\\Google\\Chrome\\Application",
+   "%LOCALAPPDATA%\\Google\\Chrome\\Application"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Web browser.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "highCpu": "A busy tab or extension; check Chrome's Task Manager.",
+  "highMemory": "Each tab/extension is a process; use Chrome's Task Manager (Shift+Esc) to find heavy tabs and extensions.",
+  "startup": "'Continue running background apps when Chrome is closed' keeps it in memory; can be turned off in chrome://settings/system."
+ },
+ {
+  "name": "firefox.exe",
+  "aliases": [],
+  "displayName": "Mozilla Firefox",
+  "description": "Web browser.",
+  "publisher": "Mozilla Corporation",
+  "category": "browser",
+  "expectedPaths": [
+   "%ProgramFiles%\\Mozilla Firefox"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Web browser.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "highMemory": "Use about:processes to find heavy tabs."
+ },
+ {
+  "name": "brave.exe",
+  "aliases": [],
+  "displayName": "Brave",
+  "description": "Web browser.",
+  "publisher": "Brave Software, Inc.",
+  "category": "browser",
+  "expectedPaths": [
+   "%ProgramFiles%\\BraveSoftware\\Brave-Browser\\Application",
+   "%LOCALAPPDATA%\\BraveSoftware\\Brave-Browser\\Application"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Web browser.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "opera.exe",
+  "aliases": [
+   "browser_assistant.exe"
+  ],
+  "displayName": "Opera / Opera GX",
+  "description": "Web browser.",
+  "publisher": "Opera Norway AS",
+  "category": "browser",
+  "expectedPaths": [
+   "%LOCALAPPDATA%\\Programs\\Opera*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Web browser.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "startup": "Opera installs a 'browser assistant' startup entry and auto-update tasks that can be disabled."
+ },
+ {
+  "name": "Dropbox.exe",
+  "aliases": [],
+  "displayName": "Dropbox",
+  "description": "Cloud file sync.",
+  "publisher": "Dropbox, Inc.",
+  "category": "cloud-sync",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\Dropbox\\Client",
+   "%ProgramFiles%\\Dropbox\\Client"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Cloud file sync.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "startup": "Needed at startup for continuous sync."
+ },
+ {
+  "name": "GoogleDriveFS.exe",
+  "aliases": [],
+  "displayName": "Google Drive for desktop",
+  "description": "Cloud file sync.",
+  "publisher": "Google LLC",
+  "category": "cloud-sync",
+  "expectedPaths": [
+   "%ProgramFiles%\\Google\\Drive File Stream\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Cloud file sync.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "OfficeClickToRun.exe",
+  "aliases": [],
+  "displayName": "Microsoft Office Click-to-Run",
+  "description": "Office updates and streaming installation service.",
+  "publisher": "Microsoft Corporation",
+  "category": "updater",
+  "expectedPaths": [
+   "%ProgramFiles%\\Common Files\\microsoft shared\\ClickToRun"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Office updates and streaming installation service.",
+  "troubleshooting": [
+   "Office repair (Quick/Online) is started from Installed apps → Microsoft 365 → Modify."
+  ],
+  "safeToEnd": false
+ },
+ {
+  "name": "OUTLOOK.EXE",
+  "aliases": [],
+  "displayName": "Microsoft Outlook (classic)",
+  "description": "Email client.",
+  "publisher": "Microsoft Corporation",
+  "category": "app",
+  "expectedPaths": [
+   "%ProgramFiles%\\Microsoft Office\\root\\Office16",
+   "%ProgramFiles(x86)%\\Microsoft Office\\root\\Office16"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Email client.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "highCpu": "Large mailboxes indexing or a bad add-in; start with 'outlook.exe /safe' to test add-ins."
+ },
+ {
+  "name": "olk.exe",
+  "aliases": [],
+  "displayName": "Outlook (new)",
+  "description": "Email client (new Outlook).",
+  "publisher": "Microsoft Corporation",
+  "category": "app",
+  "expectedPaths": [
+   "%ProgramFiles%\\WindowsApps\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Email client (new Outlook).",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "WINWORD.EXE",
+  "aliases": [],
+  "displayName": "Microsoft Word",
+  "description": "Word processor.",
+  "publisher": "Microsoft Corporation",
+  "category": "app",
+  "expectedPaths": [
+   "%ProgramFiles%\\Microsoft Office\\root\\Office16"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Word processor.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "EXCEL.EXE",
+  "aliases": [],
+  "displayName": "Microsoft Excel",
+  "description": "Spreadsheets.",
+  "publisher": "Microsoft Corporation",
+  "category": "app",
+  "expectedPaths": [
+   "%ProgramFiles%\\Microsoft Office\\root\\Office16"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Spreadsheets.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "Creative Cloud.exe",
+  "aliases": [
+   "CCXProcess.exe",
+   "CCLibrary.exe",
+   "AdobeIPCBroker.exe",
+   "Adobe Desktop Service.exe",
+   "CoreSync.exe"
+  ],
+  "displayName": "Adobe Creative Cloud",
+  "description": "Adobe app manager.",
+  "publisher": "Adobe Inc.",
+  "category": "creative",
+  "expectedPaths": [
+   "%ProgramFiles%\\Adobe\\Adobe Creative Cloud\\ACC",
+   "%ProgramFiles(x86)%\\Adobe\\Adobe Creative Cloud\\ACC"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Adobe app manager.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "startup": "Not needed at startup unless the customer syncs Adobe fonts/files continuously."
+ },
+ {
+  "name": "AdobeARM.exe",
+  "aliases": [],
+  "displayName": "Adobe Acrobat Update Service",
+  "description": "Updates Acrobat/Reader.",
+  "publisher": "Adobe Inc.",
+  "category": "updater",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\Common Files\\Adobe\\ARM\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Updates Acrobat/Reader.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "Acrobat.exe",
+  "aliases": [
+   "AcroRd32.exe"
+  ],
+  "displayName": "Adobe Acrobat",
+  "description": "PDF reader/editor.",
+  "publisher": "Adobe Inc.",
+  "category": "app",
+  "expectedPaths": [
+   "%ProgramFiles%\\Adobe\\Acrobat DC\\Acrobat"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "PDF reader/editor.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "GoogleUpdate.exe",
+  "aliases": [
+   "updater.exe"
+  ],
+  "displayName": "Google Update",
+  "description": "Keeps Google software updated.",
+  "publisher": "Google LLC",
+  "category": "updater",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\Google\\Update",
+   "%LOCALAPPDATA%\\Google\\Update"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Keeps Google software updated.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "startup": "Runs via scheduled tasks; leave enabled so Chrome stays patched."
+ },
+ {
+  "name": "MicrosoftEdgeUpdate.exe",
+  "aliases": [],
+  "displayName": "Microsoft Edge Update",
+  "description": "Keeps Edge and WebView2 updated.",
+  "publisher": "Microsoft Corporation",
+  "category": "updater",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\Microsoft\\EdgeUpdate"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Keeps Edge and WebView2 updated.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "startup": "Leave enabled — WebView2 security updates depend on it."
+ },
+ {
+  "name": "jusched.exe",
+  "aliases": [],
+  "displayName": "Java Update Scheduler",
+  "description": "Checks for Java updates.",
+  "publisher": "Oracle Corporation",
+  "category": "updater",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\Common Files\\Java\\Java Update"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Checks for Java updates.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "startup": "Old Java runtimes are a security risk — uninstall Java if no app needs it."
+ },
+ {
+  "name": "CCleaner64.exe",
+  "aliases": [
+   "CCleaner.exe"
+  ],
+  "displayName": "CCleaner",
+  "description": "Third-party cleaning tool.",
+  "publisher": "Piriform Software Ltd",
+  "category": "app",
+  "expectedPaths": [
+   "%ProgramFiles%\\CCleaner"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Third-party cleaning tool.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "startup": "'Smart Cleaning' monitoring is not needed at startup. Avoid its registry cleaner on customer PCs."
+ },
+ {
+  "name": "7zFM.exe",
+  "aliases": [],
+  "displayName": "7-Zip File Manager",
+  "description": "Archive tool.",
+  "publisher": "Igor Pavlov",
+  "category": "app",
+  "expectedPaths": [
+   "%ProgramFiles%\\7-Zip"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Archive tool.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "PowerToys.exe",
+  "aliases": [],
+  "displayName": "Microsoft PowerToys",
+  "description": "Productivity utilities.",
+  "publisher": "Microsoft Corporation",
+  "category": "app",
+  "expectedPaths": [
+   "%ProgramFiles%\\PowerToys",
+   "%LOCALAPPDATA%\\PowerToys"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Productivity utilities.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "Everything.exe",
+  "aliases": [],
+  "displayName": "Everything (voidtools)",
+  "description": "Instant file name search.",
+  "publisher": "voidtools",
+  "category": "app",
+  "expectedPaths": [
+   "%ProgramFiles%\\Everything"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Instant file name search.",
+  "troubleshooting": [],
+  "safeToEnd": true
+ },
+ {
+  "name": "wallpaper64.exe",
+  "aliases": [
+   "wallpaper32.exe"
+  ],
+  "displayName": "Wallpaper Engine",
+  "description": "Animated wallpapers.",
+  "publisher": "Wallpaper Engine Team",
+  "category": "app",
+  "expectedPaths": [
+   "%ProgramFiles(x86)%\\Steam\\steamapps\\common\\wallpaper_engine"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Animated wallpapers.",
+  "troubleshooting": [],
+  "safeToEnd": true,
+  "highCpu": "Animated wallpapers use GPU/CPU; set it to pause while games run."
+ },
+ {
+  "name": "MBAMService.exe",
+  "aliases": [
+   "mbamtray.exe",
+   "Malwarebytes.exe"
+  ],
+  "displayName": "Malwarebytes Service",
+  "description": "Malwarebytes protection service.",
+  "publisher": "Malwarebytes",
+  "category": "security",
+  "expectedPaths": [
+   "%ProgramFiles%\\Malwarebytes\\Anti-Malware"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Malwarebytes protection service.",
+  "troubleshooting": [
+   "Running alongside another real-time antivirus can slow the PC; keep one real-time product."
+  ],
+  "safeToEnd": false
+ },
+ {
+  "name": "AvastSvc.exe",
+  "aliases": [
+   "AvastUI.exe"
+  ],
+  "displayName": "Avast Antivirus",
+  "description": "Avast antivirus service.",
+  "publisher": "Avast Software",
+  "category": "security",
+  "expectedPaths": [
+   "%ProgramFiles%\\Avast Software\\Avast"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Avast antivirus service.",
+  "troubleshooting": [
+   "Use the official avastclear tool for complete removal."
+  ],
+  "safeToEnd": false
+ },
+ {
+  "name": "AVGSvc.exe",
+  "aliases": [
+   "AVGUI.exe"
+  ],
+  "displayName": "AVG Antivirus",
+  "description": "AVG antivirus service.",
+  "publisher": "AVG Technologies",
+  "category": "security",
+  "expectedPaths": [
+   "%ProgramFiles%\\AVG\\Antivirus"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "AVG antivirus service.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "mcshield.exe",
+  "aliases": [
+   "mfemms.exe",
+   "McUICnt.exe",
+   "mcapexe.exe"
+  ],
+  "displayName": "McAfee",
+  "description": "McAfee antivirus engine.",
+  "publisher": "McAfee, LLC",
+  "category": "security",
+  "expectedPaths": [
+   "%ProgramFiles%\\McAfee\\*",
+   "%ProgramFiles%\\Common Files\\McAfee\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "McAfee antivirus engine.",
+  "troubleshooting": [
+   "Often pre-installed as a trial; remove with the McAfee Consumer Product Removal tool if the customer doesn't subscribe."
+  ],
+  "safeToEnd": false
+ },
+ {
+  "name": "NortonSecurity.exe",
+  "aliases": [
+   "Norton.exe",
+   "NortonUI.exe"
+  ],
+  "displayName": "Norton",
+  "description": "Norton security suite.",
+  "publisher": "Gen Digital Inc.",
+  "category": "security",
+  "expectedPaths": [
+   "%ProgramFiles%\\Norton*\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Norton security suite.",
+  "troubleshooting": [
+   "Remove with the Norton Remove and Reinstall tool."
+  ],
+  "safeToEnd": false
+ },
+ {
+  "name": "bdagent.exe",
+  "aliases": [
+   "bdservicehost.exe"
+  ],
+  "displayName": "Bitdefender",
+  "description": "Bitdefender agent.",
+  "publisher": "Bitdefender",
+  "category": "security",
+  "expectedPaths": [
+   "%ProgramFiles%\\Bitdefender\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "Bitdefender agent.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ },
+ {
+  "name": "ekrn.exe",
+  "aliases": [
+   "egui.exe"
+  ],
+  "displayName": "ESET",
+  "description": "ESET antivirus kernel service.",
+  "publisher": "ESET",
+  "category": "security",
+  "expectedPaths": [
+   "%ProgramFiles%\\ESET\\*"
+  ],
+  "critical": false,
+  "windowsComponent": false,
+  "functionality": "ESET antivirus kernel service.",
+  "troubleshooting": [],
+  "safeToEnd": false
+ }
+]

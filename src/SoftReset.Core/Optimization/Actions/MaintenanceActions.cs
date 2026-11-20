@@ -556,7 +556,7 @@ public sealed class ClearAppCacheAction : OptimizationAction
         ctx.Knowledge.FindAppGuideByKey(r.Param("app")) ?? throw new ArgumentException($"Unknown application '{r.Param("app")}'.");
 
     private static IEnumerable<(CacheLocation Loc, string Path)> Locations(AppGuide g) =>
-        g.Caches.Select(c => (c, Environment.ExpandEnvironmentVariables(c.Path)));
+        g.Caches.Select(c => (c, Environment.ExpandEnvironmentVariables(c.Path).Replace('\\', Path.DirectorySeparatorChar)));
 
     private static List<string> RunningProcesses(ActionContext ctx, AppGuide g)
     {

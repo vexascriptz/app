@@ -409,3 +409,9 @@ internal sealed class FastStartupUptimeRule : Rule
         yield return f;
     }
 }
+
+/// <summary>Public view of the overlay/capture tools the gaming rule recognises.</summary>
+public static class KnownOverlays
+{
+    public static IReadOnlyDictionary<string, string> Map => Known.Overlays;
+}

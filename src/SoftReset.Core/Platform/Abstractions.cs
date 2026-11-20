@@ -200,7 +200,8 @@ public sealed class ScheduledTaskInfo
     public DateTimeOffset? NextRun { get; set; }
     public bool HasLogonTrigger { get; set; }
     public bool HasBootTrigger { get; set; }
-    public bool IsMicrosoft => Path.StartsWith(@"\Microsoft\", StringComparison.OrdinalIgnoreCase);
+    public bool IsMicrosoft => Path.StartsWith(@"\Microsoft\", StringComparison.OrdinalIgnoreCase)
+                               || Author.StartsWith("Microsoft", StringComparison.OrdinalIgnoreCase);
 }
 
 public interface IScheduledTaskService
