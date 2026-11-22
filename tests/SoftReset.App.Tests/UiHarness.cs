@@ -117,9 +117,16 @@ public sealed class UiHarness : IDisposable
     {
         await WaitAsync(() => Vm.CurrentDialog is TDialog, timeoutMs);
         var dialog = Vm.CurrentDialog;
-        Click(Find<Button>(buttonName));
+        // Wait until the dialog is laid out, so the click lands on the intended button.
+        Button? button = null;
+        await WaitAsync(() => (button = TryFind<Button>(buttonName)) is { IsEffectivelyEnabled: true } b && b.Bounds.Width > 0 && b.Bounds.Height > 0);
+        Pump(60);
+        Click(button!);
         await WaitAsync(() => !ReferenceEquals(Vm.CurrentDialog, dialog));
     }
+
+    public T? TryFind<T>(string name) where T : Control =>
+        Window.GetVisualDescendants().OfType<T>().FirstOrDefault(c => c.Name == name && c.IsEffectivelyVisible);
 
     public T Find<T>(string name) where T : Control =>
         Window.GetVisualDescendants().OfType<T>().FirstOrDefault(c => c.Name == name && c.IsEffectivelyVisible) ?? throw new InvalidOperationException($"Control {name} not found.");
