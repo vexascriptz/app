@@ -1,6 +1,7 @@
 using SoftReset.Core.Diagnostics;
 using SoftReset.Core.Models;
 using SoftReset.Core.Optimization;
+using SoftReset.Core.Optimization.Actions;
 using SoftReset.Core.Platform;
 using SoftReset.Core.Safety;
 using SoftReset.Core.Startup;
@@ -243,6 +244,46 @@ public class ActionRollbackTests
         Assert.True(File.Exists(recent));
         Assert.Equal(new[] { recent }, Directory.EnumerateFiles(temp, "*", SearchOption.AllDirectories));
         Assert.True(long.Parse(r.Parameters["bytesFreed"]) > 1_000_000);
+    }
+
+    [Fact]
+    public void FileCleaner_KeepsFolderJustExtractedIntoTemp_EvenWithOldFileDates()
+    {
+        using var rig = new TestRig();
+        var root = Path.Combine(rig.Root, "clean-root");
+        var extracted = Path.Combine(root, "Temp1_setup.zip");
+        Directory.CreateDirectory(extracted);
+        var inner = Path.Combine(extracted, "setup.exe");
+        File.WriteAllText(inner, "running installer");
+        File.SetLastWriteTimeUtc(inner, DateTime.UtcNow.AddDays(-400)); // archives keep the original date
+        var cutoff = DateTime.UtcNow.AddHours(-24);
+        if (new DirectoryInfo(extracted).CreationTimeUtc <= cutoff) return; // this file system can't report creation dates
+
+        var r = FileCleaner.Delete(root, TimeSpan.FromHours(24), useCreationTime: true);
+
+        Assert.True(File.Exists(inner));
+        Assert.Equal(0, r.FilesDeleted);
+    }
+
+    [Fact]
+    public void FileCleaner_WithCreationDates_StillDeletesFilesThatAreOldInEveryWay()
+    {
+        using var rig = new TestRig();
+        var root = Path.Combine(rig.Root, "clean-root2");
+        var sub = Path.Combine(root, "old-installer");
+        Directory.CreateDirectory(sub);
+        var file = Path.Combine(sub, "leftover.tmp");
+        File.WriteAllText(file, "old");
+        var old = DateTime.UtcNow.AddDays(-30);
+        File.SetLastWriteTimeUtc(file, old);
+        File.SetCreationTimeUtc(file, old);
+        Directory.SetCreationTimeUtc(sub, old);
+        if (new FileInfo(file).CreationTimeUtc > old.AddDays(1)) return; // this file system can't set creation dates
+
+        var r = FileCleaner.Delete(root, TimeSpan.FromHours(24), useCreationTime: true);
+
+        Assert.False(File.Exists(file));
+        Assert.Equal(1, r.FilesDeleted);
     }
 
     [Fact]

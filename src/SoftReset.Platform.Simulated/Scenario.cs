@@ -292,8 +292,11 @@ internal static class Scenario
         {
             var p = Path.Combine(dir, $"file{i:D3}.{ext}");
             File.WriteAllBytes(p, data.AsSpan(0, size - i * 7 % 1024).ToArray());
-            File.SetLastWriteTimeUtc(p, DateTime.UtcNow.AddDays(-oldDays - i % 5));
+            var when = DateTime.UtcNow.AddDays(-oldDays - i % 5);
+            File.SetLastWriteTimeUtc(p, when);
+            File.SetCreationTimeUtc(p, when);
         }
+        Directory.SetCreationTimeUtc(dir, DateTime.UtcNow.AddDays(-oldDays - 5));
     }
 
     private static void SeedDownloads(string dir)

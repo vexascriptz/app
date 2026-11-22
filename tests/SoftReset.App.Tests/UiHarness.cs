@@ -17,7 +17,7 @@ public sealed class UiHarness : IDisposable
 {
     public UiHarness(int width = 1440, int height = 920, bool elevated = false)
     {
-        Root = Path.Combine(Path.GetTempPath(), "softreset-ui-" + Guid.NewGuid().ToString("N")[..8]);
+        Root = Path.Combine(AppContext.BaseDirectory, "sandbox", "ui-" + Guid.NewGuid().ToString("N")[..8]);
         Platform = new SimulatedPlatform(Path.Combine(Root, "sim"), elevated);
         Services = new AppServices(Platform, new AppPaths(Path.Combine(Root, "data"), isPortable: true), demoMode: true);
         Vm = new MainWindowViewModel(Services);

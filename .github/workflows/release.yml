@@ -44,8 +44,16 @@ jobs:
       - name: Build
         run: dotnet build SoftReset.sln -c Release -p:Version=${{ steps.v.outputs.version }}
 
-      - name: Test (core, UI, and Windows-only suites)
-        run: dotnet test SoftReset.sln -c Release --no-build --logger "console;verbosity=normal"
+      - name: Test (core and UI on a simulated PC)
+        shell: pwsh
+        run: |
+          foreach ($p in 'tests/SoftReset.Core.Tests', 'tests/SoftReset.App.Tests') {
+            dotnet test $p -c Release --no-build --logger "console;verbosity=normal"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+      - name: Test (real Windows)
+        run: dotnet test tests/SoftReset.Windows.Tests -c Release --no-build --logger "console;verbosity=normal"
 
       - name: Publish portable executable
         run: dotnet publish src/SoftReset.App/SoftReset.App.csproj -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -p:Version=${{ steps.v.outputs.version }} -o out/SoftResetConsole

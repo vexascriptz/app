@@ -143,17 +143,19 @@ public sealed class CleanupResult
 
 /// <summary>
 /// Deletes files under a folder with strict safety rules: never follows junctions or
-/// symbolic links, skips files modified recently, and skips anything locked.
+/// symbolic links, skips files modified or created recently, skips whole folders that
+/// were created recently (e.g. an archive just extracted there, whose files keep their
+/// original old dates), and skips anything locked.
 /// </summary>
 public static class FileCleaner
 {
-    public static CleanupResult Measure(string root, TimeSpan minAge, CancellationToken ct = default) =>
-        Walk(root, minAge, delete: false, ct);
+    public static CleanupResult Measure(string root, TimeSpan minAge, CancellationToken ct = default, bool? useCreationTime = null) =>
+        Walk(root, minAge, delete: false, useCreationTime ?? OperatingSystem.IsWindows(), ct);
 
-    public static CleanupResult Delete(string root, TimeSpan minAge, CancellationToken ct = default) =>
-        Walk(root, minAge, delete: true, ct);
+    public static CleanupResult Delete(string root, TimeSpan minAge, CancellationToken ct = default, bool? useCreationTime = null) =>
+        Walk(root, minAge, delete: true, useCreationTime ?? OperatingSystem.IsWindows(), ct);
 
-    private static CleanupResult Walk(string root, TimeSpan minAge, bool delete, CancellationToken ct)
+    private static CleanupResult Walk(string root, TimeSpan minAge, bool delete, bool useCreationTime, CancellationToken ct)
     {
         var result = new CleanupResult();
         if (string.IsNullOrEmpty(root) || !Directory.Exists(root)) return result;
@@ -174,13 +176,14 @@ public static class FileCleaner
                 if ((e.Attributes & FileAttributes.ReparsePoint) != 0) { result.FilesSkipped++; continue; }
                 if (e is DirectoryInfo sub)
                 {
+                    if (IsRecent(sub, cutoff, useCreationTime)) { result.FilesSkipped++; continue; } // new folder: leave all of it
                     WalkDir(sub, isRoot: false);
                     continue;
                 }
                 if (e is not FileInfo f) continue;
                 long len;
                 try { len = f.Length; } catch { result.FilesSkipped++; continue; }
-                if (f.LastWriteTimeUtc > cutoff) { result.FilesSkipped++; continue; }
+                if (IsRecent(f, cutoff, useCreationTime)) { result.FilesSkipped++; continue; }
                 result.FilesFound++;
                 result.BytesFound += len;
                 if (!delete) continue;
@@ -207,6 +210,16 @@ public static class FileCleaner
                 catch { /* in use or not empty */ }
             }
         }
+    }
+
+    /// <summary>Modified or created after the cutoff. Extracted and copied files keep their old
+    /// modified date but get a new creation date, so both are checked.</summary>
+    /// By default creation dates are only trusted on Windows (NTFS records them on extract and
+    /// copy); other file systems may not keep them or allow setting them.
+    private static bool IsRecent(FileSystemInfo e, DateTime cutoff, bool useCreationTime)
+    {
+        try { return e.LastWriteTimeUtc > cutoff || (useCreationTime && e.CreationTimeUtc > cutoff); }
+        catch { return true; }
     }
 
     public static string Summary(CleanupResult r) =>

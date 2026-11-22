@@ -11,7 +11,7 @@ public sealed class TestRig : IDisposable
 {
     public TestRig(bool elevated = false)
     {
-        Root = Path.Combine(Path.GetTempPath(), "softreset-test-" + Guid.NewGuid().ToString("N")[..10]);
+        Root = Path.Combine(AppContext.BaseDirectory, "sandbox", "test-" + Guid.NewGuid().ToString("N")[..10]);
         Platform = new SimulatedPlatform(Path.Combine(Root, "sim"), elevated);
         Paths = new AppPaths(Path.Combine(Root, "data"), isPortable: true);
         Paths.EnsureCreated();

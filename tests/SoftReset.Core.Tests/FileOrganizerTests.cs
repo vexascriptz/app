@@ -5,7 +5,7 @@ namespace SoftReset.Core.Tests;
 
 public class FileOrganizerTests : IDisposable
 {
-    private readonly string _root = Path.Combine(Path.GetTempPath(), "softreset-files-" + Guid.NewGuid().ToString("N")[..8]);
+    private readonly string _root = Path.Combine(AppContext.BaseDirectory, "sandbox", "files-" + Guid.NewGuid().ToString("N")[..8]);
     private readonly string _logs;
 
     public FileOrganizerTests()
