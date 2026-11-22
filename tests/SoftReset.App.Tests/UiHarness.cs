@@ -89,8 +89,11 @@ public sealed class UiHarness : IDisposable
     /// <summary>Clicks a control with the (headless) mouse, exactly as a user would: hit-testing decides what receives the click.</summary>
     public void Click(Control c)
     {
+        // Wait (briefly) until the control is visible and laid out, so the click lands on it.
+        var until = DateTime.UtcNow.AddSeconds(3);
+        while ((!c.IsEffectivelyVisible || !c.IsArrangeValid || c.Bounds.Width <= 0 || c.Bounds.Height <= 0) && DateTime.UtcNow < until) Pump(20);
         c.BringIntoView();
-        Pump(40);
+        Pump(60);
         if (!c.IsEffectivelyVisible) throw new InvalidOperationException($"{c.Name ?? c.GetType().Name} is not visible.");
         var p = c.TranslatePoint(new Point(c.Bounds.Width / 2, c.Bounds.Height / 2), Window) ?? throw new InvalidOperationException("Control is not in the window.");
         Window.MouseMove(p, RawInputModifiers.None);
