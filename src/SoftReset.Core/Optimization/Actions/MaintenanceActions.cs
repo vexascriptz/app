@@ -36,7 +36,7 @@ public abstract class FolderCleanupAction : OptimizationAction
         var p = NewPreview();
         p.EstimatedBytesFreed = m.BytesFound;
         if (m.FilesFound > 0) p.Changes.Add(new PreviewChange(folder, $"{m.FilesFound} files, {ToolOutputParsers.FormatBytes(m.BytesFound)}", "Deleted (files in use are skipped)"));
-        p.Warnings.Add("Deleted temporary files cannot be restored. Only files untouched for at least 24 hours are removed; links and junctions are never followed.");
+        p.Warnings.Add("Deleted temporary files cannot be restored. Only files at least a day old are removed — anything added in the last day (like a just-unzipped installer) is kept. Links and junctions are never followed.");
         return Task.FromResult(p);
     }
 

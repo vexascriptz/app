@@ -176,7 +176,7 @@ public static class FileCleaner
                 if ((e.Attributes & FileAttributes.ReparsePoint) != 0) { result.FilesSkipped++; continue; }
                 if (e is DirectoryInfo sub)
                 {
-                    if (IsRecent(sub, cutoff, useCreationTime)) { result.FilesSkipped++; continue; } // new folder: leave all of it
+                    if (IsNewFolder(sub, cutoff, useCreationTime)) { result.FilesSkipped++; continue; } // new folder: leave all of it
                     WalkDir(sub, isRoot: false);
                     continue;
                 }
@@ -216,9 +216,18 @@ public static class FileCleaner
     /// modified date but get a new creation date, so both are checked.</summary>
     /// By default creation dates are only trusted on Windows (NTFS records them on extract and
     /// copy); other file systems may not keep them or allow setting them.
-    private static bool IsRecent(FileSystemInfo e, DateTime cutoff, bool useCreationTime)
+    private static bool IsRecent(FileInfo f, DateTime cutoff, bool useCreationTime)
     {
-        try { return e.LastWriteTimeUtc > cutoff || (useCreationTime && e.CreationTimeUtc > cutoff); }
+        try { return f.LastWriteTimeUtc > cutoff || (useCreationTime && f.CreationTimeUtc > cutoff); }
+        catch { return true; }
+    }
+
+    /// A folder's modified date changes whenever anything inside it changes, so only its
+    /// creation date says whether the folder itself is new.
+    private static bool IsNewFolder(DirectoryInfo d, DateTime cutoff, bool useCreationTime)
+    {
+        if (!useCreationTime) return false;
+        try { return d.CreationTimeUtc > cutoff; }
         catch { return true; }
     }
 
