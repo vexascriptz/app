@@ -722,11 +722,20 @@ public sealed class SettingRegistrySetAction : OptimizationAction, IDynamicAdmin
         var p = NewPreview();
         p.RequiresAdmin = RequiresAdminFor(request);
         p.RequiresRestart = def.Restart is "restart" or "signout";
+        if (IsAlreadySet(ctx, def, c)) return Task.FromResult(p); // nothing to change
         var cur = new SettingsReader(ctx.Platform, "").Read(def.Read);
-        p.Changes.Add(new PreviewChange($@"{def.Name} ({def.Read.Hive}\{def.Read.Path}\{def.Read.Value})", cur.Display, c.ResultLabel ?? (c.Type == "registry-delete" ? "Windows default" : c.Data ?? "")));
-        if (!string.IsNullOrEmpty(def.Risks)) p.Warnings.Add(def.Risks);
+        p.Changes.Add(new PreviewChange(def.Name, cur.Display, c.ResultLabel ?? (c.Type == "registry-delete" ? "Windows default" : c.Data ?? "")));
         if (def.Restart != "none") p.Warnings.Add($"Takes effect after: {def.RestartText}.");
         return Task.FromResult(p);
+    }
+
+    /// <summary>True when the registry already holds exactly the value this control would write.</summary>
+    private static bool IsAlreadySet(ActionContext ctx, SettingDefinition def, SettingControl c)
+    {
+        var v = ctx.Platform.Registry.GetValue(RegistryBackup.ParseHive(def.Read.Hive!), def.Read.Path!, def.Read.Value!);
+        return c.Type == "registry-delete"
+            ? v is null
+            : v is not null && RegistryBackup.Encode(v) == RegistryBackup.Encode(RegistryBackup.Decode(Enum.Parse<RegKind>(c.Kind ?? "DWord", true), c.Data ?? ""));
     }
 
     public override Task ApplyAsync(ActionContext ctx, ActionRequest request, ChangeRecord record, CancellationToken ct)

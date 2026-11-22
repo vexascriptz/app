@@ -1,4 +1,4 @@
-softreset Technician Console 1.0.1
+softreset Technician Console 1.1.0
 ==================================
 
 1. Double-click SoftResetConsole.exe. Nothing to install.

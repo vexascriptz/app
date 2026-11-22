@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SoftReset.App.ViewModels"
+             xmlns:app="using:SoftReset.App"
+             x:Class="SoftReset.App.Views.AutoPlanDialogView" x:DataType="vm:AutoPlanDialogViewModel">
+  <DockPanel Width="560" MaxHeight="680">
+    <StackPanel DockPanel.Dock="Top" Spacing="4" Margin="0,0,0,12">
+      <TextBlock Classes="h2" Text="{Binding Heading}" TextWrapping="Wrap" />
+      <TextBlock Classes="muted" Text="Untick anything you want to skip." />
+    </StackPanel>
+    <StackPanel DockPanel.Dock="Bottom" Spacing="10" Margin="0,14,0,0">
+      <TextBlock Classes="muted small" Text="{Binding AlreadyGoodText}" IsVisible="{Binding AlreadyGoodCount}" />
+      <TextBlock Classes="muted small" Text="Windows will ask for permission once." IsVisible="{Binding NeedsPermission}" />
+      <TextBlock Classes="muted small" Text="Some changes finish after a restart." IsVisible="{Binding NeedsRestart}" />
+      <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+        <Button Classes="secondary" Content="Cancel" Command="{Binding CancelCommand}" x:Name="AutoCancelButton" />
+        <Button Classes="primary" Content="Optimize" Command="{Binding OptimizeCommand}" x:Name="AutoOptimizeConfirmButton" />
+      </StackPanel>
+    </StackPanel>
+    <ScrollViewer>
+      <ItemsControl ItemsSource="{Binding Items}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:AutoStepItem">
+            <Border Classes="soft" Margin="0,0,0,6" Padding="12,8">
+              <CheckBox IsChecked="{Binding IsSelected}">
+                <Grid ColumnDefinitions="*,Auto">
+                  <StackPanel Spacing="1">
+                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" TextWrapping="Wrap" />
+                    <TextBlock Classes="muted small" Text="{Binding Detail}" TextTrimming="CharacterEllipsis" MaxWidth="400" HorizontalAlignment="Left" IsVisible="{Binding Detail, Converter={x:Static app:Converters.NotEmpty}}" />
+                  </StackPanel>
+                  <Border Grid.Column="1" Classes="pill" Margin="8,0,0,0" VerticalAlignment="Center" Background="{StaticResource WarningBgBrush}" IsVisible="{Binding CantUndo}">
+                    <TextBlock Text="Can't undo" Foreground="{StaticResource WarningBrush}" />
+                  </Border>
+                </Grid>
+              </CheckBox>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

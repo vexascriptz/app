@@ -208,6 +208,18 @@ public sealed partial class FilesViewModel : PageViewModel
         finally { Busy = false; }
     }
 
+    /// <summary>Look at the folder, sort it by file type, and move files after one confirmation.</summary>
+    [RelayCommand]
+    private async Task AutoOrganize()
+    {
+        await Analyze();
+        if (Analysis is null) return;
+        Strategy = "By file type";
+        BuildPlan();
+        if (Plan is null || Plan.Moves.Count == 0) { Dialogs.Toast("This folder is already tidy.", ToastKind.Success); return; }
+        await ApplyPlan();
+    }
+
     [RelayCommand] private void Reveal(string path) => S.Platform.Shell.Launch(new LaunchTarget(LaunchKind.RevealFile, path));
 }
 
@@ -262,6 +274,20 @@ public sealed partial class HistoryViewModel : PageViewModel
     }
 
     [RelayCommand] private void Reload() => Load();
+
+    [RelayCommand]
+    private async Task UndoAll()
+    {
+        var ids = S.Journal.LoadAll().Where(r => r.CanRollback).Select(r => r.Id).ToList();
+        if (ids.Count == 0) { Dialogs.Toast("Nothing to undo.", ToastKind.Info); return; }
+        if (!await Dialogs.ConfirmAsync($"Undo all {ids.Count} change(s)?", "Everything this app changed will be put back.", "Undo all")) return;
+        IReadOnlyList<ChangeRecord> undone;
+        using (Dialogs.Busy("Undoing…"))
+            undone = await S.Executor.RollbackManyAsync(ids);
+        var failed = undone.Count(r => r.Status != ChangeStatus.RolledBack);
+        Dialogs.Toast(failed == 0 ? "Everything was put back." : $"{failed} change(s) couldn't be undone.", failed == 0 ? ToastKind.Success : ToastKind.Warning);
+        Load();
+    }
 }
 
 // =====================================================================  Data & about

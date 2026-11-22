@@ -10,7 +10,12 @@
           <Grid ColumnDefinitions="*,10,Auto,10,Auto">
             <TextBox Text="{Binding Folder}" Watermark="Folder" x:Name="FolderBox" />
             <Button Grid.Column="2" Classes="secondary" Content="Browse…" Command="{Binding BrowseCommand}" />
-            <Button Grid.Column="4" Classes="primary" Content="Look at folder" Command="{Binding AnalyzeCommand}" IsEnabled="{Binding !Busy}" x:Name="AnalyzeButton" />
+            <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="10">
+              <Button Classes="secondary" Content="Look at folder" Command="{Binding AnalyzeCommand}" IsEnabled="{Binding !Busy}" x:Name="AnalyzeButton" />
+              <Button Classes="primary" Command="{Binding AutoOrganizeCommand}" IsEnabled="{Binding !Busy}" x:Name="AutoOrganizeButton">
+                <StackPanel Orientation="Horizontal" Spacing="8"><Path Classes="icon" Data="{StaticResource IconWand}" Stroke="White" Width="15" Height="15" /><TextBlock Text="Auto organize" /></StackPanel>
+              </Button>
+            </StackPanel>
           </Grid>
           <StackPanel Orientation="Horizontal" Spacing="6">
             

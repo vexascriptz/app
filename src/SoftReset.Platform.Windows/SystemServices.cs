@@ -361,6 +361,7 @@ internal sealed class WindowsPowerService : IPowerService
         if (Win32.GetSystemPowerStatus(out var ps))
         {
             st.OnAcPower = ps.ACLineStatus switch { 1 => true, 0 => false, _ => null };
+            st.HasBattery = ps.BatteryFlag == 255 ? null : (ps.BatteryFlag & 128) == 0;
             st.BatterySaverOn = ps.SystemStatusFlag == 1;
         }
         if (!string.IsNullOrEmpty(st.ActiveSchemeGuid))

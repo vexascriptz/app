@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SoftReset.App.ViewModels"
+             x:Class="SoftReset.App.Views.AutoResultDialogView" x:DataType="vm:AutoResultDialogViewModel">
+  <DockPanel Width="520" MaxHeight="640">
+    <StackPanel DockPanel.Dock="Top" Spacing="4" Margin="0,0,0,12">
+      <TextBlock Classes="h2" Text="{Binding Heading}" />
+      <Border Classes="notice" IsVisible="{Binding NeedsRestart}" Margin="0,6,0,0">
+        <TextBlock Classes="body" Text="Restart the PC to finish." FontWeight="SemiBold" Foreground="{StaticResource WarningBrush}" />
+      </Border>
+    </StackPanel>
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" Margin="0,14,0,0">
+      <Button Classes="secondary" Content="Undo all" Command="{Binding UndoAllCommand}" IsVisible="{Binding CanUndo}" x:Name="AutoUndoAllButton" />
+      <Button Classes="primary" Content="OK" Command="{Binding OkCommand}" x:Name="AutoOkButton" />
+    </StackPanel>
+    <ScrollViewer>
+      <ItemsControl ItemsSource="{Binding Lines}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:AutoResultLine">
+            <Grid ColumnDefinitions="24,*" Margin="0,3">
+              <TextBlock Text="✓" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}" IsVisible="{Binding Ok}" />
+              <TextBlock Text="–" FontWeight="Bold" Foreground="{StaticResource MutedBrush}" IsVisible="{Binding !Ok}" />
+              <TextBlock Grid.Column="1" Classes="body" Text="{Binding Text}" />
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

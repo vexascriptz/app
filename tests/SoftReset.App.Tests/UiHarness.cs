@@ -59,7 +59,10 @@ public sealed class UiHarness : IDisposable
         var start = DateTime.UtcNow;
         while (!condition())
         {
-            if ((DateTime.UtcNow - start).TotalMilliseconds > timeoutMs) throw new TimeoutException("Condition not met in time.");
+            if ((DateTime.UtcNow - start).TotalMilliseconds > timeoutMs)
+                throw new TimeoutException($"Condition not met in time. Dialog: {Vm.CurrentDialog?.GetType().Name ?? "none"}; busy: {Vm.BusyText ?? "no"}; toasts: {string.Join(" | ", Vm.Toasts.Select(t => t.Text))}" +
+                    (Vm.CurrentDialog is MessageDialogViewModel m ? $"; message: {m.Title}: {m.Message}" : "") +
+                    (Vm.CurrentDialog is AutoPlanDialogViewModel p ? $"; plan: {string.Join(", ", p.Items.Select(i => i.Title + " [" + i.Detail + "]"))}" : ""));
             Pump();
             await Task.Delay(20);
         }

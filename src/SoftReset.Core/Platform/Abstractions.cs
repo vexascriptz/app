@@ -499,7 +499,9 @@ public static class UiEffects
 
 public sealed class ElevatedRequest
 {
-    public string Operation { get; set; } = "apply"; // apply | rollback | maintenance
+    public string Operation { get; set; } = "apply"; // apply | rollback | apply-batch | rollback-batch
+    /// <summary>For batch operations: journal records to process in order (each record holds its own request).</summary>
+    public List<string> BatchRecordIds { get; set; } = new();
     public string ActionId { get; set; } = "";
     public Dictionary<string, string> Parameters { get; set; } = new();
     public List<string> SelectedItems { get; set; } = new();

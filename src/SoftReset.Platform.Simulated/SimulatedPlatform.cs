@@ -74,6 +74,8 @@ public sealed class SimulatedPlatform : ISystemPlatform, IDisposable
     /// uninstalled program (Opera GX's assistant), a common real-world case the startup tools detect.
     /// </summary>
     public bool FileExists(string path) => !path.Contains("Opera GX", StringComparison.OrdinalIgnoreCase);
+    /// <summary>How many times a UAC prompt would have been shown.</summary>
+    public int ElevationPromptCount => ((SimElevation)Elevation).ElevationRequests;
     public List<LaunchTarget> LaunchedTargets { get; } = new();
     public List<string> CommandLog { get; } = new();
 
@@ -291,6 +293,7 @@ internal sealed class SimPower : IPowerService
             ActiveSchemeName = st.Schemes.First(s => s.Active).Name,
             Schemes = st.Schemes.Select(s => new PowerScheme { Guid = s.Guid, Name = s.Name, Active = s.Active }).ToList(),
             OnAcPower = true,
+            HasBattery = false,
             BatterySaverOn = false,
             ProcessorMinStateAc = GetSettingIndex(st.ActiveScheme, PowerSettingIds.SubProcessor, PowerSettingIds.ProcThrottleMin, true),
             ProcessorMaxStateAc = GetSettingIndex(st.ActiveScheme, PowerSettingIds.SubProcessor, PowerSettingIds.ProcThrottleMax, true),

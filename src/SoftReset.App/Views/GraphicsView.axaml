@@ -20,6 +20,8 @@
           </StackPanel>
           <Border Grid.Column="2" Classes="soft" VerticalAlignment="Top">
             <StackPanel Spacing="4">
+              <Button Classes="secondary small" Content="Open to change" HorizontalAlignment="Left" Margin="0,0,0,6"
+                      Command="{Binding $parent[UserControl].((vm:GraphicsViewModel)DataContext).OpenSettingVendorCommand}" CommandParameter="{Binding}" />
               <TextBlock Classes="label" Text="NOW SET TO" />
               <TextBlock Text="{Binding ValueText}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" TextWrapping="Wrap" />
               <TextBlock Classes="muted small" Text="{Binding Location}" IsVisible="{Binding Location, Converter={x:Static app:Converters.NotNull}}" />
@@ -34,6 +36,9 @@
 
   <DockPanel Margin="32,4,32,24">
     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="0,0,0,14">
+      <Button Classes="primary" Command="{Binding AutoGraphicsCommand}" x:Name="AutoGraphicsButton">
+        <StackPanel Orientation="Horizontal" Spacing="8"><Path Classes="icon" Data="{StaticResource IconWand}" Stroke="White" Width="15" Height="15" /><TextBlock Text="Auto optimize graphics" /></StackPanel>
+      </Button>
       <Button Classes="secondary small" Content="Refresh" Command="{Binding RefreshCommand}" />
       <Button Classes="secondary small" Content="Windows display settings" Command="{Binding OpenWindowsGraphicsCommand}" />
       <Button Classes="secondary small" Content="DirectX info" Command="{Binding OpenDxDiagCommand}" />

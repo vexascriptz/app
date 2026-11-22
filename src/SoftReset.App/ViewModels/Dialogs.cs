@@ -13,11 +13,47 @@ public interface IDialogService
     Task<bool> ApproveAsync(ApprovalDialogViewModel dialog);
     Task ShowMessageAsync(string title, string message);
     Task<bool> KeepDisplayChangesAsync(int seconds);
+    Task<bool> ShowAsync(DialogViewModel dialog);
+    void SetBusyText(string text);
     void Toast(string text, ToastKind kind = ToastKind.Info);
     IDisposable Busy(string text);
 }
 
 public enum ToastKind { Info, Success, Warning, Error }
+
+/// <summary>One line in the auto-optimize list: ticked by default, untick to skip.</summary>
+public sealed partial class AutoStepItem : ObservableObject
+{
+    public AutoStepItem(AutoStep step) => Step = step;
+    public AutoStep Step { get; }
+    public string Title => Step.Title;
+    public string Detail => Step.Detail;
+    public bool CantUndo => Step.Reversibility == Reversibility.None && !Step.IsSafetyStep;
+    [ObservableProperty] private bool _isSelected = true;
+}
+
+public sealed partial class AutoPlanDialogViewModel : DialogViewModel
+{
+    public string Heading { get; init; } = "";
+    public ObservableCollection<AutoStepItem> Items { get; init; } = new();
+    public int AlreadyGoodCount { get; init; }
+    public bool NeedsPermission { get; init; }
+    public bool NeedsRestart { get; init; }
+    public string AlreadyGoodText => AlreadyGoodCount > 0 ? $"{AlreadyGoodCount} other things are already set right." : "";
+    [RelayCommand] public void Optimize() => Close(true);
+}
+
+public sealed record AutoResultLine(bool Ok, string Text);
+
+public sealed partial class AutoResultDialogViewModel : DialogViewModel
+{
+    public string Heading { get; init; } = "";
+    public ObservableCollection<AutoResultLine> Lines { get; init; } = new();
+    public bool NeedsRestart { get; init; }
+    public bool CanUndo { get; init; }
+    [RelayCommand] public void Ok() => Close(false);
+    [RelayCommand] public void UndoAll() => Close(true);
+}
 
 public abstract partial class DialogViewModel : ViewModelBase
 {

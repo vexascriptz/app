@@ -371,6 +371,8 @@ public sealed class PowerStatus
     public string ActiveSchemeName { get; set; } = "";
     public List<PowerScheme> Schemes { get; set; } = new();
     public bool? OnAcPower { get; set; }
+    /// <summary>False on desktops (no system battery); null when unknown.</summary>
+    public bool? HasBattery { get; set; }
     public bool? BatterySaverOn { get; set; }
     public int? ProcessorMinStateAc { get; set; }
     public int? ProcessorMaxStateAc { get; set; }

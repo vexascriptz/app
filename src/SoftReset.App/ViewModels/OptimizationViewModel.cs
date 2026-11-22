@@ -184,6 +184,9 @@ public sealed partial class OptimizationViewModel : PageViewModel
         await InspectAsync();
     }
 
+    [RelayCommand] private async Task AutoOptimize() { await Auto.RunAsync(AutoScope.Everything, "Auto optimize this PC"); RefreshUndoAuto(); if (Selected is not null) await InspectAsync(); }
+    [RelayCommand] private async Task UndoAuto() { await Auto.UndoLastAsync(); RefreshUndoAuto(); if (Selected is not null) await InspectAsync(); }
+
     [RelayCommand] private void SelectAllItems() { foreach (var i in Items.Where(i => i.Selectable)) i.IsSelected = true; }
     [RelayCommand] private void SelectNoItems() { foreach (var i in Items) i.IsSelected = false; }
 }

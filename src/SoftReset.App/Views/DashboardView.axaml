@@ -13,6 +13,25 @@
         </Grid>
       </Border>
 
+      <!-- One click -->
+      <Border Classes="hero">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Spacing="4" VerticalAlignment="Center">
+            <TextBlock Text="Make this PC faster" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" />
+            <TextBlock Classes="muted" Text="One click. Keeps your PC looking the same. You can undo it." />
+          </StackPanel>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+            <Button Classes="secondary" Content="Undo" Command="{Binding UndoAutoCommand}" IsVisible="{Binding CanUndoAuto}" />
+            <Button Classes="primary" Command="{Binding AutoOptimizeCommand}" Padding="26,14" x:Name="AutoOptimizeButton">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <Path Classes="icon" Data="{StaticResource IconWand}" Stroke="White" Width="18" Height="18" />
+                <TextBlock Text="Auto optimize" FontSize="16" />
+              </StackPanel>
+            </Button>
+          </StackPanel>
+        </Grid>
+      </Border>
+
       <!-- Status -->
       <Grid ColumnDefinitions="*,20,*,20,*">
         <Border Classes="card">
@@ -36,7 +55,7 @@
               <TextBlock Classes="label" Text="HEALTH" />
               <TextBlock Classes="body" Text="Not scanned yet" IsVisible="{Binding !HasReport}" />
               <TextBlock Classes="body" Text="{Binding LastReport.Findings.Count, StringFormat='{}{0} problems found', FallbackValue=''}" IsVisible="{Binding HasReport}" />
-              <Button Classes="primary" Content="Scan this PC" Command="{Binding RunDiagnosticsCommand}" HorizontalAlignment="Left" x:Name="QuickScanButton" />
+              <Button Classes="secondary" Content="Scan this PC" Command="{Binding RunDiagnosticsCommand}" HorizontalAlignment="Left" x:Name="QuickScanButton" />
             </StackPanel>
           </Grid>
         </Border>

@@ -271,6 +271,8 @@ public sealed partial class ProcessesViewModel : PageViewModel
         else if (exe is null) Dialogs.Toast("Opened the official Microsoft download page.");
     }
 
+    [RelayCommand] private async Task CleanStartup() { await Auto.RunAsync(Core.Optimization.AutoScope.Startup, "Stop unneeded apps starting with Windows"); RefreshUndoAuto(); }
+
     [RelayCommand] private void OpenTaskManager() => S.Platform.Shell.Launch(new LaunchTarget(LaunchKind.SystemTool, "taskmgr.exe"));
     [RelayCommand] private void OpenResourceMonitor() => S.Platform.Shell.Launch(new LaunchTarget(LaunchKind.SystemTool, "resmon.exe"));
 }

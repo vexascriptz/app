@@ -15,6 +15,9 @@ public abstract partial class PageViewModel : ViewModelBase
     protected AppServices S => Shell.Services;
     protected IDialogService Dialogs => Shell.Main;
     protected ActionRunner Runner => Shell.Runner;
+    protected AutoRunner Auto => Shell.Auto;
+    public bool CanUndoAuto => Shell.Auto.LastRunRecordIds.Count > 0;
+    protected void RefreshUndoAuto() => OnPropertyChanged(nameof(CanUndoAuto));
     public abstract string Title { get; }
     public abstract string Subtitle { get; }
     public virtual Task OnActivatedAsync() => Task.CompletedTask;
@@ -28,11 +31,13 @@ public sealed class Shell
         Services = services;
         Main = main;
         Runner = new ActionRunner(services, main);
+        Auto = new AutoRunner(services, main);
     }
 
     public AppServices Services { get; }
     public MainWindowViewModel Main { get; }
     public ActionRunner Runner { get; }
+    public AutoRunner Auto { get; }
 }
 
 public sealed class NavItem
@@ -77,6 +82,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDialogService
         _selectedNav = NavItems[0];
         _currentPage = Dashboard;
         Shell.Runner.ChangeCompleted += (_, _) => History.MarkStale();
+        Shell.Auto.Completed += (_, _) => History.MarkStale();
     }
 
     public AppServices Services { get; }
@@ -166,6 +172,15 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDialogService
 
     public Task<bool> KeepDisplayChangesAsync(int seconds) => Show(new KeepChangesDialogViewModel(seconds));
 
+    public Task<bool> ShowAsync(DialogViewModel dialog) => Show(dialog);
+
+    public void SetBusyText(string text)
+    {
+        if (_busyScopes.Count == 0) return;
+        _busyScopes[^1].Text = text;
+        BusyText = text;
+    }
+
     public void Toast(string text, ToastKind kind = ToastKind.Info)
     {
         var t = new ToastItem { Text = text, Kind = kind };
@@ -181,17 +196,33 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDialogService
     [RelayCommand]
     private void DismissToast(ToastItem t) => Toasts.Remove(t);
 
+    private readonly List<BusyScope> _busyScopes = new();
+
     public IDisposable Busy(string text)
     {
+        var scope = new BusyScope(this, text);
+        _busyScopes.Add(scope);
         BusyText = text;
-        return new BusyScope(this, text);
+        return scope;
+    }
+
+    private void EndBusy(BusyScope scope)
+    {
+        _busyScopes.Remove(scope);
+        BusyText = _busyScopes.Count > 0 ? _busyScopes[^1].Text : null;
     }
 
     private sealed class BusyScope : IDisposable
     {
         private readonly MainWindowViewModel _vm;
-        private readonly string _text;
-        public BusyScope(MainWindowViewModel vm, string text) { _vm = vm; _text = text; }
-        public void Dispose() { if (_vm.BusyText == _text) _vm.BusyText = null; }
+        private bool _disposed;
+        public BusyScope(MainWindowViewModel vm, string text) { _vm = vm; Text = text; }
+        public string Text { get; set; }
+        public void Dispose()
+        {
+            if (_disposed) return;
+            _disposed = true;
+            if (Dispatcher.UIThread.CheckAccess()) _vm.EndBusy(this); else Dispatcher.UIThread.Post(() => _vm.EndBusy(this));
+        }
     }
 }

@@ -68,15 +68,52 @@ public sealed partial class DashboardViewModel : PageViewModel
     [RelayCommand] private async Task RunDiagnostics() { Shell.Main.Navigate(Shell.Main.Diagnostics); await Shell.Main.Diagnostics.ScanCommand.ExecuteAsync(null); }
     [RelayCommand] private void OpenHistory() => Shell.Main.Navigate(Shell.Main.History);
     [RelayCommand] private void OpenTool(NavItem item) => Shell.Main.Navigate(item.Page);
+    [RelayCommand] private async Task AutoOptimize() { await Auto.RunAsync(Core.Optimization.AutoScope.Everything, "Auto optimize this PC"); RefreshUndoAuto(); }
+    [RelayCommand] private async Task UndoAuto() { await Auto.UndoLastAsync(); RefreshUndoAuto(); }
 }
 
 /// <summary>A finding with UI actions for its recommendations.</summary>
 public sealed partial class FindingItem : ObservableObject
 {
+    private readonly Shell _shell;
+
     public FindingItem(Finding f, Shell shell)
     {
         Finding = f;
+        _shell = shell;
         Recommendations = f.Recommendations.Select(r => new RecommendationItem(r, shell)).ToList();
+    }
+
+    private RecommendationItem? PrimaryAction => Recommendations.FirstOrDefault(r => r.HasAction);
+    private RecommendationItem? PrimaryShortcut => Recommendations.FirstOrDefault(r => r.HasShortcut);
+
+    /// <summary>Every problem gets one button: Fix when the app can fix it, otherwise Open (the right Windows page).</summary>
+    public string PrimaryLabel => PrimaryAction is not null ? "Fix" : "Open";
+    public bool PrimaryIsFix => PrimaryAction is not null;
+
+    [RelayCommand]
+    private async Task Primary()
+    {
+        if (PrimaryAction is { } a) { await a.RunCommand.ExecuteAsync(null); return; }
+        if (PrimaryShortcut is { } s) { s.OpenCommand.Execute(null); return; }
+        var target = Finding.Category switch
+        {
+            FindingCategory.Storage => "ms-settings:storagesense",
+            FindingCategory.Startup => "ms-settings:startupapps",
+            FindingCategory.Updates => "ms-settings:windowsupdate",
+            FindingCategory.Network => "ms-settings:network-status",
+            FindingCategory.Security => "windowsdefender:",
+            FindingCategory.Power => "ms-settings:powersleep",
+            FindingCategory.Gaming => "ms-settings:gaming-gamemode",
+            FindingCategory.Display => "ms-settings:display",
+            FindingCategory.Drivers => "devmgmt.msc",
+            FindingCategory.Stability => "perfmon.exe /rel",
+            FindingCategory.DiskHealth => "dfrgui.exe",
+            _ => "taskmgr.exe",
+        };
+        var r = _shell.Services.Platform.Shell.Launch(ShortcutParser.Parse(target));
+        if (!r.Success) _shell.Main.Toast(r.Message, ToastKind.Warning);
+        else if (_shell.Services.DemoMode) _shell.Main.Toast(r.Message);
     }
 
     public Finding Finding { get; }
@@ -99,7 +136,7 @@ public sealed partial class RecommendationItem : ObservableObject
     public bool HasAction => Recommendation.ActionId is not null && _shell.Services.Actions.TryGet(Recommendation.ActionId, out _);
     public bool HasShortcut => Recommendation.ShortcutTarget is not null;
     public string ActionLabel => Recommendation.ActionId is { } id && _shell.Services.Actions.TryGet(id, out var a)
-        ? (NeedsSelection(id) ? "Review…" : "Fix…")
+        ? (NeedsSelection(id) && id is not (ActionIds.StartupUserItems or ActionIds.StartupMachineItems or ActionIds.StartupLogonTasks) ? "Review…" : "Fix")
         : "";
     public string ShortcutLabel => Recommendation.ShortcutLabel ?? "Open";
 
@@ -110,6 +147,11 @@ public sealed partial class RecommendationItem : ObservableObject
     private async Task Run()
     {
         var id = Recommendation.ActionId!;
+        if (id is ActionIds.StartupUserItems or ActionIds.StartupMachineItems or ActionIds.StartupLogonTasks)
+        {
+            await _shell.Auto.RunAsync(Core.Optimization.AutoScope.Startup, "Stop unneeded apps starting with Windows");
+            return;
+        }
         if (NeedsSelection(id) && Recommendation.ActionParameters is null)
         {
             _shell.Main.Navigate(_shell.Main.Optimization);
@@ -195,6 +237,15 @@ public sealed partial class DiagnosticsViewModel : PageViewModel
         shell.Services.LastReport = report;
         Core.Storage.Json.WriteFile(Path.Combine(shell.Services.Paths.Scans, $"scan-{report.CreatedAt:yyyyMMdd-HHmmss}.json"), report);
         return report;
+    }
+
+    /// <summary>Fix everything that can be fixed automatically, then scan again to show the result.</summary>
+    [RelayCommand]
+    private async Task FixAll()
+    {
+        var done = await Auto.RunAsync(Core.Optimization.AutoScope.Everything, "Fix everything automatically");
+        RefreshUndoAuto();
+        if (done.Count > 0) await Scan();
     }
 
     [RelayCommand]

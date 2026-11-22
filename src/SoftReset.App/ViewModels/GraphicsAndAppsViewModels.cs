@@ -158,6 +158,11 @@ public sealed partial class GraphicsViewModel : PageViewModel
         else if (S.DemoMode) Dialogs.Toast(r.Message);
     }
 
+    [RelayCommand] private async Task AutoGraphics() { await Auto.RunAsync(AutoScope.Graphics, "Optimize graphics and gaming"); RefreshUndoAuto(); await Refresh(); }
+
+    /// <summary>Opens the vendor control panel for one driver setting.</summary>
+    [RelayCommand] private void OpenSettingVendor(GpuSettingRow row) => OpenVendor(row.Knowledge.Vendor switch { "AMD" => "amd", "Intel" => "intel", _ => "nvcp" });
+
     [RelayCommand] private void OpenWindowsGraphics() => S.Platform.Shell.Launch(new LaunchTarget(LaunchKind.Uri, "ms-settings:display-advancedgraphics"));
     [RelayCommand] private void OpenDxDiag() => S.Platform.Shell.Launch(new LaunchTarget(LaunchKind.SystemTool, "dxdiag.exe"));
 
@@ -348,6 +353,20 @@ public sealed partial class AppsViewModel : PageViewModel
         if (Guide is null) return;
         Shell.Main.Navigate(Shell.Main.Optimization);
         await Shell.Main.Optimization.SelectActionAsync(ActionIds.ClearAppCache, new() { ["app"] = Guide.Key });
+    }
+
+    /// <summary>Updates every app that has an update available (Windows Package Manager), after one confirmation.</summary>
+    [RelayCommand]
+    private async Task UpdateAll()
+    {
+        var action = S.Actions.Get(ActionIds.WingetUpgrade);
+        ActionInspection insp;
+        using (Dialogs.Busy("Checking for app updates…"))
+            insp = await Task.Run(() => action.InspectAsync(S.ActionContext, new ActionRequest { ActionId = action.Id }, CancellationToken.None));
+        if (!insp.Applicable) { Dialogs.Toast(insp.NotApplicableReason ?? "App updates aren't available on this PC.", ToastKind.Warning); return; }
+        var items = insp.Items.Where(i => i.Selectable).Select(i => i.Id).ToList();
+        if (items.Count == 0) { Dialogs.Toast("All apps are up to date.", ToastKind.Success); return; }
+        await Runner.RunAsync(new ActionRequest { ActionId = action.Id, SelectedItems = items });
     }
 
     [RelayCommand] private void OpenLink(GuideLink l) => Launch(new LaunchTarget(LaunchKind.Uri, l.Url));

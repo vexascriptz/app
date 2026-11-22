@@ -105,6 +105,89 @@ public sealed class ActionExecutor
         return record;
     }
 
+    /// <summary>
+    /// Applies several requests. Changes that need administrator rights are run together in one
+    /// elevated helper (one UAC prompt) before the others; each still gets its own record, backups,
+    /// verification, and rollback. A failure in one request never stops the rest.
+    /// </summary>
+    public async Task<IReadOnlyList<ChangeRecord>> ApplyManyAsync(IReadOnlyList<ActionRequest> requests, IProgress<(int Done, int Total, string Title)>? progress = null, CancellationToken ct = default)
+    {
+        var items = requests.Select(r => (Action: _registry.Get(r.ActionId), Request: r)).ToList();
+        var records = items.Select(i => { var rec = NewRecord(i.Action, i.Request); _ctx.Journal.Save(rec); return rec; }).ToList();
+        var results = new ChangeRecord[records.Count];
+        var done = 0;
+        var elevated = Enumerable.Range(0, items.Count).Where(i => NeedsElevation(items[i].Action, items[i].Request)).ToList();
+        if (elevated.Count > 0)
+        {
+            progress?.Report((done, items.Count, "Waiting for Windows permission…"));
+            var batch = await RunElevatedBatchAsync("apply-batch", elevated.Select(i => records[i]).ToList(), ct);
+            foreach (var (i, rec) in elevated.Zip(batch)) results[i] = rec;
+            done += elevated.Count;
+        }
+        for (var i = 0; i < items.Count; i++)
+        {
+            if (results[i] is not null) continue;
+            progress?.Report((done, items.Count, records[i].Title));
+            results[i] = await ApplyInProcessAsync(items[i].Action, items[i].Request, records[i], ct);
+            done++;
+        }
+        progress?.Report((items.Count, items.Count, ""));
+        return results;
+    }
+
+    /// <summary>Rolls back several records (newest first), with one UAC prompt for those that need it.</summary>
+    public async Task<IReadOnlyList<ChangeRecord>> RollbackManyAsync(IReadOnlyList<string> recordIds, CancellationToken ct = default)
+    {
+        var records = recordIds.Select(id => _ctx.Journal.Load(id)).Where(r => r is { CanRollback: true }).Select(r => r!)
+            .OrderByDescending(r => r.CreatedAt).ToList();
+        var results = new List<ChangeRecord>();
+        var elevated = records.Where(r => r.Elevated && !_ctx.Platform.IsElevated).ToList();
+        if (elevated.Count > 0) results.AddRange(await RunElevatedBatchAsync("rollback-batch", elevated, ct));
+        foreach (var r in records.Except(elevated))
+            results.Add(await RollbackInProcessAsync(_registry.Get(r.ActionId), r, ct));
+        return results;
+    }
+
+    private async Task<IReadOnlyList<ChangeRecord>> RunElevatedBatchAsync(string operation, IReadOnlyList<ChangeRecord> records, CancellationToken ct)
+    {
+        var resultFile = Path.Combine(_ctx.Paths.Temp, $"elevated-batch-{Guid.NewGuid():N}.json");
+        var request = new ElevatedRequest
+        {
+            Operation = operation,
+            BatchRecordIds = records.Select(r => r.Id).ToList(),
+            DataDirectory = _ctx.Paths.Root,
+            ResultFile = resultFile,
+        };
+        var result = await _ctx.Platform.Elevation.RunElevatedAsync(request, ct);
+        var output = new List<ChangeRecord>();
+        foreach (var original in records)
+        {
+            var r = _ctx.Journal.Load(original.Id) ?? original;
+            var apply = operation == "apply-batch";
+            if (result.UserCancelled)
+            {
+                if (apply) { r.Status = ChangeStatus.Cancelled; r.Message = "Windows permission was declined. Nothing was changed."; }
+                else r.RollbackMessage = "Windows permission was declined. The undo did not run.";
+                _ctx.Journal.Save(r);
+            }
+            else if (!result.Launched)
+            {
+                if (apply) { r.Status = ChangeStatus.Failed; r.Message = $"Could not start the elevated helper: {result.Message}"; }
+                else r.RollbackMessage = $"Could not start the elevated helper: {result.Message}";
+                _ctx.Journal.Save(r);
+            }
+            else if (apply && r.Status == ChangeStatus.Pending)
+            {
+                r.Status = ChangeStatus.Failed;
+                r.Message = $"The elevated helper exited (code {result.ExitCode}) without completing this change.";
+                _ctx.Journal.Save(r);
+            }
+            output.Add(r);
+        }
+        try { if (File.Exists(resultFile)) File.Delete(resultFile); } catch { }
+        return output;
+    }
+
     public async Task<ChangeRecord> RollbackAsync(string recordId, CancellationToken ct = default)
     {
         var record = _ctx.Journal.Load(recordId) ?? throw new InvalidOperationException("Change record not found.");
@@ -213,6 +296,37 @@ public static class ElevatedHelper
         var executor = new ActionExecutor(registry, ctx);
         var status = "unknown";
         string message;
+        if (request.Operation is "apply-batch" or "rollback-batch")
+        {
+            var count = 0;
+            foreach (var id in request.BatchRecordIds)
+            {
+                try
+                {
+                    var rec = journal.Load(id) ?? throw new InvalidOperationException($"Change record {id} not found.");
+                    var act = registry.Get(rec.ActionId);
+                    var req = new ActionRequest { ActionId = rec.ActionId, Parameters = rec.Parameters, SelectedItems = rec.SelectedItems, SessionId = rec.SessionId };
+                    if (request.Operation == "apply-batch") await executor.ApplyInProcessAsync(act, req, rec, ct);
+                    else await executor.RollbackInProcessAsync(act, rec, ct);
+                    count++;
+                }
+                catch (Exception ex)
+                {
+                    var rec = journal.Load(id);
+                    if (rec is not null)
+                    {
+                        if (request.Operation == "apply-batch") { rec.Status = ChangeStatus.Failed; rec.Message = ex.Message; }
+                        else { rec.Status = ChangeStatus.RollbackFailed; rec.RollbackMessage = ex.Message; }
+                        journal.Save(rec);
+                    }
+                }
+            }
+            if (!string.IsNullOrEmpty(request.ResultFile))
+            {
+                try { Json.WriteFile(request.ResultFile, new { status = "Batch", message = $"{count} of {request.BatchRecordIds.Count} processed" }); } catch { }
+            }
+            return 0;
+        }
         try
         {
             if (!registry.TryGet(request.ActionId, out var action))

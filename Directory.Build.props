@@ -4,7 +4,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
-    <Version>1.0.1</Version>
+    <Version>1.1.0</Version>
     <Company>softreset</Company>
     <Product>softreset Technician Console</Product>
     <Copyright>Copyright (c) 2026 softreset</Copyright>

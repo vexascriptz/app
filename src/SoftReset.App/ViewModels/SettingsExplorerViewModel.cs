@@ -4,12 +4,17 @@ using CommunityToolkit.Mvvm.Input;
 using SoftReset.Core.Diagnostics;
 using SoftReset.Core.Knowledge;
 using SoftReset.Core.Optimization;
+using SoftReset.Core.Platform;
 
 namespace SoftReset.App.ViewModels;
 
 public sealed partial class SettingRow : ObservableObject
 {
-    public SettingRow(SettingDefinition d) => Definition = d;
+    public SettingRow(SettingDefinition d)
+    {
+        Definition = d;
+        RecommendedControl = FindRecommended(d);
+    }
     public SettingDefinition Definition { get; }
     public string Name => Definition.Name;
     public string Category => Definition.Category;
@@ -18,7 +23,74 @@ public sealed partial class SettingRow : ObservableObject
     public bool Unavailable => State is not null && State.Availability != SettingAvailability.Available;
     public bool Writable => Definition.Controls.Any(c => c.Type is "registry-set" or "registry-delete" or "action");
     public string Badges => Writable ? "Can change here" : "Opens in Windows";
-    partial void OnStateChanged(SettingState? value) { Current = value?.Current.Display ?? "…"; OnPropertyChanged(nameof(Unavailable)); }
+
+    /// <summary>The control that applies the recommended value, when the catalogue says what is recommended.</summary>
+    public int? RecommendedControl { get; }
+
+    private static readonly string[] GeneralUseCases = { "Most users", "All", "Everyone else", "Most people" };
+
+    private static int? FindRecommended(SettingDefinition d)
+    {
+        bool Writes(SettingControl c) => c.Type is "registry-set" or "registry-delete";
+        if (Core.Optimization.AutoOptimizer.RecommendedSettings.TryGetValue(d.Id, out var label))
+        {
+            var i = d.Controls.FindIndex(c => c.Label == label && Writes(c));
+            if (i >= 0) return i;
+        }
+        var rec = d.Recommendations.FirstOrDefault(r => GeneralUseCases.Contains(r.UseCase, StringComparer.OrdinalIgnoreCase));
+        if (rec is null || d.Category is "Security" or "Accessibility" or "Accounts") return null;
+        var idx = d.Controls.FindIndex(c => Writes(c) && c.ResultLabel is { Length: > 0 } r && rec.Value.StartsWith(r, StringComparison.OrdinalIgnoreCase));
+        return idx >= 0 ? idx : null;
+    }
+    public int? OpenControl => Definition.Controls.FindIndex(c => c.Type == "open") is var i and >= 0 ? i : null;
+
+    /// <summary>"Apply" when the recommended value isn't set yet, otherwise "Open" (Windows Settings) — every row has one button.</summary>
+    public bool QuickIsApply => RecommendedControl is { } i && !IsCurrent(Definition.Controls[i]);
+    public string QuickLabel => QuickIsApply ? "Apply" : "Open";
+
+    /// <summary>Where "Open" goes when the setting has no page of its own: the Windows page for its category.</summary>
+    public LaunchTarget CategoryPage => Category switch
+    {
+        "Display" => new(LaunchKind.Uri, "ms-settings:display"),
+        "Graphics" => new(LaunchKind.Uri, "ms-settings:display-advancedgraphics"),
+        "Sound" => new(LaunchKind.Uri, "ms-settings:sound"),
+        "Notifications" => new(LaunchKind.Uri, "ms-settings:notifications"),
+        "Power" => new(LaunchKind.Uri, "ms-settings:powersleep"),
+        "Storage" => new(LaunchKind.Uri, "ms-settings:storagesense"),
+        "Multitasking" => new(LaunchKind.Uri, "ms-settings:multitasking"),
+        "Bluetooth" or "Devices" => new(LaunchKind.Uri, "ms-settings:bluetooth"),
+        "Network" => new(LaunchKind.Uri, "ms-settings:network-status"),
+        "Personalization" or "Registry-backed preferences" => new(LaunchKind.Uri, "ms-settings:personalization"),
+        "Applications" => new(LaunchKind.Uri, "ms-settings:appsfeatures"),
+        "Startup" => new(LaunchKind.Uri, "ms-settings:startupapps"),
+        "Privacy" => new(LaunchKind.Uri, "ms-settings:privacy"),
+        "Security" => new(LaunchKind.Uri, "windowsdefender:"),
+        "Windows Update" => new(LaunchKind.Uri, "ms-settings:windowsupdate"),
+        "Accessibility" => new(LaunchKind.Uri, "ms-settings:easeofaccess-keyboard"),
+        "Gaming" => new(LaunchKind.Uri, "ms-settings:gaming-gamemode"),
+        "Accounts" => new(LaunchKind.Uri, "ms-settings:yourinfo"),
+        "Printers" => new(LaunchKind.Uri, "ms-settings:printers"),
+        "Taskbar" => new(LaunchKind.Uri, "ms-settings:taskbar"),
+        "File Explorer" => new(LaunchKind.SystemTool, "control.exe", "folders"),
+        "Advanced system properties" => new(LaunchKind.SystemTool, "SystemPropertiesAdvanced.exe"),
+        "Services" => new(LaunchKind.Msc, "services.msc"),
+        "Scheduled tasks" => new(LaunchKind.Msc, "taskschd.msc"),
+        "Legacy Control Panel" or "Administrative tools" or "Group Policy" => new(LaunchKind.SystemTool, "control.exe"),
+        _ => new(LaunchKind.Uri, "ms-settings:"),
+    };
+    public bool IsRecommendedSet => RecommendedControl is { } i && IsCurrent(Definition.Controls[i]);
+
+    private bool IsCurrent(SettingControl c) =>
+        State?.Current.Readable == true && c.ResultLabel is { Length: > 0 } r && string.Equals(State.Current.Display, r, StringComparison.OrdinalIgnoreCase);
+
+    partial void OnStateChanged(SettingState? value)
+    {
+        Current = value?.Current.Display ?? "…";
+        OnPropertyChanged(nameof(Unavailable));
+        OnPropertyChanged(nameof(QuickIsApply));
+        OnPropertyChanged(nameof(QuickLabel));
+        OnPropertyChanged(nameof(IsRecommendedSet));
+    }
 }
 
 public sealed partial class SettingControlItem : ObservableObject
@@ -142,6 +214,31 @@ public sealed partial class SettingsExplorerViewModel : PageViewModel
                 break;
             }
         }
+    }
+
+    /// <summary>The one button on each row: apply the recommended value, or open the page in Windows Settings.</summary>
+    [RelayCommand]
+    private async Task Quick(SettingRow row)
+    {
+        Selected = row;
+        if (row.QuickIsApply && row.RecommendedControl is { } i)
+            await ExecuteControlAsync(new SettingControlItem(this, row, row.Definition.Controls[i], i));
+        else if (row.OpenControl is { } o)
+            await ExecuteControlAsync(new SettingControlItem(this, row, row.Definition.Controls[o], o));
+        else
+        {
+            var r = S.Platform.Shell.Launch(row.CategoryPage);
+            if (!r.Success) Dialogs.Toast(r.Message, ToastKind.Warning);
+            else if (S.DemoMode) Dialogs.Toast(r.Message);
+        }
+    }
+
+    [RelayCommand]
+    private async Task ApplyRecommended()
+    {
+        await Auto.RunAsync(Core.Optimization.AutoScope.Settings, "Apply recommended Windows settings");
+        RefreshUndoAuto();
+        await RefreshValues();
     }
 
     [RelayCommand]

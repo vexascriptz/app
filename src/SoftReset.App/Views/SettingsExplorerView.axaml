@@ -5,6 +5,9 @@
              x:Class="SoftReset.App.Views.SettingsExplorerView" x:DataType="vm:SettingsExplorerViewModel">
   <Grid ColumnDefinitions="230,390,*" Margin="32,4,32,24">
     <DockPanel>
+      <Button DockPanel.Dock="Top" Classes="primary" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,0,0,10" Command="{Binding ApplyRecommendedCommand}" x:Name="ApplyRecommendedButton">
+        <StackPanel Orientation="Horizontal" Spacing="8"><Path Classes="icon" Data="{StaticResource IconWand}" Stroke="White" Width="15" Height="15" /><TextBlock Text="Apply all recommended" /></StackPanel>
+      </Button>
       <TextBox DockPanel.Dock="Top" Text="{Binding Search}" Watermark="Search, e.g. dark mode" Margin="0,0,0,10" x:Name="SettingsSearch" />
       <CheckBox DockPanel.Dock="Bottom" IsChecked="{Binding ShowUnavailable}" Margin="0,8,0,0">
         <TextBlock Text="Show unavailable" FontSize="12" />
@@ -25,11 +28,15 @@
       <ListBox Classes="plain" ItemsSource="{Binding Items}" SelectedItem="{Binding Selected}" x:Name="SettingsList">
         <ListBox.ItemTemplate>
           <DataTemplate x:DataType="vm:SettingRow">
-            <StackPanel Spacing="2">
-              <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" TextWrapping="Wrap" />
-              <TextBlock Text="{Binding Current}" FontSize="12" Foreground="{StaticResource AccentDarkBrush}" TextTrimming="CharacterEllipsis" />
-              <TextBlock Classes="muted small" Text="{Binding Badges}" />
-            </StackPanel>
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel Spacing="2" VerticalAlignment="Center">
+                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding Current}" FontSize="12" Foreground="{StaticResource AccentDarkBrush}" TextTrimming="CharacterEllipsis" />
+              </StackPanel>
+              <Button Grid.Column="1" Content="{Binding QuickLabel}" VerticalAlignment="Center" Margin="8,0,0,0"
+                      Classes="small secondary" Classes.primary="{Binding QuickIsApply}"
+                      Command="{Binding $parent[UserControl].((vm:SettingsExplorerViewModel)DataContext).QuickCommand}" CommandParameter="{Binding}" />
+            </Grid>
           </DataTemplate>
         </ListBox.ItemTemplate>
       </ListBox>
