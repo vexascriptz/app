@@ -18,6 +18,32 @@ dotnet test SoftReset.sln
 
 ## Recorded results
 
+### Version 1.1.0 (Auto optimize) — real Windows, GitHub Actions run 13
+
+[Run 44995986416](https://github.com/vexascriptz/app/actions/runs/44995986416) on `windows-latest`
+(Windows Server 2025 Datacenter 24H2, build 26100, elevated, Hyper-V VM, no GPU, no battery):
+
+- Core: **152 passed**. UI: **16 passed**. Real Windows: **18 passed, 0 skipped**.
+- The real-Windows Auto optimize test built a plan from the actual machine, applied it (display
+  changes left out — the VM has one fixed mode), confirmed nothing failed, ran Auto optimize again and
+  got **0 changes**, then ran **Undo all** and checked the power plan and every recommended setting were
+  back to their original values.
+- `--self-test`: **all 14 checks passed** (health 75, same 4 findings as run 2 — correct for a CI VM).
+- `--capture-pages`: every page opened and was captured (exit code 0).
+- Linux (simulated PC): Core **152 passed**, UI **16 passed**, real-Windows suite **18 skipped**.
+
+What earlier 1.1.0 runs found and what was fixed:
+
+- *Restore point failed with "Not found"* on Windows Server, which has no System Restore. The app now
+  checks System Restore is available and switched on before offering a restore point, and says so plainly
+  if it isn't.
+- *A UI test's files vanished mid-test* (runs 9–11). Cause: the real Auto optimize test cleaned `%TEMP%`
+  at the same time, and the simulated PC's files (dated months back) lived there. That showed a real
+  risk: an archive just unzipped into `%TEMP%` keeps its old file dates, so it could have been deleted
+  while in use. Temp cleanup now also keeps anything **created** in the last day, and skips whole folders
+  created in the last day. Test sandboxes moved out of `%TEMP%`; tests that change the real machine run in
+  their own CI step.
+
 ### Version 1.0.1 (simplified interface, customer session removed)
 
 - Linux: Core **136 passed**, UI **10 passed**, Windows-only **16 skipped** (not counted as passing).
