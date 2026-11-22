@@ -32,7 +32,6 @@ public sealed class ActionRunner
 
     public async Task<ChangeRecord?> RunAsync(ActionRequest request, bool skipApproval = false)
     {
-        if (_s.ActiveSession is { IsClosed: false } session) request.SessionId ??= session.Id;
         var action = _s.Actions.Get(request.ActionId);
         ActionPreview preview;
         try
@@ -47,7 +46,7 @@ public sealed class ActionRunner
         }
         if (preview.NothingToDo && action.Reversibility != Reversibility.None && preview.Warnings.Count == 0)
         {
-            _dialogs.Toast("Nothing to change — the setting is already in that state.", ToastKind.Info);
+            _dialogs.Toast("Already set — nothing to change.", ToastKind.Info);
             return null;
         }
 
@@ -58,15 +57,14 @@ public sealed class ActionRunner
             {
                 Title = title,
                 Description = action.Description,
-                ExpectedBenefit = action.ExpectedBenefit,
-                Risks = action.Risks,
+                ExpectedBenefit = FirstSentence(action.ExpectedBenefit),
+                Risks = FirstSentence(action.Risks),
                 RequiresAdmin = preview.RequiresAdmin || ActionExecutor.RequiresAdmin(action, request),
                 RequiresRestart = preview.RequiresRestart,
                 Reversibility = preview.Reversibility,
                 EstimatedBytesFreed = preview.EstimatedBytesFreed,
                 Changes = new ObservableCollection<PreviewChange>(preview.Changes),
                 Warnings = new ObservableCollection<string>(preview.Warnings),
-                InSession = request.SessionId is not null,
             };
             if (!await _dialogs.ApproveAsync(dlg)) return null;
         }
@@ -93,22 +91,30 @@ public sealed class ActionRunner
         return record;
     }
 
+    /// <summary>Keeps dialogs short: the first sentence carries the point; the full text is on the page.</summary>
+    internal static string FirstSentence(string text)
+    {
+        var t = text.Trim();
+        var i = t.IndexOf(". ", StringComparison.Ordinal);
+        return i > 0 ? t[..(i + 1)] : t;
+    }
+
     private void Report(ChangeRecord r)
     {
         switch (r.Status)
         {
             case ChangeStatus.Verified:
-                _dialogs.Toast($"{r.Title}: done. {r.VerificationMessage}{(r.RequiresRestart ? " Restart required." : "")}", ToastKind.Success);
+                _dialogs.Toast($"{r.Title}: done.{(r.RequiresRestart ? " Restart the PC to finish." : "")}", ToastKind.Success);
                 break;
             case ChangeStatus.Applied:
             case ChangeStatus.VerificationFailed:
-                _dialogs.Toast($"{r.Title}: applied, but verification did not confirm it. {r.VerificationMessage}", ToastKind.Warning);
+                _dialogs.Toast($"{r.Title}: applied, but couldn't confirm it worked.", ToastKind.Warning);
                 break;
             case ChangeStatus.Cancelled:
                 _dialogs.Toast(r.Message ?? "Cancelled.", ToastKind.Info);
                 break;
             default:
-                _ = _dialogs.ShowMessageAsync($"{r.Title} did not complete", (r.Message ?? "Unknown error.") + (r.CanRollback ? "\n\nSome items may have changed before the failure. Use Change History → Roll back to restore the backups." : ""));
+                _ = _dialogs.ShowMessageAsync($"{r.Title} did not complete", (r.Message ?? "Unknown error.") + (r.CanRollback ? "\n\nSome parts may have changed. You can undo them in Undo changes." : ""));
                 break;
         }
     }
@@ -117,18 +123,17 @@ public sealed class ActionRunner
     {
         if (!record.CanRollback)
         {
-            await _dialogs.ShowMessageAsync("Cannot roll back", record.Reversibility == Reversibility.None ? "This change cannot be undone automatically." : $"This change is in state {record.Status}.");
+            await _dialogs.ShowMessageAsync("Can't undo this", record.Reversibility == Reversibility.None ? "This kind of change can't be undone." : "It has already been undone or didn't change anything.");
             return null;
         }
-        var ok = await _dialogs.ConfirmAsync("Roll back this change?",
-            $"{record.Title}\n\nThe console will restore {record.Backups.Count} backed-up item(s) captured on {record.CreatedAt.LocalDateTime:g}.", "Roll back");
+        var ok = await _dialogs.ConfirmAsync("Undo this change?", $"{record.Title} will be put back the way it was.", "Undo");
         if (!ok) return null;
         ChangeRecord result;
-        using (_dialogs.Busy("Restoring backups…"))
+        using (_dialogs.Busy("Undoing…"))
             result = await _s.Executor.RollbackAsync(record.Id);
         _s.Log($"Rollback {result.ActionId} → {result.Status}: {result.RollbackMessage}");
-        if (result.Status == ChangeStatus.RolledBack) _dialogs.Toast("Previous configuration restored.", ToastKind.Success);
-        else await _dialogs.ShowMessageAsync("Rollback did not complete", result.RollbackMessage ?? "Unknown error.");
+        if (result.Status == ChangeStatus.RolledBack) _dialogs.Toast("Undone.", ToastKind.Success);
+        else await _dialogs.ShowMessageAsync("Couldn't fully undo", result.RollbackMessage ?? "Unknown error.");
         ChangeCompleted?.Invoke(this, result);
         return result;
     }

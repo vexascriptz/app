@@ -3,7 +3,7 @@
              x:Class="SoftReset.App.Views.KeepChangesDialogView" x:DataType="vm:KeepChangesDialogViewModel">
   <StackPanel Spacing="16" Width="460">
     <TextBlock Classes="h2" Text="Keep these display settings?" />
-    <TextBlock Classes="body" Text="If the picture looks correct and stable, keep the new setting. If the screen is blank or flickering, do nothing — the previous mode is restored automatically." />
+    <TextBlock Classes="body" Text="If the screen looks wrong, do nothing — it goes back automatically." />
     <TextBlock Classes="h3">
       <Run Text="Reverting in" /> <Run Text="{Binding SecondsLeft, Mode=OneWay}" /> <Run Text="seconds" />
     </TextBlock>

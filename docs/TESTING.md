@@ -5,10 +5,10 @@
 | Suite | Tests | Runs on | What it covers |
 |---|---|---|---|
 | `tests/SoftReset.Core.Tests` | 136 | Linux and Windows | Every diagnostic rule against fixtures; every optimization action's apply → verify → rollback against the simulated PC (including admin actions through the elevated helper, UAC decline, failure part-way, interrupted changes); file organizer apply/undo/never-overwrite; knowledge-base integrity (all 245 settings have all fields, safe controls, valid read specs; processes; app guides; GPU settings); PDF structure; output parsers; sessions; storage. |
-| `tests/SoftReset.App.Tests` | 11 | Linux and Windows | The real application window rendered headlessly and driven with mouse clicks and keyboard input: every page opens; approve → apply → verify → undo; declining approval; declined UAC; settings change rolled back from Change History; display change auto-revert; full 10-step customer session ending in a PDF; file organizer apply and undo; typed confirmation for data removal; protected processes. Also produces the screenshots in `docs/screenshots`. |
+| `tests/SoftReset.App.Tests` | 10 | Linux and Windows | The real application window rendered headlessly and driven with mouse clicks and keyboard input: every page opens; approve → apply → verify → undo; declining approval; declined UAC; settings change undone from Undo changes; display change auto-revert; file organizer apply and undo; typed confirmation for data removal; protected processes. Also produces the screenshots in `docs/screenshots`. |
 | `tests/SoftReset.Windows.Tests` | 16 | Windows only (skipped elsewhere) | Real registry, WMI, event logs, signatures, services, Task Scheduler, startup, installed apps, power, displays, network, GPU, live metrics; all 35 rules on real data; all 245 settings read; every action inspected and previewed on real Windows without changing anything. Three tests change real settings and restore them (Explorer option, power plan, DNS flush) — they run only with `SOFTRESET_ALLOW_SYSTEM_CHANGES=1`. |
 | `SoftResetConsole.exe --self-test` | 14 checks | Windows | The published executable's own read-only validation. |
-| `SoftResetConsole.exe --capture-pages` | 11 pages | Windows | The published executable opens every page against real data and saves screenshots. |
+| `SoftResetConsole.exe --capture-pages` | every page | Windows | The published executable opens every page against real data and saves screenshots. |
 
 Run locally:
 
@@ -18,7 +18,12 @@ dotnet test SoftReset.sln
 
 ## Recorded results
 
-### Linux development environment (simulated PC)
+### Version 1.0.1 (simplified interface, customer session removed)
+
+- Linux: Core **136 passed**, UI **10 passed**, Windows-only **16 skipped** (not counted as passing).
+- Windows: see the Release workflow run for 1.0.1 — it runs every suite and the exe's self-test before publishing.
+
+### Linux development environment (simulated PC), version 1.0.0
 
 - Core: **136 passed**, 0 failed.
 - UI: **11 passed**, 0 failed.

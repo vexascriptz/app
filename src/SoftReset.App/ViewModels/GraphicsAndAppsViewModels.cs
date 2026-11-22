@@ -58,8 +58,8 @@ public sealed class GpuSettingRow
 public sealed partial class GraphicsViewModel : PageViewModel
 {
     public GraphicsViewModel(Shell shell) : base(shell) { }
-    public override string Title => "Graphics & NVIDIA";
-    public override string Subtitle => "GPU drivers, live telemetry, displays, and NVIDIA/AMD/Intel driver settings explained. Driver settings are read-only here; changes open the vendor control panel.";
+    public override string Title => "Graphics";
+    public override string Subtitle => "Your graphics card, monitors, and driver settings.";
 
     public ObservableCollection<GpuCard> Gpus { get; } = new();
     public ObservableCollection<DisplayRow> Displays { get; } = new();
@@ -197,8 +197,8 @@ public sealed partial class AppsViewModel : PageViewModel
     private List<StartupEntry> _startup = new();
 
     public AppsViewModel(Shell shell) : base(shell) { }
-    public override string Title => "Applications";
-    public override string Subtitle => "Every discoverable installed program, Store app, and Windows feature, with guides, repair options, and safe uninstall steps.";
+    public override string Title => "Apps";
+    public override string Subtitle => "Installed programs, with fixes for common problems.";
 
     public ObservableCollection<AppRow> Apps { get; } = new();
     public ObservableCollection<OptionalFeatureInfo> Features { get; } = new();
@@ -218,7 +218,7 @@ public sealed partial class AppsViewModel : PageViewModel
     public bool IsStore => Selected?.App.Kind == AppKind.Store;
     public bool CanUninstall => Selected is not null && !Selected.IsEssential && (Selected.App.UninstallCommand is not null || IsStore) && !Selected.App.NoRemove;
     public bool HasCaches => Guide?.Caches.Count > 0;
-    public string EssentialText => Selected?.IsEssential == true ? (Guide?.EssentialReason ?? "This is a Windows component or shared runtime. Removing it can break Windows or other applications, so the console does not offer uninstalling it.") : "";
+    public string EssentialText => Selected?.IsEssential == true ? "Part of Windows or needed by other programs — removing it could break things." : "";
 
     partial void OnSearchChanged(string value) => Filter();
     partial void OnKindFilterChanged(string value) => Filter();
@@ -235,8 +235,8 @@ public sealed partial class AppsViewModel : PageViewModel
         var matches = _startup.Where(e => names.Any(n => e.Name.StartsWith(n, StringComparison.OrdinalIgnoreCase))
                                           || (row.App.InstallLocation is { Length: > 3 } loc && e.ExecutablePath is { } exe && exe.StartsWith(loc, StringComparison.OrdinalIgnoreCase))
                                           || e.Name.Equals(row.Name, StringComparison.OrdinalIgnoreCase)).ToList();
-        if (matches.Count == 0) return row.Guide?.StartupBehavior is { Length: > 0 } sb ? $"No startup entry found on this PC. Typical behaviour: {sb}" : "No startup entry found on this PC.";
-        return string.Join("; ", matches.Select(m => $"{m.Name}: {(m.Enabled ? "starts with Windows" : "disabled at startup")}"));
+        if (matches.Count == 0) return "No";
+        return matches.Any(m => m.Enabled) ? "Yes" : "No (turned off)";
     }
 
     public override async Task OnActivatedAsync()
@@ -292,7 +292,7 @@ public sealed partial class AppsViewModel : PageViewModel
     private async Task RepairMsi()
     {
         if (Selected?.App.MsiProductCode is not { } code) return;
-        if (!await Dialogs.ConfirmAsync($"Repair {Selected.Name}?", "Windows Installer will verify and reinstall missing or corrupted files for this program (msiexec /fa). Settings and documents are not affected. The installer may ask for administrator approval or the original installation media.", "Start repair")) return;
+        if (!await Dialogs.ConfirmAsync($"Repair {Selected.Name}?", "Windows will check the program's files and replace any that are missing or damaged. Your settings and documents aren't touched.", "Repair")) return;
         S.Log($"MSI repair {Selected.Name} {code}");
         Launch(new LaunchTarget(LaunchKind.SystemTool, "msiexec.exe", $"/fa {code}"));
     }
@@ -301,7 +301,7 @@ public sealed partial class AppsViewModel : PageViewModel
     private async Task Modify()
     {
         if (Selected?.App.ModifyCommand is not { } cmd) return;
-        if (!await Dialogs.ConfirmAsync($"Open {Selected.Name} setup?", "This starts the program's own setup in modify/repair mode. Follow its prompts.", "Open setup")) return;
+        if (!await Dialogs.ConfirmAsync($"Open {Selected.Name} setup?", "Opens the program's own setup so you can repair or change it.", "Open setup")) return;
         Launch(VendorCommand(cmd));
     }
 
@@ -324,8 +324,7 @@ public sealed partial class AppsViewModel : PageViewModel
     private async Task Uninstall()
     {
         if (Selected is null || !CanUninstall) return;
-        var steps = Guide?.SafeUninstall is { Count: > 0 } s ? string.Join("\n", s.Select(x => "• " + x)) : "• Close the application first.\n• Follow the vendor uninstaller's prompts.";
-        if (!await Dialogs.ConfirmAsync($"Uninstall {Selected.Name}?", $"This opens the application's own uninstaller — the console never removes software silently.\n\n{steps}\n\nConfirm the customer wants this removed.", "Open uninstaller", danger: true)) return;
+        if (!await Dialogs.ConfirmAsync($"Uninstall {Selected.Name}?", "This opens the program's own uninstaller. Close the program first.", "Open uninstaller", danger: true)) return;
         S.Log($"Uninstall requested for {Selected.Name}");
         if (IsStore) Launch(new LaunchTarget(LaunchKind.Uri, "ms-settings:appsfeatures"));
         else Launch(VendorCommand(Selected.App.UninstallCommand!));

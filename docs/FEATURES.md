@@ -19,24 +19,11 @@ Legend for the **Verified by** column:
 | Starts with standard rights; per-action UAC elevation through `--elevated-run` | Core (`AdminAction_RunsThroughElevatedHelper…`, `UacDeclined_MakesNoChange…`), UI (`Declined_UAC_prompt…`); real UAC prompt: **Not yet** |
 | Portable data folder next to the exe, fallback to `%LOCALAPPDATA%` | Core (`AppPaths_PortableWhenWritable_FallbackOtherwise`) |
 | Interrupted changes detected at next start | Core (`InterruptedRecords_AreRecoveredAtStartup`, `Journal_SkipsCorruptRecords`) |
-| All 11 pages open and render a real view | UI (`Every_navigation_item_opens_its_page`, `Every_page_renders_with_data`), Capture |
-| Remove all application data with typed confirmation | UI (`Removing_all_data_requires_typing_DELETE`) |
+| All 10 pages open and render a real view | UI (`Every_navigation_item_opens_its_page`, `Every_page_renders_with_data`), Capture |
+| Delete all saved data with typed confirmation | UI (`Removing_all_data_requires_typing_DELETE`) |
 | Demo mode with a simulated customer PC | UI (all), launched under a virtual display |
 
-## Customer session (10 stages)
-
-| Feature | Verified by |
-|---|---|
-| Start, concerns, sensitive-text warning, notes | UI (`Customer_session_runs_end_to_end…`), Core (`SensitiveText`, `Session_LifecyclePersistsAndLoads`) |
-| Baseline scan, findings walkthrough | UI |
-| Proposed fixes generated from findings; manual tasks | UI |
-| Approval checklist requiring the customer's name | UI (refuses without a name, then records approval) |
-| Apply approved changes with backups; restore point option | UI, Core |
-| Re-check and before/after metrics | UI, Core (`Compare_ClassifiesResolvedRemainingNew`, `AppliedFixes_ResolveFindingsOnRescan`) |
-| Professional PDF report | UI (validates `%PDF-1.4` output), Core (`SessionReport_BuildsMultiPagePdfWithContent`, `Pdf_HasValidStructureAndXrefOffsets`). Sample: [sample-session-report.pdf](sample-session-report.pdf) |
-| Close and resume sessions | UI, Core |
-
-## Automatic problem diagnoser
+## Find problems
 
 | Feature | Verified by |
 |---|---|
@@ -47,7 +34,7 @@ Legend for the **Verified by** column:
 | Indicative health score | Core |
 | Diagnostic PDF export | Core, Self-test (writes `diagnostic-report.pdf`) |
 
-## Background process explorer
+## Running programs
 
 | Feature | Verified by |
 |---|---|
@@ -58,7 +45,7 @@ Legend for the **Verified by** column:
 | Critical processes cannot be ended | UI (`Protected_processes_cannot_be_ended…`), Core (`EndProcesses_SkipsProtectedProcesses`) |
 | Sysinternals launch when present, official page otherwise | Manual code path; **Not yet** on Windows |
 
-## Windows settings explorer
+## Windows settings
 
 | Feature | Verified by |
 |---|---|
@@ -69,7 +56,7 @@ Legend for the **Verified by** column:
 | Security settings are never write controls; HKLM writes require admin | Core |
 | Open-the-right-page controls for settings Windows doesn't expose | Core (`Settings_ControlsAreSafeAndResolvable`) |
 
-## Graphics & NVIDIA
+## Graphics
 
 | Feature | Verified by |
 |---|---|
@@ -80,7 +67,7 @@ Legend for the **Verified by** column:
 | Display modes and refresh-rate change with 15 s keep-or-revert | Core (`RefreshRate_ChangesAndRestoresMode`, `RefreshRate_UnsupportedModeFailsWithoutChange`), UI (`Refresh_rate_change_reverts…`); real monitor: **Not yet** |
 | HAGS and per-app GPU preference (Windows settings) | Core |
 
-## Applications
+## Apps
 
 | Feature | Verified by |
 |---|---|
@@ -90,7 +77,7 @@ Legend for the **Verified by** column:
 | Uninstall only via the app's own uninstaller; essential components protected | UI page; code path verified in sim; real uninstaller launch: **Not yet** |
 | winget upgrade of selected apps | Core (`Winget_ListsAndUpgradesSelected`, parser tests); real winget: **Not yet** |
 
-## Optimization engine (40 actions, plus 3 used by the Settings explorer)
+## Speed up & fix (40 fixes, plus 3 used by Windows settings)
 
 | Category | Actions | Verified by |
 |---|---|---|
@@ -108,7 +95,7 @@ Legend for the **Verified by** column:
 | All | Honest metadata (benefit, risk, reversibility, measurement) | Core (`ActionCatalog_EveryActionHasHonestMetadata`) |
 | All | Failure part-way keeps backups; partial rollback works | Core (`FailureMidway_KeepsBackups_AndPartialRollbackWorks`) |
 
-## File organizer
+## Organize files
 
 | Feature | Verified by |
 |---|---|
@@ -117,11 +104,11 @@ Legend for the **Verified by** column:
 | Preview, approval, apply, undo — never deletes or overwrites | Core (`Execute_ThenUndo_RestoresEveryFile`, `Execute_NeverOverwrites`, `Undo_RefusesToOverwriteNewFileAtOriginalLocation`), UI (`File_organizer_moves_only_after_approval…`) |
 | Skips recent files, shortcuts, cloud placeholders; refuses system folders | Core |
 
-## Change history and safety
+## Undo changes and safety
 
 | Feature | Verified by |
 |---|---|
 | Write-ahead change journal with typed backups | Core |
 | Registry backup restores value and absence exactly, all value kinds | Core (`RegistryBackup_RoundTripsAllKinds`), **Win** (`Registry_backup_restores_previous_value_and_previous_absence`, `Registry_round_trips_every_value_kind…`) |
-| Rollback from history | UI |
+| Undo from the Undo changes page | UI |
 | Approval required; declining changes nothing | UI (`Declining_approval_changes_nothing`) |

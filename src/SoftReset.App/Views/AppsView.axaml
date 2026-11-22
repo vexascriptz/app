@@ -12,13 +12,13 @@
   <Grid ColumnDefinitions="420,*" Margin="32,4,32,24">
     <DockPanel>
       <Grid DockPanel.Dock="Top" ColumnDefinitions="*,10,170" Margin="0,0,0,10">
-        <TextBox Text="{Binding Search}" Watermark="Search apps or publishers" x:Name="AppSearch" />
+        <TextBox Text="{Binding Search}" Watermark="Search" x:Name="AppSearch" />
         <ComboBox Grid.Column="2" ItemsSource="{Binding KindFilters}" SelectedItem="{Binding KindFilter}" HorizontalAlignment="Stretch" />
       </Grid>
       <StackPanel DockPanel.Dock="Bottom" Spacing="8" Margin="0,10,0,0">
         <TextBlock Classes="muted small wrap" Text="{Binding Summary}" />
         <StackPanel Orientation="Horizontal" Spacing="8">
-          <Button Classes="secondary small" Content="Windows Installed apps" Command="{Binding OpenAppsSettingsCommand}" />
+          <Button Classes="secondary small" Content="Windows app list" Command="{Binding OpenAppsSettingsCommand}" />
           <Button Classes="secondary small" Content="Windows features" Command="{Binding OpenFeaturesCommand}" />
         </StackPanel>
       </StackPanel>
@@ -50,9 +50,9 @@
       <StackPanel Spacing="14">
         <Border Classes="card" IsVisible="{Binding !HasSelection}">
           <StackPanel Spacing="10">
-            <TextBlock Classes="h3" Text="Pick an application" />
-            <TextBlock Classes="body" Text="Each page shows what the program is, its version and storage, whether it starts with Windows, common problems with fixes, repair and reset steps, and how to uninstall it safely. Uninstalling always uses the program's own uninstaller, and Windows components are never offered for removal." />
-            <TextBlock Classes="h3" Text="Windows optional features" Margin="0,10,0,0" />
+            <TextBlock Classes="h3" Text="Pick an app" />
+            <TextBlock Classes="body" Text="You'll see what it is, common problems and fixes, and options to repair or remove it." />
+            <TextBlock Classes="h3" Text="Windows features" Margin="0,10,0,0" />
             <ItemsControl ItemsSource="{Binding Features}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="p:OptionalFeatureInfo">
@@ -75,18 +75,18 @@
             </StackPanel>
             <Border Classes="soft">
               <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
-                <TextBlock Classes="label" Text="PUBLISHER" />
+                <TextBlock Classes="label" Text="MADE BY" />
                 <TextBlock Grid.Column="1" Classes="body" Text="{Binding Selected.Publisher, FallbackValue=''}" />
                 <TextBlock Grid.Row="1" Classes="label" Text="VERSION" Margin="0,6,0,0" />
                 <TextBlock Grid.Row="1" Grid.Column="1" Classes="body" Text="{Binding Selected.Version, FallbackValue=''}" Margin="0,6,0,0" />
-                <TextBlock Grid.Row="2" Classes="label" Text="STORAGE" Margin="0,6,0,0" />
+                <TextBlock Grid.Row="2" Classes="label" Text="SIZE" Margin="0,6,0,0" />
                 <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="10" Margin="0,6,0,0">
                   <TextBlock Classes="body" Text="{Binding SizeText}" VerticalAlignment="Center" />
-                  <Button Classes="ghost small" Content="Measure folder" Command="{Binding ComputeSizeCommand}" Padding="4,0" />
+                  <Button Classes="ghost small" Content="Measure" Command="{Binding ComputeSizeCommand}" Padding="4,0" />
                 </StackPanel>
                 <TextBlock Grid.Row="3" Classes="label" Text="LOCATION" Margin="0,6,0,0" />
                 <TextBlock Grid.Row="3" Grid.Column="1" Classes="body" Text="{Binding Selected.App.InstallLocation, FallbackValue='Not recorded', TargetNullValue='Not recorded by the installer'}" Margin="0,6,0,0" />
-                <TextBlock Grid.Row="4" Classes="label" Text="STARTUP" Margin="0,6,0,0" />
+                <TextBlock Grid.Row="4" Classes="label" Text="STARTS WITH PC" Margin="0,6,0,0" />
                 <TextBlock Grid.Row="4" Grid.Column="1" Classes="body" Text="{Binding StartupText}" Margin="0,6,0,0" />
               </Grid>
             </Border>
@@ -95,9 +95,9 @@
             </Border>
             <WrapPanel>
               <Button Classes="secondary small" Content="Open" Command="{Binding OpenAppCommand}" Margin="0,0,8,8" />
-              <Button Classes="secondary small" Content="Repair (Windows Installer)" Command="{Binding RepairMsiCommand}" IsVisible="{Binding CanRepairMsi}" Margin="0,0,8,8" />
-              <Button Classes="secondary small" Content="Modify / repair setup" Command="{Binding ModifyCommand}" IsVisible="{Binding CanModify}" Margin="0,0,8,8" />
-              <Button Classes="secondary small" Content="Repair or reset (Windows)" Command="{Binding StoreAdvancedCommand}" IsVisible="{Binding IsStore}" Margin="0,0,8,8" />
+              <Button Classes="secondary small" Content="Repair" Command="{Binding RepairMsiCommand}" IsVisible="{Binding CanRepairMsi}" Margin="0,0,8,8" />
+              <Button Classes="secondary small" Content="Repair / change" Command="{Binding ModifyCommand}" IsVisible="{Binding CanModify}" Margin="0,0,8,8" />
+              <Button Classes="secondary small" Content="Repair or reset" Command="{Binding StoreAdvancedCommand}" IsVisible="{Binding IsStore}" Margin="0,0,8,8" />
               <Button Classes="secondary small" Content="Clear caches…" Command="{Binding ClearCacheCommand}" IsVisible="{Binding HasCaches}" Margin="0,0,8,8" />
               <Button Classes="danger small" Content="Uninstall…" Command="{Binding UninstallCommand}" IsVisible="{Binding CanUninstall}" Margin="0,0,8,8" />
             </WrapPanel>
@@ -127,14 +127,14 @@
                 <ItemsControl ItemsSource="{Binding Guide.Reset, FallbackValue={x:Null}}" ItemTemplate="{StaticResource Bullet}" />
               </StackPanel>
               <StackPanel Grid.Column="2" Spacing="4">
-                <TextBlock Classes="label" Text="SAFE UNINSTALL" />
+                <TextBlock Classes="label" Text="BEFORE UNINSTALLING" />
                 <ItemsControl ItemsSource="{Binding Guide.SafeUninstall, FallbackValue={x:Null}}" ItemTemplate="{StaticResource Bullet}" />
-                <TextBlock Classes="label" Text="SETTINGS WORTH KNOWING" Margin="0,8,0,0" />
+                <TextBlock Classes="label" Text="USEFUL SETTINGS" Margin="0,8,0,0" />
                 <ItemsControl ItemsSource="{Binding Guide.RelevantSettings, FallbackValue={x:Null}}" ItemTemplate="{StaticResource Bullet}" />
               </StackPanel>
             </Grid>
             <StackPanel Spacing="4">
-              <TextBlock Classes="label" Text="OFFICIAL GUIDANCE" />
+              <TextBlock Classes="label" Text="HELP PAGES" />
               <ItemsControl ItemsSource="{Binding Guide.Links, FallbackValue={x:Null}}">
                 <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>

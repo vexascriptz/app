@@ -13,12 +13,7 @@ public sealed partial class ActionCard : ObservableObject
     public IOptimizationAction Action { get; }
     public string Title => Action.Title;
     public string Description => Action.Description;
-    public string Badges => string.Join(" · ", new[]
-    {
-        Action.RequiresAdmin ? "Admin" : null,
-        Action.RequiresRestart ? "Restart" : null,
-        Action.Reversibility switch { Reversibility.Full => "Reversible", Reversibility.Partial => "Partly reversible", _ => "Not reversible" },
-    }.Where(x => x is not null));
+    public string Badges => Action.Reversibility switch { Reversibility.Full => "Can undo", Reversibility.Partial => "Can partly undo", _ => "Can't undo" };
 }
 
 public sealed class CategoryGroup
@@ -26,6 +21,19 @@ public sealed class CategoryGroup
     public CategoryGroup(string name, IEnumerable<ActionCard> actions) { Name = name; Actions = actions.ToList(); }
     public string Name { get; }
     public IReadOnlyList<ActionCard> Actions { get; }
+}
+
+/// <summary>A tickable item (startup entry, file, process…) shown in a list.</summary>
+public sealed partial class SelectableItem : ObservableObject
+{
+    public string Id { get; init; } = "";
+    public string Label { get; init; } = "";
+    public string Detail { get; init; } = "";
+    public string? State { get; init; }
+    public string? Recommendation { get; init; }
+    public string? Warning { get; init; }
+    public bool Selectable { get; init; } = true;
+    [ObservableProperty] private bool _isSelected;
 }
 
 public sealed partial class OptionItem : ObservableObject
@@ -44,23 +52,23 @@ public sealed partial class OptimizationViewModel : PageViewModel
     {
         string Name(OptimizationCategory c) => c switch
         {
-            OptimizationCategory.Startup => "Startup optimization",
-            OptimizationCategory.Storage => "Storage cleanup",
-            OptimizationCategory.Background => "Background activity",
-            OptimizationCategory.Power => "Power configuration",
-            OptimizationCategory.Gaming => "Gaming configuration",
-            OptimizationCategory.Display => "Display configuration",
-            OptimizationCategory.Maintenance => "Windows maintenance",
-            OptimizationCategory.AppMaintenance => "Application maintenance",
-            OptimizationCategory.Network => "Network diagnostics",
-            OptimizationCategory.Desktop => "Desktop customization",
+            OptimizationCategory.Startup => "Faster startup",
+            OptimizationCategory.Storage => "Free up space",
+            OptimizationCategory.Background => "Background programs",
+            OptimizationCategory.Power => "Power",
+            OptimizationCategory.Gaming => "Gaming",
+            OptimizationCategory.Display => "Display",
+            OptimizationCategory.Maintenance => "Repair Windows",
+            OptimizationCategory.AppMaintenance => "Apps",
+            OptimizationCategory.Network => "Internet",
+            OptimizationCategory.Desktop => "Look and feel",
             _ => c.ToString(),
         };
         Groups = S.Actions.Catalog.GroupBy(a => a.Category).OrderBy(g => g.Key).Select(g => new CategoryGroup(Name(g.Key), g.Select(a => new ActionCard(a)))).ToList();
     }
 
-    public override string Title => "Optimization";
-    public override string Subtitle => "Real, measurable interventions. Each one is inspected, previewed, approved, backed up, applied, and verified. No placebo tweaks.";
+    public override string Title => "Speed up & fix";
+    public override string Subtitle => "Pick a fix on the left. You'll see exactly what changes before anything happens.";
 
     public IReadOnlyList<CategoryGroup> Groups { get; }
     public ObservableCollection<OptionItem> Options { get; } = new();
@@ -77,7 +85,7 @@ public sealed partial class OptimizationViewModel : PageViewModel
     public bool HasOptions => Options.Count > 0;
     public bool HasItems => Items.Count > 0;
     public bool Applicable => Inspection?.Applicable ?? false;
-    public string StateText => Inspection is null ? "" : Inspection.Applicable ? Inspection.CurrentState : $"Not applicable: {Inspection.NotApplicableReason}";
+    public string StateText => Inspection is null ? "Checking…" : Inspection.Applicable ? Inspection.CurrentState : $"Not needed on this PC: {Inspection.NotApplicableReason}";
     public bool CanRollbackLast => LastRecord?.CanRollback == true;
 
     partial void OnSelectedChanged(ActionCard? oldValue, ActionCard? newValue)

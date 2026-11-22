@@ -40,8 +40,8 @@ public sealed partial class ProcessesViewModel : PageViewModel
     private bool _detailsWorkerRunning;
 
     public ProcessesViewModel(Shell shell) : base(shell) { }
-    public override string Title => "Background processes";
-    public override string Subtitle => "Every accessible process with publisher, signature, resource use, and what it does. Nothing is classified as malware by name or usage alone.";
+    public override string Title => "Running programs";
+    public override string Subtitle => "What's running right now and who made it. Click one for details.";
 
     public ObservableCollection<ProcessRow> Rows { get; } = new();
     private List<ProcessRow> _all = new();
@@ -118,7 +118,7 @@ public sealed partial class ProcessesViewModel : PageViewModel
             fresh.Add(row);
         }
         _all = fresh;
-        Summary = $"{fresh.Count} processes · {fresh.Sum(r => r.Cpu):0}% CPU across all processes · {Core.Parsing.ToolOutputParsers.FormatBytes(fresh.Sum(r => r.Memory))} private memory";
+        Summary = $"{fresh.Count} running";
         Filter();
         if (!_detailsWorkerRunning) _ = LoadDetailsAsync();
     }
@@ -187,9 +187,9 @@ public sealed partial class ProcessesViewModel : PageViewModel
         var match = Knowledge is null ? null : KnowledgeBase.PathMatchesExpectation(Knowledge, value.Path);
         LocationCheck = match switch
         {
-            true => "Runs from the expected location.",
-            false => $"Not in the usual location for {value.Name} — worth checking who installed it.",
-            _ => value.Path is null ? "Location not accessible (protected process or needs administrator rights)." : "",
+            true => "In its normal folder.",
+            false => "Not in its normal folder — worth checking.",
+            _ => value.Path is null ? "Location hidden by Windows." : "",
         };
         HostedServices = _services.TryGetValue(value.Pid, out var svcs) ? string.Join(", ", svcs) : "";
         UpdateSignaturePanel(value);
@@ -210,8 +210,8 @@ public sealed partial class ProcessesViewModel : PageViewModel
         var d = value.Path is not null && _details.TryGetValue(value.Path, out var det) ? det : null;
         SignerText = d is null ? "Checking…" : d.Signature switch
         {
-            SignatureState.SignedMicrosoftWindows or SignatureState.Signed => $"Signed by {d.Signer ?? "a trusted publisher"}{(d.CatalogSigned ? " (catalog signature)" : "")}",
-            SignatureState.Unsigned => "No digital signature. Many legitimate small or portable apps are unsigned.",
+            SignatureState.SignedMicrosoftWindows or SignatureState.Signed => $"{d.Signer ?? "A verified publisher"} (verified)",
+            SignatureState.Unsigned => "Unknown — not signed. Common for small apps, but check if unsure.",
             SignatureState.NotChecked => "Not checked",
             _ => d.Signature.ToString(),
         };
@@ -223,8 +223,8 @@ public sealed partial class ProcessesViewModel : PageViewModel
     private async Task EndProcess()
     {
         if (Selected is null) return;
-        if (IsProtected) { await Dialogs.ShowMessageAsync("Protected process", $"{Selected.Name} is a core Windows or security process. Ending it could crash Windows or remove protection, so the console will not do it."); return; }
-        if (!await Dialogs.ConfirmAsync($"End {Selected.Name}?", $"PID {Selected.Pid}. Unsaved work in this program will be lost. Ending a process cannot be undone, but the program can be started again.\n\nMake sure the customer agrees.", "End process", danger: true)) return;
+        if (IsProtected) { await Dialogs.ShowMessageAsync("Can't end this", $"{Selected.Name} is part of Windows. Ending it could crash the PC."); return; }
+        if (!await Dialogs.ConfirmAsync($"End {Selected.Name}?", "Any unsaved work in it will be lost.", "End it", danger: true)) return;
         if (S.Platform.Processes.TryTerminate(Selected.Pid, out var err)) { Dialogs.Toast($"{Selected.Name} ended.", ToastKind.Success); S.Log($"Ended process {Selected.Name} ({Selected.Pid})"); }
         else Dialogs.Toast($"Could not end {Selected.Name}: {err}", ToastKind.Warning);
         Refresh();

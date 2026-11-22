@@ -19,7 +19,7 @@ Task Scheduler COM, powrprof, NVML/NVAPI and so on), not a web view. Avalonia wa
 
 | Project | Target | Purpose |
 |---|---|---|
-| `src/SoftReset.Core` | net10.0 | Everything that is not Windows-specific: snapshot model, platform abstractions, diagnostic engine and rules, optimization framework and actions, change journal and backups, knowledge bases (embedded JSON), settings reader, file organizer, sessions, PDF writer and reports, parsers for `powercfg`/`netsh`/`nvidia-smi`/`winget` output. |
+| `src/SoftReset.Core` | net10.0 | Everything that is not Windows-specific: snapshot model, platform abstractions, diagnostic engine and rules, optimization framework and actions, change journal and backups, knowledge bases (embedded JSON), settings reader, file organizer, PDF writer and reports, parsers for `powercfg`/`netsh`/`nvidia-smi`/`winget` output. |
 | `src/SoftReset.Platform.Windows` | net10.0-windows | The real implementation of the abstractions: registry, WMI/CIM, event logs, performance data, processes and signatures, services, Task Scheduler, power (powrprof), displays (EnumDisplaySettingsEx/ChangeDisplaySettingsEx), GPU (NVML, NVAPI DRS, D3DKMT), network, installed apps (Uninstall keys, WinRT PackageManager), shell launching, elevation. |
 | `src/SoftReset.Platform.Simulated` | net10.0 | A complete simulated PC (in-memory registry, processes, services, events, displays, GPUs, files in a sandbox folder) seeded with a realistic gaming-desktop scenario. Used by `--demo`, by all UI tests, and by the core integration tests. |
 | `src/SoftReset.App` | net10.0-windows | The Avalonia application: shell, pages, dialogs, view models, the action runner, self-test, and page capture. |
@@ -64,9 +64,8 @@ read calls are used, with structure layouts from NVIDIA's MIT-licensed headers. 
 softreset-data/
   .softreset-data       marker
   settings.json
-  sessions/<id>/        session.json, baseline/follow-up scans, PDF report
-  reports/              copies of all PDF reports
-  scans/                diagnostic scans run outside sessions
+  reports/              saved PDF reports
+  scans/                diagnostic scans
   journal/              one JSON file per change record
   backups/              file-based backups
   file-operations/      file organizer logs (used for undo)

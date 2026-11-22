@@ -27,14 +27,13 @@
             <TextBlock Classes="body" Text="{Binding Finding.Summary}" />
             <Border Classes="soft" Padding="12">
               <StackPanel Spacing="6">
-                <TextBlock Classes="label" Text="EVIDENCE" />
+                <TextBlock Classes="label" Text="WHAT WE SAW" />
                 <ItemsControl ItemsSource="{Binding Finding.Evidence}">
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="m:Evidence">
-                      <Grid ColumnDefinitions="200,*,Auto" Margin="0,3">
+                      <Grid ColumnDefinitions="200,*" Margin="0,3">
                         <TextBlock Text="{Binding Label}" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource NavySoftBrush}" TextWrapping="Wrap" Margin="0,0,10,0" />
                         <TextBlock Grid.Column="1" Text="{Binding Value}" FontSize="12.5" TextWrapping="Wrap" />
-                        <TextBlock Grid.Column="2" Text="{Binding Source}" FontSize="11" Foreground="{StaticResource SubtleBrush}" Margin="12,0,0,0" MaxWidth="240" TextTrimming="CharacterEllipsis" />
                       </Grid>
                     </DataTemplate>
                   </ItemsControl.ItemTemplate>
@@ -42,7 +41,7 @@
               </StackPanel>
             </Border>
             <StackPanel Spacing="4" IsVisible="{Binding HasCauses}">
-              <TextBlock Classes="label" Text="LIKELY CAUSES" />
+              <TextBlock Classes="label" Text="LIKELY CAUSE" />
               <ItemsControl ItemsSource="{Binding Finding.LikelyCauses}">
                 <ItemsControl.ItemTemplate>
                   <DataTemplate x:DataType="x:String"><TextBlock Classes="body" Text="{Binding StringFormat='• {0}'}" /></DataTemplate>
@@ -50,7 +49,7 @@
               </ItemsControl>
             </StackPanel>
             <StackPanel Spacing="6">
-              <TextBlock Classes="label" Text="RECOMMENDED ACTIONS" />
+              <TextBlock Classes="label" Text="WHAT TO DO" />
               <ItemsControl ItemsSource="{Binding Recommendations}">
                 <ItemsControl.ItemTemplate>
                   <DataTemplate x:DataType="vm:RecommendationItem">
@@ -67,7 +66,7 @@
             </StackPanel>
             <Border Classes="notice" IsVisible="{Binding HasUncertainties}">
               <StackPanel Spacing="4">
-                <TextBlock Classes="label" Text="UNCERTAINTY" Foreground="{StaticResource WarningBrush}" />
+                <TextBlock Classes="label" Text="NOT SURE ABOUT" Foreground="{StaticResource WarningBrush}" />
                 <ItemsControl ItemsSource="{Binding Finding.Uncertainties}">
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="x:String"><TextBlock Classes="body" Text="{Binding}" /></DataTemplate>
@@ -75,7 +74,6 @@
                 </ItemsControl>
               </StackPanel>
             </Border>
-            <TextBlock Classes="muted small wrap" Text="{Binding Finding.ConfidenceExplanation, StringFormat='Why this confidence: {0}'}" />
           </StackPanel>
         </StackPanel>
       </Border>
@@ -86,26 +84,22 @@
     <StackPanel Spacing="16">
       <Border Classes="card">
         <StackPanel Spacing="12">
-          <TextBlock Classes="h3" Text="Scan options" />
-          <StackPanel Spacing="4">
-            <TextBlock Classes="label" Text="CPU SAMPLE LENGTH (SECONDS)" />
-            <ComboBox ItemsSource="{Binding SampleOptions}" SelectedItem="{Binding SampleSeconds}" HorizontalAlignment="Stretch" />
-          </StackPanel>
-          <CheckBox IsChecked="{Binding IncludeSignatures}" Content="Verify digital signatures" />
-          <CheckBox IsChecked="{Binding IncludeConnectivity}">
-            <TextBlock TextWrapping="Wrap" Text="Test internet connectivity (contacts Microsoft's connectivity check)" />
-          </CheckBox>
           <Button Classes="primary" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Command="{Binding ScanCommand}" IsEnabled="{Binding !IsScanning}" x:Name="ScanButton">
             <StackPanel Orientation="Horizontal" Spacing="8">
               <Path Classes="icon" Data="{StaticResource IconPlay}" Stroke="White" Width="13" Height="13" />
-              <TextBlock Text="Run diagnostic scan" />
+              <TextBlock Text="Scan this PC" />
             </StackPanel>
           </Button>
           <StackPanel Spacing="6" IsVisible="{Binding IsScanning}">
             <ProgressBar Value="{Binding Progress}" Maximum="100" />
             <TextBlock Classes="muted small" Text="{Binding Stage}" />
           </StackPanel>
-          <TextBlock Classes="muted small wrap" Text="The scan is read-only. It reads performance counters, event logs, drivers, storage health, network and security configuration." />
+          <Expander Header="Options" HorizontalAlignment="Stretch" Padding="8">
+            <StackPanel Spacing="8">
+              <CheckBox IsChecked="{Binding IncludeSignatures}" Content="Check who made each program" />
+              <CheckBox IsChecked="{Binding IncludeConnectivity}" Content="Test the internet connection" />
+            </StackPanel>
+          </Expander>
         </StackPanel>
       </Border>
       <Border Classes="card" IsVisible="{Binding HasReport}">
@@ -113,14 +107,14 @@
           <StackPanel Orientation="Horizontal" Spacing="14">
             <app:HealthRing Width="84" Height="84" Value="{Binding Report.HealthScore, FallbackValue=0}" />
             <StackPanel VerticalAlignment="Center" Spacing="2">
-              <TextBlock Classes="h3" Text="Health score" />
-              <TextBlock Classes="muted small wrap" Width="150" Text="Indicative. Weighted by severity and confidence." />
+              <TextBlock Classes="h3" Text="Health" />
+              <TextBlock Classes="muted small" Text="out of 100" />
             </StackPanel>
           </StackPanel>
           <Grid ColumnDefinitions="*,*,*">
             <StackPanel>
               <TextBlock Text="{Binding CriticalHigh}" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource DangerBrush}" />
-              <TextBlock Classes="muted small" Text="Critical/high" />
+              <TextBlock Classes="muted small" Text="Serious" />
             </StackPanel>
             <StackPanel Grid.Column="1">
               <TextBlock Text="{Binding MediumCount}" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource WarningBrush}" />
@@ -128,13 +122,13 @@
             </StackPanel>
             <StackPanel Grid.Column="2">
               <TextBlock Text="{Binding LowCount}" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" />
-              <TextBlock Classes="muted small" Text="Low/info" />
+              <TextBlock Classes="muted small" Text="Minor" />
             </StackPanel>
           </Grid>
           <Button Classes="secondary" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Command="{Binding ExportPdfCommand}">
             <StackPanel Orientation="Horizontal" Spacing="8">
               <Path Classes="icon" Data="{StaticResource IconDocument}" Width="14" Height="14" />
-              <TextBlock Text="Export PDF report" />
+              <TextBlock Text="Save as PDF" />
             </StackPanel>
           </Button>
         </StackPanel>
@@ -145,9 +139,8 @@
       <StackPanel Spacing="10" IsVisible="{Binding HasReport}" Margin="0,0,0,12">
         <Grid ColumnDefinitions="*,Auto,Auto">
           <StackPanel Spacing="2">
-            <TextBlock Classes="h2" Text="Findings" />
-            <TextBlock Classes="muted small" Text="{Binding Summary}" />
-            <TextBlock Classes="muted small wrap" Text="{Binding MachineLine}" />
+            <TextBlock Classes="h2" Text="Problems found" />
+            <TextBlock Classes="muted small" Text="Click one to see details and fixes." />
           </StackPanel>
           <ComboBox Grid.Column="1" ItemsSource="{Binding SeverityFilters}" SelectedItem="{Binding SeverityFilter}" Width="170" Margin="0,0,8,0" VerticalAlignment="Top" />
           <ComboBox Grid.Column="2" ItemsSource="{Binding CategoryFilters}" SelectedItem="{Binding CategoryFilter}" Width="170" VerticalAlignment="Top" />
@@ -158,12 +151,12 @@
           <Border Classes="soft" IsVisible="{Binding NoReport}" Padding="30">
             <StackPanel Spacing="8" HorizontalAlignment="Center">
               <Path Classes="icon" Data="{StaticResource IconPulse}" Width="40" Height="40" HorizontalAlignment="Center" />
-              <TextBlock Classes="h3" Text="No scan results yet" HorizontalAlignment="Center" />
-              <TextBlock Classes="muted" Text="Run a scan to collect real diagnostic data from this PC." HorizontalAlignment="Center" />
+              <TextBlock Classes="h3" Text="Not scanned yet" HorizontalAlignment="Center" />
+              <TextBlock Classes="muted" Text="Click Scan this PC to start. It takes about a minute." HorizontalAlignment="Center" />
             </StackPanel>
           </Border>
           <ItemsControl ItemsSource="{Binding Findings}" ItemTemplate="{StaticResource FindingTemplate}" />
-          <Expander Header="Data the scan could not collect" IsVisible="{Binding Issues.Count}" Margin="0,4,0,0" HorizontalAlignment="Stretch">
+          <Expander Header="Things the scan couldn't check" IsVisible="{Binding Issues.Count}" Margin="0,4,0,0" HorizontalAlignment="Stretch">
             <ItemsControl ItemsSource="{Binding Issues}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="m:CollectionIssue">

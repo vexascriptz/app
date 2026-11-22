@@ -8,12 +8,12 @@
       <Border Classes="card">
         <StackPanel Spacing="10">
           <Grid ColumnDefinitions="*,10,Auto,10,Auto">
-            <TextBox Text="{Binding Folder}" Watermark="Folder to analyse" x:Name="FolderBox" />
+            <TextBox Text="{Binding Folder}" Watermark="Folder" x:Name="FolderBox" />
             <Button Grid.Column="2" Classes="secondary" Content="Browse…" Command="{Binding BrowseCommand}" />
-            <Button Grid.Column="4" Classes="primary" Content="Analyse folder" Command="{Binding AnalyzeCommand}" IsEnabled="{Binding !Busy}" x:Name="AnalyzeButton" />
+            <Button Grid.Column="4" Classes="primary" Content="Look at folder" Command="{Binding AnalyzeCommand}" IsEnabled="{Binding !Busy}" x:Name="AnalyzeButton" />
           </Grid>
           <StackPanel Orientation="Horizontal" Spacing="6">
-            <TextBlock Classes="muted small" Text="Quick pick:" VerticalAlignment="Center" />
+            
             <Button Classes="ghost small" Content="Downloads" Command="{Binding UseFolderCommand}" CommandParameter="Downloads" />
             <Button Classes="ghost small" Content="Desktop" Command="{Binding UseFolderCommand}" CommandParameter="Desktop" />
             <Button Classes="ghost small" Content="Documents" Command="{Binding UseFolderCommand}" CommandParameter="Documents" />
@@ -28,7 +28,7 @@
       <Grid ColumnDefinitions="*,20,*" IsVisible="{Binding HasAnalysis}">
         <Border Classes="card">
           <StackPanel Spacing="10">
-            <TextBlock Classes="h3" Text="What's in this folder" />
+            <TextBlock Classes="h3" Text="What's in it" />
             <TextBlock Classes="muted" Text="{Binding AnalysisSummary}" />
             <ItemsControl ItemsSource="{Binding Categories}">
               <ItemsControl.ItemTemplate>
@@ -41,7 +41,7 @@
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
-            <TextBlock Classes="label" Text="SUGGESTIONS" Margin="0,6,0,0" IsVisible="{Binding Suggestions.Count}" />
+            <TextBlock Classes="label" Text="TIPS" Margin="0,6,0,0" IsVisible="{Binding Suggestions.Count}" />
             <ItemsControl ItemsSource="{Binding Suggestions}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="x:String"><TextBlock Classes="body" Text="{Binding StringFormat='• {0}'}" Margin="0,1" /></DataTemplate>
@@ -73,10 +73,10 @@
           <Grid ColumnDefinitions="*,Auto,Auto">
             <StackPanel>
               <TextBlock Classes="h3" Text="Duplicate files" />
-              <TextBlock Classes="muted small wrap" Text="Files are compared byte for byte, not by name. The oldest copy of each group is kept; the others are pre-selected to move into a '_softreset_review' folder for the customer to check. Nothing is deleted." />
+              <TextBlock Classes="muted small wrap" Text="Exact copies. Ticked ones are moved to a review folder, not deleted." />
             </StackPanel>
             <Button Grid.Column="1" Classes="secondary" Content="Find duplicates" Command="{Binding FindDuplicatesCommand}" IsEnabled="{Binding !Busy}" VerticalAlignment="Center" Margin="10,0" x:Name="FindDuplicatesButton" />
-            <Button Grid.Column="2" Classes="primary" Content="Move selected to review…" Command="{Binding MoveDuplicatesToReviewCommand}" IsVisible="{Binding HasDuplicates}" VerticalAlignment="Center" x:Name="MoveDuplicatesButton" />
+            <Button Grid.Column="2" Classes="primary" Content="Move ticked copies…" Command="{Binding MoveDuplicatesToReviewCommand}" IsVisible="{Binding HasDuplicates}" VerticalAlignment="Center" x:Name="MoveDuplicatesButton" />
           </Grid>
           <ItemsControl ItemsSource="{Binding Duplicates}">
             <ItemsControl.ItemTemplate>
@@ -106,12 +106,12 @@
 
       <Border Classes="card" IsVisible="{Binding HasAnalysis}">
         <StackPanel Spacing="10">
-          <TextBlock Classes="h3" Text="Reorganise" />
+          <TextBlock Classes="h3" Text="Sort into folders" />
           <WrapPanel>
             <ComboBox ItemsSource="{Binding Strategies}" SelectedItem="{Binding Strategy}" Width="230" Margin="0,0,14,6" />
-            <CheckBox IsChecked="{Binding TopLevelOnly}" Content="Only files directly in this folder" Margin="0,0,14,6" />
-            <CheckBox IsChecked="{Binding SkipShortcuts}" Content="Leave shortcuts in place" Margin="0,0,14,6" />
-            <Button Classes="secondary" Content="Preview moves" Command="{Binding BuildPlanCommand}" Margin="0,0,0,6" x:Name="PreviewMovesButton" />
+            <CheckBox IsChecked="{Binding TopLevelOnly}" Content="Top level only" Margin="0,0,14,6" />
+            <CheckBox IsChecked="{Binding SkipShortcuts}" Content="Skip shortcuts" Margin="0,0,14,6" />
+            <Button Classes="secondary" Content="Preview" Command="{Binding BuildPlanCommand}" Margin="0,0,0,6" x:Name="PreviewMovesButton" />
           </WrapPanel>
           <StackPanel Spacing="8" IsVisible="{Binding HasPlan}">
             <TextBlock Classes="body" FontWeight="SemiBold" Text="{Binding PlanSummary}" />
@@ -129,15 +129,15 @@
                 </DataTemplate>
               </ListBox.ItemTemplate>
             </ListBox>
-            <Button Classes="primary" Content="Customer approves — move files" Command="{Binding ApplyPlanCommand}" HorizontalAlignment="Left" IsEnabled="{Binding !Busy}" x:Name="ApplyPlanButton" />
+            <Button Classes="primary" Content="Move files" Command="{Binding ApplyPlanCommand}" HorizontalAlignment="Left" IsEnabled="{Binding !Busy}" x:Name="ApplyPlanButton" />
           </StackPanel>
         </StackPanel>
       </Border>
 
       <Border Classes="card">
         <StackPanel Spacing="8">
-          <TextBlock Classes="h3" Text="Operation log" />
-          <TextBlock Classes="muted" Text="No file operations yet." IsVisible="{Binding !Logs.Count}" />
+          <TextBlock Classes="h3" Text="Recent moves" />
+          <TextBlock Classes="muted" Text="Nothing yet." IsVisible="{Binding !Logs.Count}" />
           <ItemsControl ItemsSource="{Binding Logs}">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="f:FileOperationLog">

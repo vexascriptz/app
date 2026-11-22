@@ -1,18 +1,11 @@
-softreset Technician Console 1.0.0
+softreset Technician Console 1.0.1
 ==================================
 
-1. Copy this folder anywhere (USB drive, Desktop, C:\Tools). No installation needed.
-2. Double-click SoftResetConsole.exe.
-   - Windows SmartScreen may say the publisher is unknown because the file is not code-signed:
-     click "More info" -> "Run anyway".
-   - The console runs with normal rights. Windows asks for administrator approval (UAC) only
-     for the specific changes that need it.
-3. Records are saved in a "softreset-data" folder created next to SoftResetConsole.exe.
-   Data & about -> "Remove all data" deletes them. Deleting this folder removes the console.
+1. Double-click SoftResetConsole.exe. Nothing to install.
+2. If Windows says "unknown publisher": click "More info" -> "Run anyway".
+3. Start with "Find problems" to scan the PC.
 
-Optional:
-  SoftResetConsole.exe --demo                 practice on a simulated PC (changes nothing real)
-  SoftResetConsole.exe --self-test <folder>   read-only validation report for this PC
+Try it safely first:  SoftResetConsole.exe --demo
 
-Sysinternals (optional): place procexp64.exe, autoruns64.exe and tcpview64.exe in
-tools\sysinternals next to SoftResetConsole.exe to launch them from the Processes page.
+The app saves its data in a "softreset-data" folder next to the exe.
+To remove everything: About -> "Delete all saved data", then delete this folder.

@@ -7,7 +7,6 @@ using SoftReset.Core.Models;
 using SoftReset.Core.Optimization;
 using SoftReset.Core.Platform;
 using SoftReset.Core.Reports;
-using SoftReset.Core.Sessions;
 
 namespace SoftReset.App.ViewModels;
 
@@ -16,8 +15,8 @@ public sealed partial class DashboardViewModel : PageViewModel
     private DispatcherTimer? _timer;
 
     public DashboardViewModel(Shell shell) : base(shell) { }
-    public override string Title => "Welcome";
-    public override string Subtitle => "Diagnose, explain, and fix — with the customer's approval for every change.";
+    public override string Title => "Home";
+    public override string Subtitle => "What would you like to do?";
 
     [ObservableProperty] private IReadOnlyList<double> _cpuHistory = Array.Empty<double>();
     [ObservableProperty] private IReadOnlyList<double> _memoryHistory = Array.Empty<double>();
@@ -25,14 +24,13 @@ public sealed partial class DashboardViewModel : PageViewModel
     [ObservableProperty] private double _memoryNow;
     [ObservableProperty] private string _memoryText = "";
     [ObservableProperty] private DiagnosticReport? _lastReport;
-    public ObservableCollection<CustomerSession> RecentSessions { get; } = new();
     public ObservableCollection<Finding> TopFindings { get; } = new();
 
     public int InterruptedCount => S.InterruptedChanges.Count;
     public bool HasInterrupted => InterruptedCount > 0;
     public bool HasReport => LastReport is not null;
-    public string PlatformText => S.DemoMode ? "Demo mode: a simulated customer PC. Run on Windows for real diagnostics." : $"Running on {Environment.MachineName} · Windows build {S.Platform.OsBuild}";
-    public string DataLocation => S.Paths.IsPortable ? $"Portable data folder: {S.Paths.Root}" : $"Data folder: {S.Paths.Root}";
+    /// <summary>Every tool except Home and About, shown as tiles so it's clear what each one does.</summary>
+    public IEnumerable<NavItem> Tools => Shell.Main.NavItems.Where(n => n.Page is not DashboardViewModel and not DataViewModel);
 
     private readonly List<double> _cpu = new();
     private readonly List<double> _mem = new();
@@ -43,8 +41,6 @@ public sealed partial class DashboardViewModel : PageViewModel
         OnPropertyChanged(nameof(HasReport));
         TopFindings.Clear();
         foreach (var f in LastReport?.Findings.Take(4) ?? Enumerable.Empty<Finding>()) TopFindings.Add(f);
-        RecentSessions.Clear();
-        foreach (var s in S.Sessions.List().Take(5)) RecentSessions.Add(s);
         if (_timer is null)
         {
             S.Platform.Live.Sample();
@@ -69,19 +65,9 @@ public sealed partial class DashboardViewModel : PageViewModel
         MemoryText = s.MemoryTotalBytes > 0 ? $"{Core.Parsing.ToolOutputParsers.FormatBytes(s.MemoryTotalBytes - s.MemoryAvailableBytes)} of {Core.Parsing.ToolOutputParsers.FormatBytes(s.MemoryTotalBytes)}" : "";
     }
 
-    [RelayCommand] private void StartSession() => Shell.Main.Navigate(Shell.Main.Session);
     [RelayCommand] private async Task RunDiagnostics() { Shell.Main.Navigate(Shell.Main.Diagnostics); await Shell.Main.Diagnostics.ScanCommand.ExecuteAsync(null); }
     [RelayCommand] private void OpenHistory() => Shell.Main.Navigate(Shell.Main.History);
-    [RelayCommand] private void OpenSettings() => Shell.Main.Navigate(Shell.Main.SettingsExplorer);
-    [RelayCommand] private void OpenProcesses() => Shell.Main.Navigate(Shell.Main.Processes);
-    [RelayCommand] private void OpenOptimization() => Shell.Main.Navigate(Shell.Main.Optimization);
-
-    [RelayCommand]
-    private void ResumeSession(CustomerSession s)
-    {
-        Shell.Main.Session.Resume(s.Id);
-        Shell.Main.Navigate(Shell.Main.Session);
-    }
+    [RelayCommand] private void OpenTool(NavItem item) => Shell.Main.Navigate(item.Page);
 }
 
 /// <summary>A finding with UI actions for its recommendations.</summary>
@@ -166,8 +152,8 @@ public sealed partial class DiagnosticsViewModel : PageViewModel
         _includeConnectivity = S.Settings.IncludeConnectivityTests;
     }
 
-    public override string Title => "Diagnostics";
-    public override string Subtitle => "Read-only scan of performance, stability, storage, drivers, updates, network, security, and gaming configuration.";
+    public override string Title => "Find problems";
+    public override string Subtitle => "Scans this PC and lists what's wrong. Nothing is changed.";
 
     public int[] SampleOptions { get; } = { 3, 5, 10, 20 };
     [ObservableProperty] private int _sampleSeconds;
@@ -177,10 +163,10 @@ public sealed partial class DiagnosticsViewModel : PageViewModel
     [ObservableProperty] private int _progress;
     [ObservableProperty] private string _stage = "";
     [ObservableProperty] private DiagnosticReport? _report;
-    [ObservableProperty] private string _severityFilter = "All findings";
-    [ObservableProperty] private string _categoryFilter = "All categories";
-    public string[] SeverityFilters { get; } = { "All findings", "Critical and high", "Medium and above", "Low and info" };
-    public ObservableCollection<string> CategoryFilters { get; } = new() { "All categories" };
+    [ObservableProperty] private string _severityFilter = "All problems";
+    [ObservableProperty] private string _categoryFilter = "All areas";
+    public string[] SeverityFilters { get; } = { "All problems", "Serious only", "Serious and medium", "Minor only" };
+    public ObservableCollection<string> CategoryFilters { get; } = new() { "All areas" };
     public ObservableCollection<FindingItem> Findings { get; } = new();
     public ObservableCollection<CollectionIssue> Issues { get; } = new();
     private List<FindingItem> _all = new();
@@ -221,7 +207,7 @@ public sealed partial class DiagnosticsViewModel : PageViewModel
         try
         {
             var progress = new Progress<CollectionProgress>(p => { Progress = p.Percent; Stage = p.Stage; });
-            var options = new CollectionOptions { CpuSampleDuration = TimeSpan.FromSeconds(SampleSeconds), IncludeConnectivityTests = IncludeConnectivity, IncludeSignatureChecks = IncludeSignatures };
+            var options = new CollectionOptions { CpuSampleDuration = TimeSpan.FromSeconds(S.Settings.ScanSampleSeconds), IncludeConnectivityTests = IncludeConnectivity, IncludeSignatureChecks = IncludeSignatures };
             Report = await CollectAndAnalyzeAsync(Shell, options, progress);
             Load(Report);
             Dialogs.Toast($"Scan complete: {Report.Findings.Count} findings.", ToastKind.Success);
@@ -240,9 +226,9 @@ public sealed partial class DiagnosticsViewModel : PageViewModel
         _all = report.Findings.Select(f => new FindingItem(f, Shell)).ToList();
         if (_all.Count > 0) _all[0].IsExpanded = true;
         CategoryFilters.Clear();
-        CategoryFilters.Add("All categories");
+        CategoryFilters.Add("All areas");
         foreach (var c in report.Findings.Select(f => f.Category.ToString()).Distinct().OrderBy(c => c)) CategoryFilters.Add(c);
-        CategoryFilter = "All categories";
+        CategoryFilter = "All areas";
         Issues.Clear();
         foreach (var i in report.Snapshot.CollectionIssues) Issues.Add(i);
         ApplyFilter();
@@ -253,11 +239,11 @@ public sealed partial class DiagnosticsViewModel : PageViewModel
         Findings.Clear();
         foreach (var f in _all.Where(f => SeverityFilter switch
                  {
-                     "Critical and high" => f.Finding.Severity >= Severity.High,
-                     "Medium and above" => f.Finding.Severity >= Severity.Medium,
-                     "Low and info" => f.Finding.Severity <= Severity.Low,
+                     "Serious only" => f.Finding.Severity >= Severity.High,
+                     "Serious and medium" => f.Finding.Severity >= Severity.Medium,
+                     "Minor only" => f.Finding.Severity <= Severity.Low,
                      _ => true,
-                 } && (CategoryFilter == "All categories" || f.CategoryText == CategoryFilter)))
+                 } && (CategoryFilter == "All areas" || f.CategoryText == CategoryFilter)))
             Findings.Add(f);
     }
 

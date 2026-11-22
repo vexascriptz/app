@@ -58,13 +58,7 @@
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top">
               <Border Classes="pill" Background="{StaticResource WarningBgBrush}" IsVisible="{Binding DemoMode}">
-                <TextBlock Text="DEMO MODE — simulated PC, no real changes" Foreground="{StaticResource WarningBrush}" />
-              </Border>
-              <Border Classes="pill" IsVisible="{Binding SessionBanner, Converter={x:Static app:Converters.NotNull}}">
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                  <Ellipse Width="7" Height="7" Fill="{StaticResource SuccessBrush}" />
-                  <TextBlock Text="{Binding SessionBanner}" />
-                </StackPanel>
+                <TextBlock Text="Demo mode — nothing real is changed" Foreground="{StaticResource WarningBrush}" />
               </Border>
             </StackPanel>
           </Grid>

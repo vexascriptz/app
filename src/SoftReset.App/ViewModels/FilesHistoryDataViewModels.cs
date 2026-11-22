@@ -36,8 +36,8 @@ public sealed class CategoryBar
 public sealed partial class FilesViewModel : PageViewModel
 {
     public FilesViewModel(Shell shell) : base(shell) { _folder = S.Platform.Folders.Downloads; }
-    public override string Title => "File organizer";
-    public override string Subtitle => "Analyse a folder, find duplicates, and reorganise it with the customer's approval. Files are moved, never deleted, and every batch can be undone.";
+    public override string Title => "Organize files";
+    public override string Subtitle => "Sort a folder and find duplicate files. Nothing is deleted, and you can undo it.";
 
     [ObservableProperty] private string _folder;
     [ObservableProperty] private bool _busy;
@@ -92,7 +92,7 @@ public sealed partial class FilesViewModel : PageViewModel
         if (!Directory.Exists(Folder)) { Dialogs.Toast("Folder not found.", ToastKind.Warning); return false; }
         if (ProtectedComponents.IsProtectedFolder(Folder, S.Platform.Folders))
         {
-            _ = Dialogs.ShowMessageAsync("Protected location", "System, program, and application-data folders (and whole drives or the profile root) are never reorganised. Choose a user folder such as Downloads, Desktop, or Documents.");
+            _ = Dialogs.ShowMessageAsync("Can't use this folder", "Windows and program folders are off limits. Pick a folder like Downloads, Desktop or Documents.");
             return false;
         }
         return true;
@@ -116,7 +116,7 @@ public sealed partial class FilesViewModel : PageViewModel
             foreach (var f in Analysis.LargestFiles.Take(10)) Largest.Add(f);
             Suggestions.Clear();
             foreach (var s in Analysis.Suggestions) Suggestions.Add(s);
-            Status = "Analysis complete. Nothing has been changed.";
+            Status = "";
         }
         catch (Exception ex) { Status = ex.Message; }
         finally { Busy = false; }
@@ -145,9 +145,8 @@ public sealed partial class FilesViewModel : PageViewModel
         var selected = Duplicates.SelectMany(d => d.Files).Where(f => f.IsSelected).Select(f => f.Id).ToList();
         if (selected.Count == 0 || Analysis is null) return;
         var plan = OrganizationPlanner.PlanDuplicateReview(Analysis.Root, Duplicates.Select(d => d.Group), selected);
-        var review = Path.Combine(Analysis.Root, FileOperationExecutor.ReviewFolderName);
-        if (!await Dialogs.ConfirmAsync("Move duplicates to a review folder?",
-                $"{plan.Moves.Count} duplicate file(s) will be MOVED (not deleted) to:\n{review}\n\nThe customer can check them and delete the folder later. This can be undone from the operation log.", "Move duplicates")) return;
+        if (!await Dialogs.ConfirmAsync($"Move {plan.Moves.Count} duplicate(s)?",
+                $"They'll go into a folder called {FileOperationExecutor.ReviewFolderName} so you can check them. Nothing is deleted, and you can undo this.", "Move")) return;
         await ExecuteAsync(plan, "duplicates", $"Duplicate review in {Path.GetFileName(Analysis.Root)}");
         await FindDuplicates();
     }
@@ -165,15 +164,15 @@ public sealed partial class FilesViewModel : PageViewModel
         Plan = new OrganizationPlanner().Plan(Analysis, options);
         Moves.Clear();
         foreach (var m in Plan.Moves) Moves.Add(m);
-        Status = Plan.Moves.Count == 0 ? "Nothing to move with these options." : "Preview ready. Review the moves with the customer before applying.";
+        Status = Plan.Moves.Count == 0 ? "Nothing to move." : "Check the list below, then click Move files.";
     }
 
     [RelayCommand]
     private async Task ApplyPlan()
     {
         if (Plan is null || Plan.Moves.Count == 0) return;
-        if (!await Dialogs.ConfirmAsync("Apply this organisation?",
-                $"{Plan.Moves.Count} file(s) will be moved within {Plan.Root}.\n\n• Nothing is deleted or overwritten.\n• Every move is logged and the whole batch can be undone.\n• Files modified in the last 15 minutes, cloud-only files, and shortcuts are left in place.\n\nConfirm the customer has approved these moves.", "Move files")) return;
+        if (!await Dialogs.ConfirmAsync($"Move {Plan.Moves.Count} file(s)?",
+                "Files are sorted into folders. Nothing is deleted, and you can undo this.", "Move files")) return;
         await ExecuteAsync(Plan, "organize", $"Organised {Path.GetFileName(Plan.Root)} ({Strategy.ToLowerInvariant()})");
         Plan = null;
         Moves.Clear();
@@ -186,10 +185,9 @@ public sealed partial class FilesViewModel : PageViewModel
         try
         {
             var progress = new Progress<(int Done, int Total)>(p => Status = $"Moving {p.Done}/{p.Total}…");
-            var log = await S.FileOps.ExecuteAsync(plan, kind, description, S.ActiveSession?.Id, progress);
-            if (S.ActiveSession is { } session) { session.FileOperationLogIds.Add(log.Id); S.Sessions.Save(session); }
+            var log = await S.FileOps.ExecuteAsync(plan, kind, description, null, progress);
             S.Log($"File operation {log.Id}: {log.Status}, {log.Done} moved, {log.Failed} failed");
-            Dialogs.Toast($"{log.Done} file(s) moved{(log.Failed > 0 ? $", {log.Failed} skipped" : "")}. Undo is available in the log.", log.Failed == 0 ? ToastKind.Success : ToastKind.Warning);
+            Dialogs.Toast($"{log.Done} file(s) moved{(log.Failed > 0 ? $", {log.Failed} skipped" : "")}.", log.Failed == 0 ? ToastKind.Success : ToastKind.Warning);
             LoadLogs();
         }
         finally { Busy = false; }
@@ -199,7 +197,7 @@ public sealed partial class FilesViewModel : PageViewModel
     private async Task Undo(FileOperationLog log)
     {
         if (!log.CanUndo) return;
-        if (!await Dialogs.ConfirmAsync("Undo this file operation?", $"{log.Description}\n{log.Done} file(s) will be moved back to their original locations. Files are never overwritten.", "Undo moves")) return;
+        if (!await Dialogs.ConfirmAsync("Undo?", $"{log.Done} file(s) will be put back where they were.", "Undo")) return;
         Busy = true;
         try
         {
@@ -219,13 +217,13 @@ public sealed partial class HistoryViewModel : PageViewModel
 {
     private bool _stale = true;
     public HistoryViewModel(Shell shell) : base(shell) { }
-    public override string Title => "Change history";
-    public override string Subtitle => "Every change the console has made on this PC, with its backup, verification result, and rollback.";
+    public override string Title => "Undo changes";
+    public override string Subtitle => "Everything this app has changed. Pick one to undo it.";
 
     public ObservableCollection<ChangeRecord> Records { get; } = new();
     [ObservableProperty] private ChangeRecord? _selected;
     [ObservableProperty] private string _filter = "All changes";
-    public string[] Filters { get; } = { "All changes", "Reversible", "This session", "Problems" };
+    public string[] Filters { get; } = { "All changes", "Can be undone", "Problems" };
     public bool HasSelection => Selected is not null;
     public bool HasRecords => Records.Count > 0;
     partial void OnSelectedChanged(ChangeRecord? value) => OnPropertyChanged(nameof(HasSelection));
@@ -242,13 +240,11 @@ public sealed partial class HistoryViewModel : PageViewModel
     private void Load()
     {
         _stale = false;
-        var sessionId = S.ActiveSession?.Id;
         var keep = Selected?.Id;
         Records.Clear();
         foreach (var r in S.Journal.LoadAll().Where(r => Filter switch
                  {
-                     "Reversible" => r.CanRollback,
-                     "This session" => sessionId is not null && r.SessionId == sessionId,
+                     "Can be undone" => r.CanRollback,
                      "Problems" => r.Status is ChangeStatus.Failed or ChangeStatus.Interrupted or ChangeStatus.RollbackFailed or ChangeStatus.VerificationFailed,
                      _ => true,
                  }))
@@ -274,16 +270,12 @@ public sealed partial class DataViewModel : PageViewModel
 {
     public DataViewModel(Shell shell) : base(shell)
     {
-        _technicianName = S.Settings.TechnicianName;
-        _businessContact = S.Settings.BusinessContact;
         _sampleSeconds = S.Settings.ScanSampleSeconds;
     }
 
-    public override string Title => "Data & about";
-    public override string Subtitle => "Where the console stores its records, how to remove them, and licensing information.";
+    public override string Title => "About";
+    public override string Subtitle => "App info and the data it keeps.";
 
-    [ObservableProperty] private string _technicianName;
-    [ObservableProperty] private string _businessContact;
     [ObservableProperty] private int _sampleSeconds;
     [ObservableProperty] private string _dataSize = "";
     public int[] SampleOptions { get; } = { 3, 5, 10, 20 };
@@ -303,8 +295,6 @@ public sealed partial class DataViewModel : PageViewModel
     [RelayCommand]
     private void SaveSettings()
     {
-        S.Settings.TechnicianName = TechnicianName.Trim();
-        S.Settings.BusinessContact = BusinessContact.Trim();
         S.Settings.ScanSampleSeconds = SampleSeconds;
         S.SaveSettings();
         Dialogs.Toast("Settings saved.", ToastKind.Success);
@@ -317,16 +307,15 @@ public sealed partial class DataViewModel : PageViewModel
     private async Task RemoveAllData()
     {
         var pending = S.Journal.LoadAll().Count(r => r.CanRollback);
-        var msg = "This permanently deletes everything the console has stored on this PC or drive: sessions, reports, scans, the change journal and backups, file-operation logs, settings, and logs.\n\n" +
-                  (pending > 0 ? $"⚠ {pending} change(s) can still be rolled back. After removal their backups are gone and they can no longer be undone by the console.\n\n" : "") +
-                  "Not affected: changes already made to Windows, System Restore points (managed in System Protection), and any '_softreset_review' folders created by the file organizer inside customer folders (review and delete those with the customer).";
-        if (!await Dialogs.ConfirmAsync("Remove all application data?", msg, "Remove everything", danger: true, requireTypedText: "DELETE")) return;
+        var msg = "Deletes this app's saved scans, reports, logs and undo history. Changes already made to Windows stay as they are." +
+                  (pending > 0 ? $"\n\n{pending} change(s) can still be undone. After this they can't." : "");
+        if (!await Dialogs.ConfirmAsync("Delete all saved data?", msg, "Delete", danger: true, requireTypedText: "DELETE")) return;
         try
         {
             foreach (var dir in Directory.EnumerateDirectories(S.Paths.Root)) Directory.Delete(dir, recursive: true);
             foreach (var f in Directory.EnumerateFiles(S.Paths.Root)) File.Delete(f);
             S.Paths.EnsureCreated();
-            Dialogs.Toast("All console data removed. You can delete the console's folder to remove the program itself.", ToastKind.Success);
+            Dialogs.Toast("Saved data deleted.", ToastKind.Success);
         }
         catch (Exception ex) { await Dialogs.ShowMessageAsync("Some files could not be removed", ex.Message); }
         await OnActivatedAsync();

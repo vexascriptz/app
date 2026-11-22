@@ -98,8 +98,8 @@ public abstract class StartupItemsActionBase : OptimizationAction
 public sealed class UserStartupItemsAction : StartupItemsActionBase
 {
     public override string Id => ActionIds.StartupUserItems;
-    public override string Title => "Startup apps (this user)";
-    public override string Description => "Programs that start when this user signs in (HKCU Run key and the user's Startup folder).";
+    public override string Title => "Startup apps";
+    public override string Description => "Programs that open by themselves when you sign in.";
     protected override bool MachineScope => false;
 }
 
@@ -107,7 +107,7 @@ public sealed class MachineStartupItemsAction : StartupItemsActionBase
 {
     public override string Id => ActionIds.StartupMachineItems;
     public override string Title => "Startup apps (all users)";
-    public override string Description => "Programs that start for every user (HKLM Run keys and the all-users Startup folder). Changing these requires administrator approval.";
+    public override string Description => "Programs that open by themselves for everyone on this PC. Needs admin.";
     protected override bool MachineScope => true;
     public override bool RequiresAdmin => true;
 }
@@ -115,9 +115,9 @@ public sealed class MachineStartupItemsAction : StartupItemsActionBase
 public sealed class LogonTasksAction : OptimizationAction
 {
     public override string Id => ActionIds.StartupLogonTasks;
-    public override string Title => "Third-party tasks that run at sign-in";
+    public override string Title => "Hidden startup tasks";
     public override OptimizationCategory Category => OptimizationCategory.Startup;
-    public override string Description => "Non-Microsoft scheduled tasks with a logon trigger — many updaters and launchers use these instead of Run keys, so they don't appear in Task Manager's Startup tab.";
+    public override string Description => "Updaters and launchers that start at sign-in but don't show in Task Manager.";
     public override string ExpectedBenefit => "Fewer background processes after sign-in.";
     public override string Risks => "Disabling an updater task stops that app from updating itself automatically. Microsoft tasks are never shown here.";
     public override bool RequiresAdmin => true;
@@ -183,7 +183,7 @@ public sealed class PowerPlanAction : OptimizationAction
     public override string Id => ActionIds.PowerPlan;
     public override string Title => "Power plan";
     public override OptimizationCategory Category => OptimizationCategory.Power;
-    public override string Description => "Selects the active power plan. Balanced is the Windows default and lets modern CPUs boost fully when needed.";
+    public override string Description => "Balanced suits most PCs. Power saver slows the PC down.";
     public override string ExpectedBenefit => "Leaving Power saver restores full CPU performance. High performance keeps the CPU at higher clocks, which can help older desktops in CPU-bound games at the cost of power and heat.";
     public override string Risks => "High performance increases power use, heat, and fan noise; on laptops it shortens battery life. The previous plan is restored on rollback.";
     public override Reversibility Reversibility => Reversibility.Full;
@@ -302,9 +302,9 @@ public abstract class PowerSettingAction : OptimizationAction
 public sealed class ProcessorMaxStateAction : PowerSettingAction
 {
     public override string Id => ActionIds.ProcessorState;
-    public override string Title => "Maximum processor state";
+    public override string Title => "CPU speed limit";
     public override OptimizationCategory Category => OptimizationCategory.Power;
-    public override string Description => "Restores the active plan's maximum processor state (plugged in) to 100% so the CPU can reach full speed.";
+    public override string Description => "Lets the CPU run at full speed when plugged in.";
     public override string ExpectedBenefit => "Removes an artificial CPU speed cap; measurable in CPU-heavy tasks.";
     public override string Risks => "More heat and fan noise under load if the cap was set deliberately to manage temperatures.";
     protected override string Subgroup => PowerSettingIds.SubProcessor;
@@ -319,7 +319,7 @@ public sealed class UsbSelectiveSuspendAction : PowerSettingAction
     public override string Id => ActionIds.UsbSelectiveSuspend;
     public override string Title => "USB selective suspend";
     public override OptimizationCategory Category => OptimizationCategory.Power;
-    public override string Description => "Allows Windows to power down idle USB devices. Disabling it (plugged in) is a standard fix for USB devices that disconnect, lag, or fail to wake.";
+    public override string Description => "Turn it off if USB devices disconnect or lag.";
     public override string ExpectedBenefit => "Fixes intermittent USB disconnects (headsets, controllers, audio interfaces, VR). No performance gain otherwise.";
     public override string Risks => "Slightly higher idle power use when plugged in.";
     protected override string Subgroup => PowerSettingIds.SubUsb;
@@ -334,7 +334,7 @@ public sealed class HibernationAction : OptimizationAction
     public override string Id => ActionIds.Hibernation;
     public override string Title => "Hibernation";
     public override OptimizationCategory Category => OptimizationCategory.Storage;
-    public override string Description => "Turns hibernation off (powercfg /hibernate off), which deletes hiberfil.sys and frees disk space roughly 40% of installed RAM.";
+    public override string Description => "Turning it off frees disk space (about 40% of your RAM size).";
     public override string ExpectedBenefit => "Frees several GB on small SSDs.";
     public override string Risks => "Also disables Fast Startup and the Hibernate power option. Laptops that run out of battery during sleep will lose unsaved work instead of hibernating. Fully reversible with powercfg /hibernate on.";
     public override bool RequiresAdmin => true;
@@ -386,9 +386,9 @@ public sealed class HibernationAction : OptimizationAction
 public sealed class RefreshRateAction : OptimizationAction
 {
     public override string Id => ActionIds.RefreshRate;
-    public override string Title => "Display refresh rate";
+    public override string Title => "Monitor refresh rate";
     public override OptimizationCategory Category => OptimizationCategory.Display;
-    public override string Description => "Sets a monitor to a refresh rate it supports at its current resolution. The mode is tested by the driver before it is applied.";
+    public override string Description => "Set your monitor to its smoothest supported rate, e.g. 144 Hz.";
     public override string ExpectedBenefit => "On high-refresh monitors stuck at 60 Hz: visibly smoother motion and lower input latency. Measured by re-reading the display mode.";
     public override string Risks => "If the cable cannot carry the higher rate the screen may flicker or go blank — the console asks for confirmation and reverts automatically after 15 seconds without it.";
     public override Reversibility Reversibility => Reversibility.Full;
@@ -485,9 +485,9 @@ public sealed class RefreshRateAction : OptimizationAction
 public sealed class VisualEffectsAction : OptimizationAction
 {
     public override string Id => ActionIds.VisualEffects;
-    public override string Title => "Visual effects";
+    public override string Title => "Animations and effects";
     public override OptimizationCategory Category => OptimizationCategory.Display;
-    public override string Description => "Turns Windows animations and shadows off ('Adjust for best performance') or back on, using the same documented switches as System Properties → Performance Options. Font smoothing (ClearType) is never changed.";
+    public override string Description => "Turn off animations and shadows to make a slow PC feel faster.";
     public override string ExpectedBenefit => "Snappier-feeling menus and windows on low-end PCs (integrated graphics, 4 GB RAM). Little to no benefit on modern hardware.";
     public override string Risks => "Windows looks plainer. Every effect's previous state is backed up and restored on rollback.";
     public override Reversibility Reversibility => Reversibility.Full;
@@ -550,9 +550,9 @@ public sealed class VisualEffectsAction : OptimizationAction
 public sealed class MouseAccelerationAction : OptimizationAction
 {
     public override string Id => "input.mouse-acceleration";
-    public override string Title => "Enhance pointer precision (mouse acceleration)";
+    public override string Title => "Mouse acceleration";
     public override OptimizationCategory Category => OptimizationCategory.Gaming;
-    public override string Description => "Windows mouse acceleration makes the pointer move further when the mouse is moved quickly.";
+    public override string Description => "Makes the pointer move further when you move the mouse fast. Gamers usually turn it off.";
     public override string ExpectedBenefit => "Turning it off gives consistent 1:1 aim in games (muscle memory). Many players prefer it off; for office use with a cheap mouse it can be helpful on.";
     public override string Risks => "None — preference only. Previous state restored on rollback.";
     public override Reversibility Reversibility => Reversibility.Full;

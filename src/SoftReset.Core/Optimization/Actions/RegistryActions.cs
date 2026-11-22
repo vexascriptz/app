@@ -21,8 +21,8 @@ public sealed class ShowFileExtensionsAction : RegistryOptionsAction
     public override string Id => ActionIds.FileExtensions;
     public override string Title => "Show file name extensions";
     public override OptimizationCategory Category => OptimizationCategory.Desktop;
-    public override string Description => "Shows extensions such as .exe, .pdf, and .docx in File Explorer.";
-    public override string ExpectedBenefit => "Customers can tell documents from programs — this helps them spot fake 'invoice.pdf.exe' attachments.";
+    public override string Description => "Shows .exe, .pdf and so on at the end of file names.";
+    public override string ExpectedBenefit => "Users can tell documents from programs — this helps them spot fake 'invoice.pdf.exe' attachments.";
     public override string Risks => "None. Purely visual; renaming files becomes slightly more error-prone because the extension is visible.";
     protected override IReadOnlyList<RegTarget> Targets { get; } = new[] { new RegTarget(RegHive.CurrentUser, Paths.ExplorerAdvanced, "HideFileExt", RegKind.DWord) };
     protected override IReadOnlyDictionary<string, object?[]> OptionValues { get; } = new Dictionary<string, object?[]> { ["Show"] = new object?[] { 0 }, ["Hide"] = new object?[] { 1 } };
@@ -36,9 +36,9 @@ public sealed class ShowHiddenFilesAction : RegistryOptionsAction
     public override string Id => ActionIds.HiddenFiles;
     public override string Title => "Show hidden files and folders";
     public override OptimizationCategory Category => OptimizationCategory.Desktop;
-    public override string Description => "Shows items marked hidden (for example the AppData folder) in File Explorer. Protected operating-system files stay hidden.";
+    public override string Description => "Shows hidden folders such as AppData.";
     public override string ExpectedBenefit => "Easier troubleshooting and access to application data folders.";
-    public override string Risks => "Customers may see and accidentally modify hidden application folders. Usually best switched back to Hide at the end of a session.";
+    public override string Risks => "Users may see and accidentally modify hidden application folders. Usually best switched back to Hide at the end of a session.";
     protected override IReadOnlyList<RegTarget> Targets { get; } = new[] { new RegTarget(RegHive.CurrentUser, Paths.ExplorerAdvanced, "Hidden", RegKind.DWord) };
     protected override IReadOnlyDictionary<string, object?[]> OptionValues { get; } = new Dictionary<string, object?[]> { ["Show"] = new object?[] { 1 }, ["Hide"] = new object?[] { 2 } };
     protected override string RecommendedOption => "Hide";
@@ -48,10 +48,10 @@ public sealed class ShowHiddenFilesAction : RegistryOptionsAction
 public sealed class TaskbarAlignmentAction : RegistryOptionsAction
 {
     public override string Id => ActionIds.TaskbarAlignment;
-    public override string Title => "Taskbar alignment (Windows 11)";
+    public override string Title => "Taskbar position";
     public override OptimizationCategory Category => OptimizationCategory.Desktop;
-    public override string Description => "Places the Start button and taskbar icons in the centre (Windows 11 default) or on the left like Windows 10.";
-    public override string ExpectedBenefit => "Familiar layout for customers upgrading from Windows 10.";
+    public override string Description => "Centre (Windows 11) or left (like Windows 10).";
+    public override string ExpectedBenefit => "Familiar layout for people coming from Windows 10.";
     public override string Risks => "None. Purely cosmetic.";
     public override int MinBuild => 22000;
     protected override IReadOnlyList<RegTarget> Targets { get; } = new[] { new RegTarget(RegHive.CurrentUser, Paths.ExplorerAdvanced, "TaskbarAl", RegKind.DWord) };
@@ -65,8 +65,8 @@ public sealed class DarkModeAction : RegistryOptionsAction
     public override string Id => ActionIds.DarkMode;
     public override string Title => "Light or dark mode";
     public override OptimizationCategory Category => OptimizationCategory.Desktop;
-    public override string Description => "Switches Windows and app colour mode between light and dark (Settings → Personalization → Colors).";
-    public override string ExpectedBenefit => "Customer preference; dark mode can reduce glare in dim rooms.";
+    public override string Description => "Switches Windows between light and dark.";
+    public override string ExpectedBenefit => "Personal preference; dark mode can reduce glare in dim rooms.";
     public override string Risks => "None. Some older apps ignore the setting.";
     protected override IReadOnlyList<RegTarget> Targets { get; } = new[]
     {
@@ -88,7 +88,7 @@ public sealed class TransparencyAction : RegistryOptionsAction
     public override string Id => ActionIds.Transparency;
     public override string Title => "Transparency effects";
     public override OptimizationCategory Category => OptimizationCategory.Desktop;
-    public override string Description => "Translucent (acrylic/mica) backgrounds on the taskbar, Start, and windows.";
+    public override string Description => "See-through taskbar, Start menu and windows.";
     public override string ExpectedBenefit => "Turning it off slightly reduces GPU work on very low-end or integrated-graphics PCs and can improve readability.";
     public override string Risks => "None. Purely visual.";
     protected override IReadOnlyList<RegTarget> Targets { get; } = new[] { new RegTarget(RegHive.CurrentUser, Paths.Personalize, "EnableTransparency", RegKind.DWord) };
@@ -102,7 +102,7 @@ public sealed class ExplorerThisPcAction : RegistryOptionsAction
     public override string Id => ActionIds.ExplorerThisPc;
     public override string Title => "File Explorer opens to";
     public override OptimizationCategory Category => OptimizationCategory.Desktop;
-    public override string Description => "Chooses whether File Explorer opens to Home/Quick access or This PC (drives and folders).";
+    public override string Description => "Home or This PC.";
     public override string ExpectedBenefit => "This PC shows drives and free space immediately; Home shows recent files.";
     public override string Risks => "None.";
     protected override IReadOnlyList<RegTarget> Targets { get; } = new[] { new RegTarget(RegHive.CurrentUser, Paths.ExplorerAdvanced, "LaunchTo", RegKind.DWord) };
@@ -116,7 +116,7 @@ public sealed class GameModeAction : RegistryOptionsAction
     public override string Id => ActionIds.GameMode;
     public override string Title => "Game Mode";
     public override OptimizationCategory Category => OptimizationCategory.Gaming;
-    public override string Description => "Game Mode prioritises the foreground game and stops Windows Update from installing drivers or showing restart prompts while playing.";
+    public override string Description => "Gives games priority and stops Windows Update interrupting them.";
     public override string ExpectedBenefit => "Fewer interruptions and background installs during games. Measured FPS changes are usually small.";
     public override string Risks => "None known; it is the Windows default.";
     protected override IReadOnlyList<RegTarget> Targets { get; } = new[] { new RegTarget(RegHive.CurrentUser, Paths.GameBar, "AutoGameModeEnabled", RegKind.DWord) };
@@ -128,11 +128,11 @@ public sealed class GameModeAction : RegistryOptionsAction
 public sealed class BackgroundRecordingAction : RegistryOptionsAction
 {
     public override string Id => ActionIds.BackgroundRecording;
-    public override string Title => "Xbox Game Bar background recording";
+    public override string Title => "Background game recording";
     public override OptimizationCategory Category => OptimizationCategory.Gaming;
-    public override string Description => "'Record what happened' keeps a rolling video buffer of gameplay so the last minutes can be saved.";
+    public override string Description => "Records gameplay all the time so you can save the last few minutes. Costs some performance.";
     public override string ExpectedBenefit => "Turning it off frees the GPU video encoder, some memory, and avoids constant disk writes. Gains are small on modern GPUs, more noticeable on low-end systems.";
-    public override string Risks => "The customer can no longer save clips of something that already happened. Manual recording still works.";
+    public override string Risks => "The user can no longer save clips of something that already happened. Manual recording still works.";
     protected override IReadOnlyList<RegTarget> Targets { get; } = new[] { new RegTarget(RegHive.CurrentUser, Paths.GameDvr, "HistoricalCaptureEnabled", RegKind.DWord) };
     protected override IReadOnlyDictionary<string, object?[]> OptionValues { get; } = new Dictionary<string, object?[]> { ["Off"] = new object?[] { 0 }, ["On"] = new object?[] { 1 } };
     protected override string RecommendedOption => "Off";
@@ -144,7 +144,7 @@ public sealed class HagsAction : RegistryOptionsAction
     public override string Id => ActionIds.Hags;
     public override string Title => "Hardware-accelerated GPU scheduling";
     public override OptimizationCategory Category => OptimizationCategory.Gaming;
-    public override string Description => "Lets the GPU manage its own video memory scheduling (Settings → System → Display → Graphics → Advanced). Required for DLSS Frame Generation on NVIDIA RTX 40/50 GPUs.";
+    public override string Description => "Lets the graphics card manage its own memory. Needed for NVIDIA Frame Generation.";
     public override string ExpectedBenefit => "Can slightly reduce latency and CPU overhead; required for frame generation. Effects vary by game and driver — measure before and after.";
     public override string Risks => "Some older games and capture tools stutter with it on. Has no effect if the GPU or driver does not support it.";
     public override bool RequiresRestart => true;
@@ -160,7 +160,7 @@ public sealed class FastStartupAction : RegistryOptionsAction
     public override string Id => ActionIds.FastStartup;
     public override string Title => "Fast Startup";
     public override OptimizationCategory Category => OptimizationCategory.Power;
-    public override string Description => "Fast Startup makes 'Shut down' save the Windows kernel to disk instead of fully closing it, so the next boot is quicker.";
+    public override string Description => "Faster boot, but 'Shut down' doesn't fully restart Windows.";
     public override string ExpectedBenefit => "Turning it off makes every shutdown a clean restart, which resolves driver glitches that survive shutdowns, Wake-on-LAN issues, and dual-boot file system problems.";
     public override string Risks => "Cold boots may take a few seconds longer. Turning it on again restores the previous behaviour.";
     protected override IReadOnlyList<RegTarget> Targets { get; } = new[] { new RegTarget(RegHive.LocalMachine, Paths.SessionPower, "HiberbootEnabled", RegKind.DWord) };
@@ -173,11 +173,11 @@ public sealed class FastStartupAction : RegistryOptionsAction
 public sealed class DisableProxyAction : RegistryOptionsAction
 {
     public override string Id => ActionIds.DisableProxy;
-    public override string Title => "Manual proxy server";
+    public override string Title => "Proxy server";
     public override OptimizationCategory Category => OptimizationCategory.Network;
-    public override string Description => "Turns the manually configured web proxy off or on. The proxy address is kept, so it can be turned back on.";
+    public override string Description => "Turns a manually set proxy off or on. Turn it off if websites won't load.";
     public override string ExpectedBenefit => "Fixes 'no internet' in browsers caused by a stale proxy left by VPNs, filters, or unwanted software.";
-    public override string Risks => "If the customer's workplace or school requires the proxy, sites will stop loading until it is re-enabled.";
+    public override string Risks => "If the user's workplace or school requires the proxy, sites will stop loading until it is re-enabled.";
     protected override IReadOnlyList<RegTarget> Targets { get; } = new[] { new RegTarget(RegHive.CurrentUser, Paths.InternetSettings, "ProxyEnable", RegKind.DWord) };
     protected override IReadOnlyDictionary<string, object?[]> OptionValues { get; } = new Dictionary<string, object?[]> { ["Off"] = new object?[] { 0 }, ["On"] = new object?[] { 1 } };
     protected override string RecommendedOption => "Off";
@@ -190,7 +190,7 @@ public sealed class WindowedOptimizationsAction : OptimizationAction
     public override string Id => ActionIds.WindowedOptimizations;
     public override string Title => "Optimizations for windowed games";
     public override OptimizationCategory Category => OptimizationCategory.Gaming;
-    public override string Description => "Lets DirectX 10/11 games running in a window or borderless window use the modern flip presentation model (Settings → Display → Graphics → Change default graphics settings).";
+    public override string Description => "Lower lag for games in a window or borderless window.";
     public override string ExpectedBenefit => "Lower latency in windowed/borderless games and enables Auto HDR and VRR for them.";
     public override string Risks => "A small number of older games show glitches; turn it back off for those.";
     public override Reversibility Reversibility => Reversibility.Full;
@@ -257,9 +257,9 @@ public sealed class WindowedOptimizationsAction : OptimizationAction
 public sealed class GpuPreferenceAction : OptimizationAction
 {
     public override string Id => ActionIds.GpuPreference;
-    public override string Title => "Per-app graphics preference";
+    public override string Title => "Choose GPU per app";
     public override OptimizationCategory Category => OptimizationCategory.Gaming;
-    public override string Description => "Tells Windows which GPU an application should use (Settings → System → Display → Graphics). Useful on laptops where a game runs on the integrated GPU.";
+    public override string Description => "Make a game use the faster graphics card (mainly laptops).";
     public override string ExpectedBenefit => "Games forced onto the dedicated GPU can run several times faster on hybrid-graphics laptops.";
     public override string Risks => "Higher power use and heat for that app on battery. Some apps ignore the preference.";
     public override Reversibility Reversibility => Reversibility.Full;

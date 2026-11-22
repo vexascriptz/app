@@ -11,7 +11,7 @@
       </Grid>
       <Border Classes="card" Padding="6">
         <Grid>
-          <TextBlock Classes="muted" Margin="12" Text="No changes recorded yet. Every change made through the console appears here." IsVisible="{Binding !HasRecords}" TextWrapping="Wrap" />
+          <TextBlock Classes="muted" Margin="12" Text="No changes yet." IsVisible="{Binding !HasRecords}" TextWrapping="Wrap" />
           <ListBox Classes="plain" ItemsSource="{Binding Records}" SelectedItem="{Binding Selected}" x:Name="RecordList">
             <ListBox.ItemTemplate>
               <DataTemplate x:DataType="safety:ChangeRecord">
@@ -21,7 +21,7 @@
                     <TextBlock Classes="muted small" Text="{Binding CreatedAt, Converter={x:Static app:Converters.LocalTime}}" />
                   </StackPanel>
                   <Border Grid.Column="1" CornerRadius="999" Padding="9,2" VerticalAlignment="Center" Margin="8,0,0,0" Background="{Binding Status, Converter={x:Static app:Converters.StatusBackground}}">
-                    <TextBlock Text="{Binding Status}" FontSize="11" FontWeight="SemiBold" Foreground="{Binding Status, Converter={x:Static app:Converters.StatusForeground}}" />
+                    <TextBlock Text="{Binding Status, Converter={x:Static app:Converters.StatusText}}" FontSize="11" FontWeight="SemiBold" Foreground="{Binding Status, Converter={x:Static app:Converters.StatusForeground}}" />
                   </Border>
                 </Grid>
               </DataTemplate>
@@ -41,19 +41,13 @@
               <TextBlock Classes="body" Text="{Binding Selected.Message, FallbackValue=''}" IsVisible="{Binding Selected.Message, Converter={x:Static app:Converters.NotEmpty}, FallbackValue=False}" />
             </StackPanel>
             <Border Classes="soft">
-              <Grid ColumnDefinitions="160,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+              <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto">
                 <TextBlock Classes="label" Text="STATUS" />
-                <TextBlock Grid.Column="1" Classes="body" FontWeight="SemiBold" Text="{Binding Selected.Status, FallbackValue=''}" />
-                <TextBlock Grid.Row="1" Classes="label" Text="STARTED" Margin="0,6,0,0" />
+                <TextBlock Grid.Column="1" Classes="body" FontWeight="SemiBold" Text="{Binding Selected.Status, Converter={x:Static app:Converters.StatusText}, FallbackValue=''}" />
+                <TextBlock Grid.Row="1" Classes="label" Text="WHEN" Margin="0,6,0,0" />
                 <TextBlock Grid.Row="1" Grid.Column="1" Classes="body" Margin="0,6,0,0" Text="{Binding Selected.CreatedAt, Converter={x:Static app:Converters.LocalTime}, FallbackValue=''}" />
-                <TextBlock Grid.Row="2" Classes="label" Text="COMPLETED" Margin="0,6,0,0" />
-                <TextBlock Grid.Row="2" Grid.Column="1" Classes="body" Margin="0,6,0,0" Text="{Binding Selected.CompletedAt, Converter={x:Static app:Converters.LocalTimeN}, FallbackValue=''}" />
-                <TextBlock Grid.Row="3" Classes="label" Text="REVERSIBILITY" Margin="0,6,0,0" />
-                <TextBlock Grid.Row="3" Grid.Column="1" Classes="body" Margin="0,6,0,0" Text="{Binding Selected.Reversibility, FallbackValue=''}" />
-                <TextBlock Grid.Row="4" Classes="label" Text="ADMINISTRATOR" Margin="0,6,0,0" />
-                <TextBlock Grid.Row="4" Grid.Column="1" Classes="body" Margin="0,6,0,0" Text="{Binding Selected.Elevated, Converter={x:Static app:Converters.YesNo}, FallbackValue=''}" />
-                <TextBlock Grid.Row="5" Classes="label" Text="SESSION" Margin="0,6,0,0" />
-                <TextBlock Grid.Row="5" Grid.Column="1" Classes="body" Margin="0,6,0,0" Text="{Binding Selected.SessionId, FallbackValue='—', TargetNullValue='—'}" />
+                <TextBlock Grid.Row="2" Classes="label" Text="CAN UNDO" Margin="0,6,0,0" />
+                <TextBlock Grid.Row="2" Grid.Column="1" Classes="body" Margin="0,6,0,0" Text="{Binding Selected.CanRollback, Converter={x:Static app:Converters.YesNo}, FallbackValue=''}" />
               </Grid>
             </Border>
             <StackPanel Spacing="4">
@@ -65,7 +59,7 @@
               </ItemsControl>
             </StackPanel>
             <StackPanel Spacing="4">
-              <TextBlock Classes="label" Text="BACKUPS TAKEN BEFORE THE CHANGE" />
+              <TextBlock Classes="label" Text="SAVED BEFORE THE CHANGE" />
               <ItemsControl ItemsSource="{Binding Selected.Backups, FallbackValue={x:Null}}">
                 <ItemsControl.ItemTemplate>
                   <DataTemplate x:DataType="safety:BackupItem">
@@ -77,16 +71,16 @@
               </ItemsControl>
             </StackPanel>
             <StackPanel Spacing="4">
-              <TextBlock Classes="label" Text="VERIFICATION" />
+              <TextBlock Classes="label" Text="RESULT" />
               <TextBlock Classes="body" Text="{Binding Selected.VerificationMessage, FallbackValue='', TargetNullValue='Not verified.'}" />
             </StackPanel>
             <StackPanel Spacing="4" IsVisible="{Binding Selected.RollbackMessage, Converter={x:Static app:Converters.NotEmpty}, FallbackValue=False}">
-              <TextBlock Classes="label" Text="ROLLBACK" />
+              <TextBlock Classes="label" Text="UNDO RESULT" />
               <TextBlock Classes="body" Text="{Binding Selected.RollbackMessage, FallbackValue=''}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="10">
-              <Button Classes="primary" Content="Roll back this change…" Command="{Binding RollbackCommand}" IsEnabled="{Binding Selected.CanRollback, FallbackValue=False}" x:Name="RollbackButton" />
-              <TextBlock Classes="muted small" VerticalAlignment="Center" Text="Not reversible, already rolled back, or nothing was changed." IsVisible="{Binding !Selected.CanRollback, FallbackValue=False}" />
+              <Button Classes="primary" Content="Undo this change…" Command="{Binding RollbackCommand}" IsEnabled="{Binding Selected.CanRollback, FallbackValue=False}" x:Name="RollbackButton" />
+              <TextBlock Classes="muted small" VerticalAlignment="Center" Text="This one can't be undone." IsVisible="{Binding !Selected.CanRollback, FallbackValue=False}" />
             </StackPanel>
           </StackPanel>
         </Border>

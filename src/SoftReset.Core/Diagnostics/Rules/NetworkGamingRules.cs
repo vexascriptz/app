@@ -60,10 +60,10 @@ internal sealed class NetworkConfigRule : Rule
                     "Traffic is routed through a proxy server. On home PCs this is unusual — it is often left behind by VPNs, ad-blocking or 'privacy' tools, or adware, and causes 'no internet' in browsers.", key: "network.proxy")
                 .Ev("Proxy server", s.Network.ProxyServer!, @"HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings")
                 .Ev("Auto-config script", s.Network.AutoConfigUrl ?? "None", "Internet Settings")
-                .Cause("A VPN, filtering tool, or unwanted software set a proxy.", "It may be required by the customer's employer/school.")
-                .Rec("Confirm with the customer. If it is not required, turn the proxy off (backed up and reversible).", ActionIds.DisableProxy)
+                .Cause("A VPN, filtering tool, or unwanted software set a proxy.", "It may be required by the user's employer/school.")
+                .Rec("Confirm with the user. If it is not required, turn the proxy off (backed up and reversible).", ActionIds.DisableProxy)
                 .Shortcut("Open proxy settings.", "ms-settings:network-proxy", "Open Proxy settings")
-                .Why("The setting is read directly; whether it is wanted can only be confirmed with the customer.")
+                .Why("The setting is read directly; whether it is wanted can only be confirmed with the user.")
                 .Unsure("Workplace or school PCs legitimately use proxies.");
         }
 
@@ -74,7 +74,7 @@ internal sealed class NetworkConfigRule : Rule
             foreach (var e in s.Network.HostsFileNotableEntries.Take(10)) f.Ev("Entry", e, @"C:\Windows\System32\drivers\etc\hosts");
             f.Ev("Total active entries", s.Network.HostsFileEntryCount.ToString(), "hosts file")
              .Cause("An ad-blocking/privacy hosts list.", "Software activation cracks blocking vendor servers.", "Malware blocking security sites.")
-             .Rec("Review the entries with the customer; entries blocking Windows Update or security vendors should be removed manually in an elevated text editor after confirming.")
+             .Rec("Review the entries with the user; entries blocking Windows Update or security vendors should be removed manually in an elevated text editor after confirming.")
              .Why("The file content is read directly; intent cannot be determined automatically.")
              .Unsure("Many entries are harmless ad-blocking rules.");
             yield return f;
@@ -138,7 +138,7 @@ internal sealed class RefreshRateRule : Rule
         {
             var sev = d.MaxRefreshHzAtCurrentResolution >= 100 && d.RefreshHz <= 75 ? Severity.High : Severity.Medium;
             yield return New($"{(string.IsNullOrEmpty(d.MonitorName) ? d.DeviceName : d.MonitorName)} runs at {d.RefreshHz} Hz but supports {d.MaxRefreshHzAtCurrentResolution} Hz", sev, Confidence.High,
-                    "The monitor is capable of a higher refresh rate at its current resolution. Windows often defaults to 60 Hz, so customers who bought a high-refresh monitor never get its benefit — motion looks less smooth and games feel less responsive.",
+                    "The monitor is capable of a higher refresh rate at its current resolution. Windows often defaults to 60 Hz, so people who bought a high-refresh monitor never get its benefit — motion looks less smooth and games feel less responsive.",
                     key: $"{Id}:{d.DeviceName}")
                 .Ev("Current mode", $"{d.Width}x{d.Height} @ {d.RefreshHz} Hz", "EnumDisplaySettings (current)")
                 .Ev("Highest refresh at this resolution", $"{d.MaxRefreshHzAtCurrentResolution} Hz", "EnumDisplaySettings (supported modes)")
@@ -195,8 +195,8 @@ internal sealed class GamingConfigRule : Rule
             yield return New("Background game recording is on", Severity.Low, Confidence.Medium,
                     "Xbox Game Bar continuously records the last few minutes of gameplay. This uses GPU encoder time, memory, and disk writes; the cost is small on modern GPUs but measurable on low-end systems.", key: "gaming.background-recording")
                 .Ev("Record what happened (background recording)", "On", @"HKCU\Software\Microsoft\Windows\CurrentVersion\GameDVR\HistoricalCaptureEnabled")
-                .Cause("Enabled by the customer or a Game Bar default.")
-                .Rec("Turn background recording off unless the customer uses it to capture clips.", ActionIds.BackgroundRecording)
+                .Cause("Enabled by the user or a Game Bar default.")
+                .Rec("Turn background recording off unless the user uses it to capture clips.", ActionIds.BackgroundRecording)
                 .Why("Read from the Game DVR settings.");
         }
         if (g.GameModeEnabled == false && hasDedicated)
@@ -216,7 +216,7 @@ internal sealed class GamingConfigRule : Rule
                 "Overlays inject into games to draw on top of them. Several at once can cause stutter, crashes, or anti-cheat conflicts.", key: "gaming.overlays");
             foreach (var o in overlays) f.Ev("Running", o, "Process list");
             f.Cause("Multiple launchers and utilities each enable their own overlay.")
-             .Rec("Keep the overlay the customer actually uses and disable the others in each app's settings.")
+             .Rec("Keep the overlay the user actually uses and disable the others in each app's settings.")
              .Why("Based on running processes; whether each overlay is enabled in-game is configured inside each app.")
              .Unsure("A running process does not prove its overlay is active.");
             yield return f;

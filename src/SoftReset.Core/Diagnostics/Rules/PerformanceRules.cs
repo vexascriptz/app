@@ -67,7 +67,7 @@ internal sealed class CpuSustainedHighRule : Rule
             f.Cause("The CPU has few threads, so normal multitasking can saturate it.");
 
         f.Rec("Open Background Processes, sort by CPU, and identify what is using the processor before ending anything.")
-         .Rec("If the top consumers are startup apps the customer does not need, disable them at startup.", ActionIds.StartupUserItems)
+         .Rec("If the top consumers are startup apps the user does not need, disable them at startup.", ActionIds.StartupUserItems)
          .Why(conf == Confidence.Medium
              ? "Based on a multi-second sample of real CPU counters; high-load periods can be short-lived."
              : "Sample was very short, so this may be a momentary spike.")
@@ -103,7 +103,7 @@ internal sealed class CpuProcessHogRule : Rule
             if (transient) f.Cause("This is a Windows maintenance process; high usage is normally temporary.");
             f.Rec($"Review {t.Name} in Background Processes for its publisher, signature, and recommendations.")
              .Why("Measured from processor-time deltas over the sample window.")
-             .Unsure("Some applications legitimately use high CPU while working (games, video export, compiling). Confirm with the customer what was running.");
+             .Unsure("Some applications legitimately use high CPU while working (games, video export, compiling). Confirm with the user what was running.");
             yield return f;
         }
     }
@@ -142,7 +142,7 @@ internal sealed class MemoryPressureRule : Rule
         f.Rec("Close unused applications and browser tabs; disable startup apps that keep running in the background.", ActionIds.StartupUserItems)
          .Rec("Review the largest processes in Background Processes.")
          .Why("Read directly from Windows memory counters at the time of the scan.")
-         .Unsure("Memory use depends on what the customer had open during the scan. A RAM upgrade is only justified if usage stays high during their normal workload.");
+         .Unsure("Memory use depends on what the user had open during the scan. A RAM upgrade is only justified if usage stays high during their normal workload.");
         yield return f;
     }
 }
@@ -166,7 +166,7 @@ internal sealed class LowInstalledMemoryRule : Rule
             .Ev("Memory modules", s.Hardware.MemoryModules.Count > 0 ? string.Join(", ", s.Hardware.MemoryModules.Select(m => $"{m.Slot}: {Bytes(m.CapacityBytes)}")) : "Not reported", "WMI Win32_PhysicalMemory")
             .Cause("The hardware has limited memory for current software.")
             .Rec("Reduce background apps and startup items to free memory.", ActionIds.StartupUserItems)
-            .Rec("Discuss a memory upgrade with the customer if the motherboard has free slots or supports larger modules.")
+            .Rec("Discuss a memory upgrade with the user if the motherboard has free slots or supports larger modules.")
             .Why("Installed capacity is reported by firmware and is reliable.");
     }
 }
@@ -187,9 +187,9 @@ internal sealed class ProcessCountRule : Rule
             .Ev("Threads", s.ThreadCount.ToString(), "Process enumeration")
             .Ev("Enabled non-Microsoft startup items", nonMsStartup.ToString(), "Startup inventory")
             .Cause("Background utilities, vendor tools, and app updaters start with Windows and stay resident.", "Each browser tab and extension runs as separate processes.")
-            .Rec("Review startup items and disable the ones the customer does not need.", ActionIds.StartupUserItems)
+            .Rec("Review startup items and disable the ones the user does not need.", ActionIds.StartupUserItems)
             .Rec("Review Background Processes grouped by publisher to spot redundant vendor utilities.")
-            .Why("Counts are exact; what counts as 'too many' depends on the customer's software.")
+            .Why("Counts are exact; what counts as 'too many' depends on the user's software.")
             .Unsure("Process count alone does not prove a performance problem; it is a pointer for review.");
     }
 }
@@ -233,9 +233,9 @@ internal sealed class StorageLowSpaceRule : Rule
                 if (c.HibernationFileBytes is > 0) f.Ev("Hibernation file", Bytes(c.HibernationFileBytes), "hiberfil.sys size");
                 if (c.DownloadsFolderBytes is > 0) f.Ev("Downloads folder", Bytes(c.DownloadsFolderBytes), "Downloads folder size");
                 f.Rec("Clear temporary files (preview first; nothing personal is deleted).", ActionIds.UserTemp)
-                 .Rec("Empty the Recycle Bin after confirming with the customer.", ActionIds.RecycleBin)
+                 .Rec("Empty the Recycle Bin after confirming with the user.", ActionIds.RecycleBin)
                  .Rec("Clear the Windows Update download cache.", ActionIds.UpdateCache)
-                 .Rec("Use File Organizer to find large and duplicate files in Downloads with the customer.")
+                 .Rec("Use File Organizer to find large and duplicate files in Downloads with the user.")
                  .Shortcut("Review large files and apps in Windows Storage settings.", "ms-settings:storagesense", "Open Storage settings");
             }
             f.Cause("Accumulated downloads, media, temporary files, and installed applications.")
@@ -266,7 +266,7 @@ internal sealed class CleanupOpportunityRule : Rule
         if (c.WindowsUpdateCacheBytes is > 0) f.Ev("Update cache", Bytes(c.WindowsUpdateCacheBytes), "SoftwareDistribution");
         f.Cause("Windows and applications leave temporary files behind; the Recycle Bin is not emptied automatically unless Storage Sense is configured.")
          .Rec("Clear user temporary files.", ActionIds.UserTemp)
-         .Rec("Empty the Recycle Bin (confirm with the customer first).", ActionIds.RecycleBin)
+         .Rec("Empty the Recycle Bin (confirm with the user first).", ActionIds.RecycleBin)
          .Why("Sizes are measured directly; files in use are skipped during cleanup so the final amount can be lower.")
          .Unsure("Some files will be locked by running programs and cannot be removed until they close.");
         yield return f;
@@ -314,7 +314,7 @@ internal sealed class StartupManyItemsRule : Rule
         var latestBoot = s.Reliability.BootRecords.OrderByDescending(b => b.Time).FirstOrDefault();
         if (latestBoot is not null) f.Ev("Most recent boot duration", $"{latestBoot.BootTimeMs / 1000.0:0.#} s", "Diagnostics-Performance event 100");
         f.Cause("Applications register themselves to start automatically during installation.")
-         .Rec("Disable startup items the customer does not need. Disabling is reversible and does not uninstall anything.", ActionIds.StartupUserItems)
+         .Rec("Disable startup items the user does not need. Disabling is reversible and does not uninstall anything.", ActionIds.StartupUserItems)
          .Rec("Machine-wide startup items require administrator approval.", ActionIds.StartupMachineItems)
          .Why("The startup list is read from the same locations Task Manager uses.")
          .Unsure("Windows does not expose Task Manager's per-app 'startup impact' through a documented API, so impact is inferred from the number of items and boot duration.");
@@ -402,7 +402,7 @@ internal sealed class FastStartupUptimeRule : Rule
             .Ev("Uptime", $"{up.TotalDays:0.#} days", "Calculated")
             .Ev("Fast Startup", s.Power.FastStartupEnabled switch { true => "Enabled", false => "Disabled", _ => "Unknown" }, @"HKLM\...\Session Manager\Power\HiberbootEnabled");
         if (s.Updates.RebootPending == true) f.Ev("Restart pending for updates", "Yes", "Component Based Servicing / Windows Update registry");
-        f.Cause(fast ? "The customer uses Shut down, which does not reset the kernel when Fast Startup is on." : "The PC is rarely restarted.")
+        f.Cause(fast ? "The user uses Shut down, which does not reset the kernel when Fast Startup is on." : "The PC is rarely restarted.")
          .Rec("Restart Windows (Start → Power → Restart) at the end of the session.")
          .Rec("Optionally disable Fast Startup so Shut down performs a full restart.", ActionIds.FastStartup)
          .Why("Boot time is reported by Windows.");

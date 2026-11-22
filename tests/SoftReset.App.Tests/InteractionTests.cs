@@ -138,88 +138,6 @@ public class InteractionTests
     }
 
     [AvaloniaFact]
-    public async Task Customer_session_runs_end_to_end_and_produces_a_pdf()
-    {
-        using var h = new UiHarness();
-        h.Services.Settings.ScanSampleSeconds = 1;
-        await h.NavigateAsync(h.Vm.Session);
-        var s = h.Vm.Session;
-
-        // 1. Start
-        h.Type(h.Find<TextBox>("TechnicianBox"), "Alex");
-        h.Type(h.Find<TextBox>("CustomerBox"), "J. Smith");
-        h.Screenshot("15-session-start");
-        h.Click(h.Find<Button>("StartButton"));
-        Assert.Equal(2, s.Step);
-        Assert.NotNull(h.Services.ActiveSession);
-
-        // 2. Concerns
-        h.Type(h.Find<TextBox>("ConcernBox"), "Games stutter and the PC restarted twice this week");
-        h.Click(h.Find<Button>("AddConcernButton"));
-        Assert.Single(s.Concerns);
-        h.Screenshot("16-session-concerns");
-        h.Click(h.Find<Button>("ConcernsDoneButton"));
-        Assert.Equal(3, s.Step);
-
-        // 3-4. Baseline scan
-        h.Click(h.Find<Button>("BaselineButton"));
-        await h.WaitAsync(() => s.Step == 4, 60_000);
-        Assert.NotNull(s.Baseline);
-        h.Screenshot("17-session-baseline");
-        h.Click(h.Find<Button>("ChooseFixesButton"));
-
-        // 5. Proposed fixes — come from findings; the power plan fix must be among them.
-        Assert.Equal(5, s.Step);
-        var power = s.Fixes.First(f => f.Fix.ActionId == ActionIds.PowerPlan);
-        Assert.True(power.IsSelected);
-        foreach (var f in s.Fixes.Where(f => f.NeedsItems || f.Fix.ActionId == ActionIds.RefreshRate)) f.IsSelected = false;
-        h.Screenshot("18-session-fixes");
-        h.Click(h.Find<Button>("FixesDoneButton"));
-        await h.WaitAsync(() => s.Step == 6);
-
-        // 6. Customer approval
-        Assert.Contains(s.ApprovalItems, a => a.Fix.ActionId == ActionIds.PowerPlan);
-        h.Screenshot("19-session-approval");
-        h.Click(h.Find<Button>("RecordApprovalButton")); // no name yet → refused
-        Assert.Equal(6, s.Step);
-        h.Type(h.Find<TextBox>("ApprovedByBox"), "JS");
-        h.Click(h.Find<Button>("RecordApprovalButton"));
-        Assert.Equal(7, s.Step);
-
-        // 7. Apply
-        h.Click(h.Find<Button>("ApplyApprovedButton"));
-        await h.AnswerDialogAsync<ConfirmDialogViewModel>("ConfirmButton");
-        await h.WaitAsync(() => s.Applied, 30_000);
-        Assert.NotEqual(WellKnownPowerSchemes.PowerSaver, h.Platform.State.ActiveScheme);
-        Assert.Contains(h.Services.Journal.ForSession(s.Session!.Id), r => r.ActionId == ActionIds.PowerPlan && r.Status == ChangeStatus.Verified);
-        h.Screenshot("20-session-applied");
-        h.Click(h.Find<Button>("ApplyDoneButton"));
-
-        // 8. Recheck
-        h.Click(h.Find<Button>("RecheckButton"));
-        await h.WaitAsync(() => s.Comparison is not null, 60_000);
-        Assert.True(s.FollowUp!.HealthScore >= s.Baseline!.HealthScore);
-        Assert.NotEmpty(s.Comparison!.Resolved);
-        h.Screenshot("21-session-recheck");
-        h.Click(h.Find<Button>("RecheckDoneButton"));
-
-        // 9. Report
-        h.Click(h.Find<Button>("GenerateReportButton"));
-        await h.WaitAsync(() => s.ReportPath is not null);
-        var pdf = await File.ReadAllBytesAsync(s.ReportPath!);
-        Assert.Equal("%PDF-1.4", System.Text.Encoding.ASCII.GetString(pdf, 0, 8));
-        Assert.True(pdf.Length > 3000);
-        File.Copy(s.ReportPath!, Path.Combine(UiHarness.ScreenshotDir, "sample-session-report.pdf"), overwrite: true);
-        h.Click(h.Find<Button>("ReportDoneButton"));
-
-        // 10. Close
-        h.Click(h.Find<Button>("CloseSessionButton"));
-        await h.WaitAsync(() => s.Session!.IsClosed);
-        Assert.Null(h.Services.ActiveSession);
-        h.Screenshot("22-session-closed");
-    }
-
-    [AvaloniaFact]
     public async Task File_organizer_moves_only_after_approval_and_undo_restores_everything()
     {
         using var h = new UiHarness();
@@ -255,8 +173,8 @@ public class InteractionTests
     public async Task Removing_all_data_requires_typing_DELETE()
     {
         using var h = new UiHarness();
-        h.Services.Sessions.Start("Alex", "", "", "", "DESKTOP-DEMO01");
-        Assert.NotEmpty(Directory.GetFiles(h.Services.Paths.Sessions, "*", SearchOption.AllDirectories));
+        File.WriteAllText(Path.Combine(h.Services.Paths.Scans, "scan.json"), "{}");
+        Assert.NotEmpty(Directory.GetFiles(h.Services.Paths.Scans));
 
         await h.NavigateAsync(h.Vm.Data);
         h.Click(h.Find<Button>("RemoveDataButton"));
@@ -269,7 +187,7 @@ public class InteractionTests
         Assert.True(confirm.IsEffectivelyEnabled);
         h.Click(confirm);
         await h.WaitAsync(() => h.Vm.CurrentDialog is null);
-        Assert.Empty(Directory.GetFiles(h.Services.Paths.Sessions, "*", SearchOption.AllDirectories));
+        Assert.Empty(Directory.GetFiles(h.Services.Paths.Root, "*.json", SearchOption.AllDirectories));
     }
 
     [AvaloniaFact]

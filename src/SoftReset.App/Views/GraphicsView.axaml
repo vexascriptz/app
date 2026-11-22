@@ -12,18 +12,18 @@
             <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="14.5" Foreground="{StaticResource NavyBrush}" TextWrapping="Wrap" />
             <TextBlock Classes="body" Text="{Binding Knowledge.Description}" />
             <TextBlock Classes="body" Text="{Binding Knowledge.Effects}" IsVisible="{Binding Knowledge.Effects, Converter={x:Static app:Converters.NotEmpty}}" />
-            <TextBlock Classes="label" Text="TRADE-OFFS" Margin="0,4,0,0" IsVisible="{Binding Knowledge.Tradeoffs, Converter={x:Static app:Converters.NotEmpty}}" />
+            <TextBlock Classes="label" Text="DOWNSIDE" Margin="0,4,0,0" IsVisible="{Binding Knowledge.Tradeoffs, Converter={x:Static app:Converters.NotEmpty}}" />
             <TextBlock Classes="body" Text="{Binding Knowledge.Tradeoffs}" IsVisible="{Binding Knowledge.Tradeoffs, Converter={x:Static app:Converters.NotEmpty}}" />
-            <TextBlock Classes="label" Text="RECOMMENDED" Margin="0,4,0,0" IsVisible="{Binding RecommendationText, Converter={x:Static app:Converters.NotEmpty}}" />
+            <TextBlock Classes="label" Text="BEST FOR" Margin="0,4,0,0" IsVisible="{Binding RecommendationText, Converter={x:Static app:Converters.NotEmpty}}" />
             <TextBlock Classes="body" Text="{Binding RecommendationText}" IsVisible="{Binding RecommendationText, Converter={x:Static app:Converters.NotEmpty}}" />
             <TextBlock Classes="muted small wrap" Text="{Binding Knowledge.Notes}" IsVisible="{Binding Knowledge.Notes, Converter={x:Static app:Converters.NotEmpty}}" />
           </StackPanel>
           <Border Grid.Column="2" Classes="soft" VerticalAlignment="Top">
             <StackPanel Spacing="4">
-              <TextBlock Classes="label" Text="CURRENT VALUE" />
+              <TextBlock Classes="label" Text="NOW SET TO" />
               <TextBlock Text="{Binding ValueText}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" TextWrapping="Wrap" />
               <TextBlock Classes="muted small" Text="{Binding Location}" IsVisible="{Binding Location, Converter={x:Static app:Converters.NotNull}}" />
-              <TextBlock Classes="label" Text="WHERE TO CHANGE IT" Margin="0,8,0,0" />
+              <TextBlock Classes="label" Text="CHANGE IT IN" Margin="0,8,0,0" />
               <TextBlock Classes="small wrap" Text="{Binding Knowledge.WhereToChange}" Foreground="{StaticResource TextBrush}" />
             </StackPanel>
           </Border>
@@ -35,8 +35,8 @@
   <DockPanel Margin="32,4,32,24">
     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="0,0,0,14">
       <Button Classes="secondary small" Content="Refresh" Command="{Binding RefreshCommand}" />
-      <Button Classes="secondary small" Content="Windows graphics settings" Command="{Binding OpenWindowsGraphicsCommand}" />
-      <Button Classes="secondary small" Content="DirectX Diagnostic Tool" Command="{Binding OpenDxDiagCommand}" />
+      <Button Classes="secondary small" Content="Windows display settings" Command="{Binding OpenWindowsGraphicsCommand}" />
+      <Button Classes="secondary small" Content="DirectX info" Command="{Binding OpenDxDiagCommand}" />
       <ProgressBar IsIndeterminate="True" Width="120" IsVisible="{Binding Loading}" VerticalAlignment="Center" />
     </StackPanel>
 
@@ -58,7 +58,7 @@
                           <TextBlock Grid.Row="1" Classes="label" Text="DEDICATED MEMORY" Margin="0,6,0,0" />
                           <TextBlock Grid.Row="1" Grid.Column="1" Classes="body" Text="{Binding Memory}" Margin="0,6,0,0" />
                         </Grid>
-                        <TextBlock Classes="muted small wrap" Text="{Binding Source}" Margin="0,6,0,0" />
+                        
                         <TextBlock Classes="small wrap" Foreground="{StaticResource WarningBrush}" Text="{Binding Throttle}" IsVisible="{Binding Throttle, Converter={x:Static app:Converters.NotEmpty}}" />
                       </StackPanel>
                       <UniformGrid Grid.Column="2" Columns="3" IsVisible="{Binding HasTelemetry}">
@@ -97,14 +97,13 @@
                     </DataTemplate>
                   </ItemsControl.ItemTemplate>
                 </ItemsControl>
-                <TextBlock Classes="muted small wrap" Text="Refresh-rate changes are tested by Windows first, then applied with a 15-second keep-or-revert countdown. Only modes the driver reports for the current resolution are offered." />
+                <TextBlock Classes="muted small" Text="If the screen goes blank after a change, wait 15 seconds and it switches back." />
               </StackPanel>
             </Border>
 
             <Border Classes="card">
               <StackPanel Spacing="10">
                 <TextBlock Classes="h3" Text="Windows graphics options" />
-                <TextBlock Classes="body" Text="These are Windows settings rather than driver settings, so the console can inspect, change, and roll them back through the Optimization workflow." />
                 <WrapPanel>
                   <Button Classes="secondary" Content="Hardware-accelerated GPU scheduling" Command="{Binding HagsCommand}" Margin="0,0,8,8" />
                   <Button Classes="secondary" Content="Per-app GPU preference" Command="{Binding GpuPreferenceCommand}" Margin="0,0,8,8" />
@@ -123,7 +122,7 @@
                 <StackPanel Spacing="6">
                   <TextBlock Classes="h3" Text="NVIDIA driver settings" />
                   <TextBlock Classes="body" Text="{Binding NvidiaStatus}" />
-                  <TextBlock Classes="muted small wrap" Text="Values are read from the driver's own settings database through NVIDIA's public NVAPI interface, in a separate process. The console never writes driver settings — use the NVIDIA Control Panel or NVIDIA App to change them." />
+                  <TextBlock Classes="muted small wrap" Text="Shown for reference. Change them in the NVIDIA Control Panel or NVIDIA App." />
                 </StackPanel>
                 <StackPanel Grid.Column="1" Spacing="8" Margin="16,0,0,0" VerticalAlignment="Center">
                   <Button Classes="primary" Content="Read driver settings" Command="{Binding ReadNvidiaSettingsCommand}" x:Name="ReadNvidiaButton" />
@@ -134,7 +133,7 @@
             </Border>
             <Border Classes="card" IsVisible="{Binding Profiles.Count}">
               <StackPanel Spacing="8">
-                <TextBlock Classes="h3" Text="Per-game profiles changed from the driver defaults" />
+                <TextBlock Classes="h3" Text="Games with custom settings" />
                 <ItemsControl ItemsSource="{Binding Profiles}">
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="p:NvidiaProfileSummary">
@@ -163,7 +162,7 @@
               <Grid ColumnDefinitions="*,Auto">
                 <StackPanel Spacing="6">
                   <TextBlock Classes="h3" Text="AMD Software: Adrenalin Edition" />
-                  <TextBlock Classes="body" Text="AMD does not offer a public interface for reading these settings, so the console explains them and opens AMD Software to change them." />
+                  <TextBlock Classes="body" Text="What each AMD setting does. Change them in AMD Software." />
                 </StackPanel>
                 <Button Grid.Column="1" Classes="primary" Content="Open AMD Software" Command="{Binding OpenVendorCommand}" CommandParameter="amd" VerticalAlignment="Center" />
               </Grid>
@@ -180,7 +179,7 @@
               <Grid ColumnDefinitions="*,Auto">
                 <StackPanel Spacing="6">
                   <TextBlock Classes="h3" Text="Intel Graphics Software" />
-                  <TextBlock Classes="body" Text="Intel graphics settings are explained here and changed in Intel's own software." />
+                  <TextBlock Classes="body" Text="What each Intel setting does. Change them in Intel's software." />
                 </StackPanel>
                 <Button Grid.Column="1" Classes="primary" Content="Open Intel software" Command="{Binding OpenVendorCommand}" CommandParameter="intel" VerticalAlignment="Center" />
               </Grid>

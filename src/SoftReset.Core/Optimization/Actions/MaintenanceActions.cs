@@ -60,18 +60,18 @@ public abstract class FolderCleanupAction : OptimizationAction
 public sealed class UserTempCleanupAction : FolderCleanupAction
 {
     public override string Id => ActionIds.UserTemp;
-    public override string Title => "Clear user temporary files";
-    public override string Description => "Deletes files in this user's %TEMP% folder that have not been modified for 24 hours.";
+    public override string Title => "Clear temporary files";
+    public override string Description => "Deletes old temporary files (not touched for a day). Nothing personal.";
     public override string ExpectedBenefit => "Frees disk space. Does not noticeably speed up Windows by itself.";
-    public override string Risks => "Irreversible, but temporary files are by definition disposable. Unsaved work in crashed apps' temp files could be lost — ask the customer first.";
+    public override string Risks => "Irreversible, but temporary files are by definition disposable. Unsaved work in crashed apps' temp files could be lost — ask the user first.";
     protected override string Folder(ActionContext ctx) => ctx.Platform.Folders.Temp;
 }
 
 public sealed class WindowsTempCleanupAction : FolderCleanupAction
 {
     public override string Id => ActionIds.WindowsTemp;
-    public override string Title => "Clear Windows temporary files";
-    public override string Description => @"Deletes files in C:\Windows\Temp older than 24 hours.";
+    public override string Title => "Clear Windows temp files";
+    public override string Description => "Deletes old files in Windows' own temp folder.";
     public override string ExpectedBenefit => "Frees disk space, sometimes several GB after failed installers.";
     public override string Risks => "Irreversible. Files in use are skipped.";
     public override bool RequiresAdmin => true;
@@ -83,9 +83,9 @@ public sealed class RecycleBinAction : OptimizationAction
     public override string Id => ActionIds.RecycleBin;
     public override string Title => "Empty the Recycle Bin";
     public override OptimizationCategory Category => OptimizationCategory.Storage;
-    public override string Description => "Permanently deletes everything in the Recycle Bin on all drives.";
+    public override string Description => "Permanently deletes everything in the Recycle Bin.";
     public override string ExpectedBenefit => "Frees the space used by deleted files.";
-    public override string Risks => "IRREVERSIBLE. The customer must confirm nothing in the Recycle Bin is needed.";
+    public override string Risks => "IRREVERSIBLE. The user must confirm nothing in the Recycle Bin is needed.";
     public override Reversibility Reversibility => Reversibility.None;
 
     public override Task<ActionInspection> InspectAsync(ActionContext ctx, ActionRequest request, CancellationToken ct)
@@ -104,7 +104,7 @@ public sealed class RecycleBinAction : OptimizationAction
             p.Changes.Add(new PreviewChange("Recycle Bin", $"{i.Items} items, {ToolOutputParsers.FormatBytes(i.Bytes)}", "Empty"));
             p.EstimatedBytesFreed = i.Bytes;
         }
-        p.Warnings.Add("This permanently deletes the files. Ask the customer to review the Recycle Bin first.");
+        p.Warnings.Add("This permanently deletes the files. Ask the user to review the Recycle Bin first.");
         return Task.FromResult(p);
     }
 
@@ -126,9 +126,9 @@ public sealed class RecycleBinAction : OptimizationAction
 public sealed class UpdateCacheCleanupAction : OptimizationAction
 {
     public override string Id => ActionIds.UpdateCache;
-    public override string Title => "Clear Windows Update download cache";
+    public override string Title => "Clear downloaded updates";
     public override OptimizationCategory Category => OptimizationCategory.Storage;
-    public override string Description => @"Stops Windows Update briefly, deletes downloaded update files in C:\Windows\SoftwareDistribution\Download, and restarts the services.";
+    public override string Description => "Deletes update files Windows has downloaded. Use if updates are stuck.";
     public override string ExpectedBenefit => "Frees space and clears corrupted downloads that make updates fail.";
     public override string Risks => "Pending updates will be downloaded again. Do not run while an update is installing.";
     public override bool RequiresAdmin => true;
@@ -188,9 +188,9 @@ public sealed class UpdateCacheCleanupAction : OptimizationAction
 public sealed class EndProcessesAction : OptimizationAction
 {
     public override string Id => ActionIds.EndProcesses;
-    public override string Title => "End selected background processes";
+    public override string Title => "Close background programs";
     public override OptimizationCategory Category => OptimizationCategory.Background;
-    public override string Description => "Ends processes the technician selects from the heaviest CPU and memory users. Core Windows and security processes cannot be selected.";
+    public override string Description => "Closes programs you pick from the ones using the most CPU or memory. Windows' own processes can't be picked.";
     public override string ExpectedBenefit => "Frees CPU and memory immediately (measured by re-sampling). The process may start again at next sign-in — disable its startup entry for a lasting effect.";
     public override string Risks => "Unsaved work in the ended application is lost. Ending a process is not reversible, but the application can simply be started again.";
     public override Reversibility Reversibility => Reversibility.None;
@@ -227,7 +227,7 @@ public sealed class EndProcessesAction : OptimizationAction
             if (ProtectedComponents.IsCriticalProcess(proc.Name)) { p.Warnings.Add($"{proc.Name} is protected and will be skipped."); continue; }
             p.Changes.Add(new PreviewChange($"{proc.Name} (PID {proc.Pid})", "Running", "Ended"));
         }
-        p.Warnings.Add("Make sure the customer has saved their work in these applications.");
+        p.Warnings.Add("Make sure the user has saved their work in these applications.");
         return Task.FromResult(p);
     }
 
@@ -304,9 +304,9 @@ public abstract class CommandAction : OptimizationAction
 public sealed class RestorePointAction : OptimizationAction
 {
     public override string Id => ActionIds.RestorePoint;
-    public override string Title => "Create a System Restore point";
+    public override string Title => "Create a restore point";
     public override OptimizationCategory Category => OptimizationCategory.Maintenance;
-    public override string Description => "Creates a restore point so system files, drivers, and registry settings can be returned to their current state from System Restore.";
+    public override string Description => "Saves a snapshot so Windows can be put back to how it is now.";
     public override string ExpectedBenefit => "A safety net before larger changes. Recommended at the start of every session.";
     public override string Risks => "Uses some disk space. Windows allows one restore point per 24 hours by default; additional requests are skipped by Windows.";
     public override bool RequiresAdmin => true;
@@ -345,9 +345,9 @@ public sealed class RestorePointAction : OptimizationAction
 public sealed class SfcAction : CommandAction
 {
     public override string Id => ActionIds.Sfc;
-    public override string Title => "Repair Windows system files (SFC)";
+    public override string Title => "Repair Windows files";
     public override OptimizationCategory Category => OptimizationCategory.Maintenance;
-    public override string Description => "Runs 'sfc /scannow', which verifies protected Windows files and replaces corrupted ones from the component store.";
+    public override string Description => "Checks Windows' own files and replaces any that are damaged (SFC). Takes 10–20 minutes.";
     public override string ExpectedBenefit => "Fixes crashes and broken features caused by damaged system files. Takes 5–20 minutes.";
     public override string Risks => "Low. Replaces files with Microsoft originals; cannot be undone (and does not need to be).";
     public override bool RequiresAdmin => true;
@@ -369,9 +369,9 @@ public sealed class SfcAction : CommandAction
 public sealed class DismRestoreHealthAction : CommandAction
 {
     public override string Id => ActionIds.DismRestoreHealth;
-    public override string Title => "Repair the Windows component store (DISM)";
+    public override string Title => "Deep repair Windows";
     public override OptimizationCategory Category => OptimizationCategory.Maintenance;
-    public override string Description => "Runs 'DISM /Online /Cleanup-Image /RestoreHealth', which repairs the component store that SFC uses as its source. Downloads replacement files from Windows Update.";
+    public override string Description => "Repairs the files Windows uses to fix itself (DISM). Use if Repair Windows files fails. Needs internet.";
     public override string ExpectedBenefit => "Fixes update failures and lets SFC repair files it previously could not. Takes 10–30 minutes and needs internet.";
     public override string Risks => "Low. Requires an internet connection.";
     public override bool RequiresAdmin => true;
@@ -384,9 +384,9 @@ public sealed class DismRestoreHealthAction : CommandAction
 public sealed class ComponentCleanupAction : CommandAction
 {
     public override string Id => ActionIds.ComponentCleanup;
-    public override string Title => "Clean up superseded Windows components";
+    public override string Title => "Remove old update files";
     public override OptimizationCategory Category => OptimizationCategory.Storage;
-    public override string Description => "Runs 'DISM /Online /Cleanup-Image /StartComponentCleanup', removing superseded versions of updated components (the same task Windows runs periodically).";
+    public override string Description => "Deletes leftover copies of components that updates replaced.";
     public override string ExpectedBenefit => "Frees space in the WinSxS folder, often 1–5 GB.";
     public override string Risks => "Updates installed before the cleanup can no longer be uninstalled. Takes several minutes.";
     public override bool RequiresAdmin => true;
@@ -397,9 +397,9 @@ public sealed class ComponentCleanupAction : CommandAction
 public sealed class ChkdskScanAction : CommandAction
 {
     public override string Id => ActionIds.ChkdskScan;
-    public override string Title => "Check the system drive for file system errors (read-only scan)";
+    public override string Title => "Check the drive for errors";
     public override OptimizationCategory Category => OptimizationCategory.Maintenance;
-    public override string Description => "Runs 'chkdsk C: /scan', an online, read-only scan. It reports problems without locking the drive or making repairs.";
+    public override string Description => "Scans the C: drive for problems without changing anything.";
     public override string ExpectedBenefit => "Confirms whether file system corruption is present before deciding on repairs.";
     public override string Risks => "None — the scan does not change anything. Repairs (if needed) must be scheduled separately.";
     public override bool RequiresAdmin => true;
@@ -416,9 +416,9 @@ public sealed class ChkdskScanAction : CommandAction
 public sealed class ResetWindowsUpdateAction : OptimizationAction
 {
     public override string Id => ActionIds.ResetWindowsUpdate;
-    public override string Title => "Reset Windows Update components";
+    public override string Title => "Fix Windows Update";
     public override OptimizationCategory Category => OptimizationCategory.Maintenance;
-    public override string Description => @"Stops Windows Update and BITS, renames C:\Windows\SoftwareDistribution to a backup folder so Windows rebuilds it, then restarts the services. This is Microsoft's documented manual reset.";
+    public override string Description => "Gives Windows Update a fresh start. Fixes stuck or failing updates.";
     public override string ExpectedBenefit => "Fixes updates stuck downloading or failing with cache-related errors.";
     public override string Risks => "The update history list in Settings appears empty afterwards (the original folder is kept and restored on rollback). Updates are downloaded again.";
     public override bool RequiresAdmin => true;
@@ -481,9 +481,9 @@ public sealed class ResetWindowsUpdateAction : OptimizationAction
 public sealed class FlushDnsAction : CommandAction
 {
     public override string Id => ActionIds.FlushDns;
-    public override string Title => "Flush the DNS cache";
+    public override string Title => "Clear DNS cache";
     public override OptimizationCategory Category => OptimizationCategory.Network;
-    public override string Description => "Clears cached name lookups (ipconfig /flushdns) so Windows asks the DNS server again.";
+    public override string Description => "Fixes websites that won't load after a network change.";
     public override string ExpectedBenefit => "Fixes websites that fail to load after DNS or hosting changes.";
     public override string Risks => "None. The cache rebuilds automatically.";
     protected override IReadOnlyList<(string, string)> Commands(ActionContext ctx, ActionRequest r) => new[] { ("ipconfig.exe", "/flushdns") };
@@ -493,9 +493,9 @@ public sealed class FlushDnsAction : CommandAction
 public sealed class RenewDhcpAction : CommandAction
 {
     public override string Id => ActionIds.RenewDhcp;
-    public override string Title => "Renew IP address (DHCP)";
+    public override string Title => "Get a new IP address";
     public override OptimizationCategory Category => OptimizationCategory.Network;
-    public override string Description => "Releases and renews DHCP leases on all adapters (ipconfig /release then /renew).";
+    public override string Description => "Asks the router for a fresh connection.";
     public override string ExpectedBenefit => "Fixes 169.254.x.x addresses and connectivity after router changes.";
     public override string Risks => "Connections drop for a few seconds. Adapters with static IPs are not affected.";
     public override bool RequiresAdmin => true;
@@ -508,9 +508,9 @@ public sealed class RenewDhcpAction : CommandAction
 public sealed class ResetNetworkStackAction : CommandAction
 {
     public override string Id => ActionIds.ResetNetworkStack;
-    public override string Title => "Reset Winsock and TCP/IP";
+    public override string Title => "Reset network settings";
     public override OptimizationCategory Category => OptimizationCategory.Network;
-    public override string Description => "Runs 'netsh winsock reset' and 'netsh int ip reset' to restore the network stack to defaults (Microsoft's documented fix for corrupted network configuration, LSP leftovers, and persistent 'no internet').";
+    public override string Description => "Puts Windows networking back to defaults. Fixes many 'no internet' problems. Needs a restart.";
     public override string ExpectedBenefit => "Fixes connectivity broken by VPN/security software leftovers.";
     public override string Risks => "Static IP addresses and custom DNS settings are reset to DHCP; VPN clients may need reinstalling. Requires a restart. Cannot be rolled back automatically — the console records the current IP configuration in the change history for manual restoration.";
     public override bool RequiresAdmin => true;
@@ -545,9 +545,9 @@ public sealed class ResetNetworkStackAction : CommandAction
 public sealed class ClearAppCacheAction : OptimizationAction
 {
     public override string Id => ActionIds.ClearAppCache;
-    public override string Title => "Clear application cache";
+    public override string Title => "Clear an app's cache";
     public override OptimizationCategory Category => OptimizationCategory.AppMaintenance;
-    public override string Description => "Deletes an application's documented cache folders (never settings, logins, or user files). The application must be closed.";
+    public override string Description => "Deletes an app's temporary files. Logins and settings are kept. Close the app first.";
     public override string ExpectedBenefit => "Fixes apps that show blank windows, fail to update, or behave erratically because of corrupted cache; frees space.";
     public override string Risks => "Irreversible, but caches rebuild automatically. The first launch afterwards is slower.";
     public override Reversibility Reversibility => Reversibility.None;
@@ -626,9 +626,9 @@ public sealed class ClearAppCacheAction : OptimizationAction
 public sealed class WingetUpgradeAction : OptimizationAction
 {
     public override string Id => ActionIds.WingetUpgrade;
-    public override string Title => "Update applications (winget)";
+    public override string Title => "Update apps";
     public override OptimizationCategory Category => OptimizationCategory.AppMaintenance;
-    public override string Description => "Lists applications with updates available through Microsoft's Windows Package Manager (winget) and upgrades the selected ones. Requires internet.";
+    public override string Description => "Finds apps with updates and installs the ones you pick. Needs internet.";
     public override string ExpectedBenefit => "Security and bug fixes for outdated software.";
     public override string Risks => "Installers may close running apps or show their own prompts. Version upgrades cannot be rolled back automatically.";
     public override Reversibility Reversibility => Reversibility.None;
@@ -873,7 +873,7 @@ public sealed class RestartExplorerAction : OptimizationAction
     public override string Id => ActionIds.RestartExplorer;
     public override string Title => "Restart File Explorer";
     public override OptimizationCategory Category => OptimizationCategory.Desktop;
-    public override string Description => "Restarts the Windows shell (taskbar, desktop, File Explorer windows) so desktop and taskbar changes apply without signing out.";
+    public override string Description => "Restarts the taskbar and desktop so changes show up.";
     public override string ExpectedBenefit => "Applies taskbar/Explorer changes; recovers a frozen taskbar.";
     public override string Risks => "Open File Explorer windows close. File copies in progress in Explorer are interrupted.";
     public override Reversibility Reversibility => Reversibility.None;

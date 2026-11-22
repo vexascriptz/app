@@ -70,7 +70,7 @@ jobs:
         run: |
           $v = "${{ steps.v.outputs.version }}"
           New-Item -ItemType Directory -Force -Path release | Out-Null
-          (Get-Content packaging/START-HERE.txt -Raw).Replace("1.0.0", $v) | Set-Content out/SoftResetConsole/START-HERE.txt -NoNewline
+          ((Get-Content packaging/START-HERE.txt -Raw) -replace 'Console \d+\.\d+\.\d+', "Console $v") | Set-Content out/SoftResetConsole/START-HERE.txt -NoNewline
           Compress-Archive -Path out/SoftResetConsole -DestinationPath "release/SoftResetConsole-$v-win-x64.zip"
           Copy-Item out/SoftResetConsole/SoftResetConsole.exe release/
           Push-Location release

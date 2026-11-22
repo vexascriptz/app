@@ -37,8 +37,9 @@ public sealed class Shell
 
 public sealed class NavItem
 {
-    public NavItem(string title, string iconKey, PageViewModel page) { Title = title; IconKey = iconKey; Page = page; }
+    public NavItem(string title, string iconKey, PageViewModel page, string description) { Title = title; IconKey = iconKey; Page = page; Description = description; }
     public string Title { get; }
+    public string Description { get; }
     public string IconKey { get; }
     public PageViewModel Page { get; }
     public Avalonia.Media.Geometry? Icon => Avalonia.Application.Current?.FindResource(IconKey) as Avalonia.Media.Geometry;
@@ -51,7 +52,6 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDialogService
         Services = services;
         Shell = new Shell(services, this);
         Dashboard = new DashboardViewModel(Shell);
-        Session = new SessionViewModel(Shell);
         Diagnostics = new DiagnosticsViewModel(Shell);
         Processes = new ProcessesViewModel(Shell);
         SettingsExplorer = new SettingsExplorerViewModel(Shell);
@@ -63,28 +63,25 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDialogService
         Data = new DataViewModel(Shell);
         NavItems = new ObservableCollection<NavItem>
         {
-            new("Home", "IconHome", Dashboard),
-            new("Customer session", "IconSession", Session),
-            new("Diagnostics", "IconPulse", Diagnostics),
-            new("Background processes", "IconProcesses", Processes),
-            new("Settings explorer", "IconSliders", SettingsExplorer),
-            new("Graphics & NVIDIA", "IconChip", Graphics),
-            new("Applications", "IconApps", Apps),
-            new("Optimization", "IconWand", Optimization),
-            new("File organizer", "IconFolder", Files),
-            new("Change history", "IconHistory", History),
-            new("Data & about", "IconInfo", Data),
+            new("Home", "IconHome", Dashboard, ""),
+            new("Find problems", "IconPulse", Diagnostics, "Scan this PC and see what's wrong"),
+            new("Speed up & fix", "IconWand", Optimization, "Pick a fix and apply it"),
+            new("Running programs", "IconProcesses", Processes, "See what's running and who made it"),
+            new("Windows settings", "IconSliders", SettingsExplorer, "Look up and change any setting"),
+            new("Graphics", "IconChip", Graphics, "Graphics card, monitors, NVIDIA"),
+            new("Apps", "IconApps", Apps, "Repair or remove installed programs"),
+            new("Organize files", "IconFolder", Files, "Tidy a folder, find duplicates"),
+            new("Undo changes", "IconHistory", History, "Everything this app changed"),
+            new("About", "IconInfo", Data, "Saved data and app info"),
         };
         _selectedNav = NavItems[0];
         _currentPage = Dashboard;
-        services.ActiveSessionChanged += (_, _) => OnPropertyChanged(nameof(SessionBanner));
         Shell.Runner.ChangeCompleted += (_, _) => History.MarkStale();
     }
 
     public AppServices Services { get; }
     public Shell Shell { get; }
     public DashboardViewModel Dashboard { get; }
-    public SessionViewModel Session { get; }
     public DiagnosticsViewModel Diagnostics { get; }
     public ProcessesViewModel Processes { get; }
     public SettingsExplorerViewModel SettingsExplorer { get; }
@@ -109,9 +106,6 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDialogService
     public string ElevationText => IsElevated ? "Administrator" : "Standard rights";
     public bool DemoMode => Services.DemoMode;
     public string MachineText => Services.DemoMode ? "Demo PC (simulated)" : Environment.MachineName;
-    public string? SessionBanner => Services.ActiveSession is { IsClosed: false } s
-        ? $"Session {s.Id}{(string.IsNullOrWhiteSpace(s.CustomerName) ? "" : " · " + s.CustomerName)}"
-        : null;
 
     partial void OnSelectedNavChanged(NavItem value)
     {
@@ -143,7 +137,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDialogService
     {
         if (IsElevated) return;
         var ok = await ConfirmAsync("Restart as administrator?",
-            "The console will close and reopen with administrator rights (one UAC prompt). This allows a complete scan (boot times, crash dumps, SSD health) and avoids a UAC prompt for each administrator change.\n\nAn active session is saved and can be resumed.", "Restart as administrator");
+            "The app will reopen with full access, so scans are more complete and Windows won't ask for permission on every change.", "Restart");
         if (!ok) return;
         if (Services.Platform.Elevation.RelaunchElevated(out var error))
         {

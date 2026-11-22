@@ -40,7 +40,7 @@ internal sealed class PowerPlanRule : Rule
                 .Ev("Full-charge capacity", $"{bat.FullChargeCapacityMWh:N0} mWh", "WMI BatteryFullChargedCapacity")
                 .Ev("Cycle count", bat.CycleCount?.ToString() ?? "Not reported", "WMI BatteryCycleCount")
                 .Cause("Normal battery aging.")
-                .Rec("Recommend a battery replacement if battery life matters to the customer.")
+                .Rec("Recommend a battery replacement if battery life matters to the user.")
                 .Shortcut("Generate a detailed battery report.", "powercfg.exe /batteryreport", "Battery report")
                 .Why("Reported by the battery's controller, which can be imprecise.");
         }
@@ -96,7 +96,7 @@ internal sealed class SecurityPostureRule : Rule
                 .Cause("A third-party antivirus was uninstalled incompletely, a tweak tool disabled Defender, or malware disabled protection.")
                 .Shortcut("Open Windows Security to turn protection back on.", "windowsdefender:", "Open Windows Security")
                 .Why("Read from Windows Security Center and Defender status.")
-                .Unsure("The console never changes security settings automatically — protection must be restored by the technician in Windows Security.");
+                .Unsure("The console never changes security settings automatically — protection must be restored manually in Windows Security.");
         }
         else if (sec.DefenderRealTimeEnabled == false && !thirdParty)
         {
@@ -122,7 +122,7 @@ internal sealed class SecurityPostureRule : Rule
                 "Running more than one real-time antivirus causes slowdowns, conflicts, and crashes. Windows allows only one to be active, but leftovers still run services.", key: "security.multiple-av");
             foreach (var av in sec.ThirdPartyAntivirus) f.Ev("Antivirus", av, "WMI SecurityCenter2.AntiVirusProduct");
             f.Cause("Trial antivirus bundled with the PC plus one installed later.")
-             .Rec("Keep one product (Microsoft Defender is sufficient for most customers) and remove others with their official removal tools.")
+             .Rec("Keep one product (Microsoft Defender is sufficient for most people) and remove others with their official removal tools.")
              .Why("Read from Windows Security Center registrations, which can include stale entries.");
             yield return f;
         }
@@ -176,7 +176,7 @@ internal sealed class SuspiciousProcessRule : Rule
                 .Ev("Digital signature", p.Signature.ToString(), "WinVerifyTrust");
             foreach (var r in p.Reasons) f.Ev("Indicator", r, "Heuristic");
             f.Cause("Legitimate unsigned or portable software.", "Potentially unwanted software or malware.")
-             .Rec("Ask the customer whether they recognise the program.")
+             .Rec("Ask the user whether they recognise the program.")
              .Rec("Run a Microsoft Defender full scan (or Offline scan) and check the file with Sysinternals Process Explorer / Sigcheck.")
              .Shortcut("Open Windows Security scan options.", "windowsdefender://threat", "Open Virus & threat protection")
              .Why("Heuristic indicators only — names and locations can be legitimate.")

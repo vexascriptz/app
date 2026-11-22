@@ -17,7 +17,7 @@ public sealed partial class SettingRow : ObservableObject
     [ObservableProperty] private string _current = "…";
     public bool Unavailable => State is not null && State.Availability != SettingAvailability.Available;
     public bool Writable => Definition.Controls.Any(c => c.Type is "registry-set" or "registry-delete" or "action");
-    public string Badges => string.Join(" · ", new[] { Definition.AdminRequired ? "Admin" : null, Definition.Restart != "none" ? Definition.RestartText.Split(' ')[0] + " needed" : null, Writable ? "Changeable" : "Open only" }.Where(x => x is not null));
+    public string Badges => Writable ? "Can change here" : "Opens in Windows";
     partial void OnStateChanged(SettingState? value) { Current = value?.Current.Display ?? "…"; OnPropertyChanged(nameof(Unavailable)); }
 }
 
@@ -47,8 +47,8 @@ public sealed partial class SettingsExplorerViewModel : PageViewModel
         _selectedCategory = Categories[0];
     }
 
-    public override string Title => "Settings explorer";
-    public override string Subtitle => $"{S.Knowledge.Settings.Count} Windows settings: what each does, its current value, recommendations, risks, and a working control.";
+    public override string Title => "Windows settings";
+    public override string Subtitle => "Search for a setting to see what it does and change it.";
 
     public sealed record CategoryItem(string Name, int Count);
     public ObservableCollection<CategoryItem> Categories { get; }

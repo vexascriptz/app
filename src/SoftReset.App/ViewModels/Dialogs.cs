@@ -76,18 +76,18 @@ public sealed partial class ApprovalDialogViewModel : DialogViewModel
     public long? EstimatedBytesFreed { get; init; }
     public ObservableCollection<PreviewChange> Changes { get; init; } = new();
     public ObservableCollection<string> Warnings { get; init; } = new();
-    public bool InSession { get; init; }
 
     public string ReversibilityText => Reversibility switch
     {
-        Reversibility.Full => "Reversible — the previous configuration is backed up and can be restored from Change History.",
-        Reversibility.Partial => "Partly reversible — see the description for what can be restored.",
-        _ => "NOT reversible — this cannot be undone automatically.",
+        Reversibility.Full => "Can be undone",
+        Reversibility.Partial => "Can be partly undone",
+        _ => "Can't be undone",
     };
     public bool IsIrreversible => Reversibility == Reversibility.None;
-    public string AdminText => RequiresAdmin ? "Windows will ask for administrator approval (UAC) for this change only." : "No administrator rights needed.";
+    public string AdminText => RequiresAdmin ? "Windows will ask for permission" : "";
+    public bool HasAdminText => RequiresAdmin;
     public bool HasWarnings => Warnings.Count > 0;
-    public string? FreedText => EstimatedBytesFreed is > 0 ? $"Estimated space freed: {Core.Parsing.ToolOutputParsers.FormatBytes(EstimatedBytesFreed)}" : null;
+    public string? FreedText => EstimatedBytesFreed is > 0 ? $"Frees about {Core.Parsing.ToolOutputParsers.FormatBytes(EstimatedBytesFreed)}" : null;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ApproveCommand))]

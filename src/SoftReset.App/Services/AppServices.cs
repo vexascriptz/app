@@ -5,15 +5,12 @@ using SoftReset.Core.Models;
 using SoftReset.Core.Optimization;
 using SoftReset.Core.Platform;
 using SoftReset.Core.Safety;
-using SoftReset.Core.Sessions;
 using SoftReset.Core.Storage;
 
 namespace SoftReset.App.Services;
 
 public sealed class AppSettings
 {
-    public string TechnicianName { get; set; } = "";
-    public string BusinessContact { get; set; } = "softreset · PC service";
     public int ScanSampleSeconds { get; set; } = 5;
     public bool IncludeConnectivityTests { get; set; }
 }
@@ -33,7 +30,6 @@ public sealed class AppServices
         Actions = ActionRegistry.CreateDefault();
         Executor = new ActionExecutor(Actions, ActionContext);
         Engine = new DiagnosticEngine();
-        Sessions = new SessionService(paths);
         FileOps = new FileOperationExecutor(paths.FileOperations);
         Settings = Json.ReadFile<AppSettings>(paths.SettingsFile) ?? new AppSettings();
         InterruptedChanges = Journal.RecoverInterrupted();
@@ -49,22 +45,13 @@ public sealed class AppServices
     public ActionRegistry Actions { get; }
     public ActionExecutor Executor { get; }
     public DiagnosticEngine Engine { get; }
-    public SessionService Sessions { get; }
     public FileOperationExecutor FileOps { get; }
     public AppSettings Settings { get; }
     public IReadOnlyList<ChangeRecord> InterruptedChanges { get; }
     public string Edition { get; }
 
-    /// <summary>The most recent diagnostic report from any screen (dashboard summary, sessions).</summary>
+    /// <summary>The most recent diagnostic report, shown on the Home page.</summary>
     public DiagnosticReport? LastReport { get; set; }
-    public CustomerSession? ActiveSession { get; set; }
-    public event EventHandler? ActiveSessionChanged;
-
-    public void SetActiveSession(CustomerSession? s)
-    {
-        ActiveSession = s;
-        ActiveSessionChanged?.Invoke(this, EventArgs.Empty);
-    }
 
     public void SaveSettings() => Json.WriteFile(Paths.SettingsFile, Settings);
 

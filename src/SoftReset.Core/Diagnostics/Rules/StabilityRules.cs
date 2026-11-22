@@ -35,7 +35,7 @@ internal sealed class UnexpectedShutdownRule : Rule
             f.Cause("Sudden power loss, a power supply or battery problem, overheating shutdown, or a hard freeze that required holding the power button.");
             if (s.Hardware.IsLaptop) f.Cause("On laptops: a worn battery or faulty charger can cause instant power-off.");
         }
-        f.Rec("Ask the customer what happened at those times (freeze, black screen, sudden power-off, power cut).")
+        f.Rec("Ask the user what happened at those times (freeze, black screen, sudden power-off, power cut).")
          .Rec("Check temperatures and clean dust from fans and heatsinks if shutdowns happen under load.")
          .Rec("If stop codes are present, follow the blue screen finding first.")
          .Shortcut("View the history in Reliability Monitor.", "perfmon.exe /rel", "Open Reliability Monitor")

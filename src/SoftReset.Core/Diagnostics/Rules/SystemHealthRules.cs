@@ -53,7 +53,7 @@ internal sealed class UpdatesStaleRule : Rule
                     "With the service disabled, Windows cannot receive security fixes. Third-party 'debloat' tools commonly do this.", key: "updates.service-disabled")
                 .Ev("wuauserv start type", "Disabled", "Service Control Manager")
                 .Cause("A tweaking/debloat tool or manual change disabled updates.")
-                .Rec("Discuss with the customer, then set the Windows Update service back to Manual (the Windows default) in Services.", ActionIds.ServiceStartMode, new() { ["service"] = "wuauserv", ["startMode"] = "Manual" })
+                .Rec("Discuss with the user, then set the Windows Update service back to Manual (the Windows default) in Services.", ActionIds.ServiceStartMode, new() { ["service"] = "wuauserv", ["startMode"] = "Manual" })
                 .Why("Read from the service configuration.");
         }
 
@@ -66,10 +66,10 @@ internal sealed class UpdatesStaleRule : Rule
         if (u.UpdatesPausedByPolicyOrUser == true) f.Ev("Updates paused", u.PausedUntil is { } p ? $"until {When(p)}" : "Yes", "Windows Update settings");
         if (u.ManagedByPolicy) f.Ev("Managed by policy", "Yes — Group Policy or MDM controls updates", @"HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate");
         f.Cause("Updates are paused, failing, or blocked by policy/third-party tools.", "The PC is rarely online or rarely left on.")
-         .Rec("Open Windows Update and check for updates with the customer present.")
+         .Rec("Open Windows Update and check for updates with the user present.")
          .Shortcut("Open Windows Update.", "ms-settings:windowsupdate-action", "Check for updates")
          .Why("Based on the update agent's history; history can be cleared by resets, which would make this look older than reality.")
-         .Unsure(u.ManagedByPolicy ? "Updates are managed by an organization — confirm with the customer before changing anything." : "Update history can be reset by cleanup tools, which makes this estimate less certain.");
+         .Unsure(u.ManagedByPolicy ? "Updates are managed by an organization — confirm with the user before changing anything." : "Update history can be reset by cleanup tools, which makes this estimate less certain.");
         yield return f;
     }
 }
@@ -112,7 +112,7 @@ internal sealed class DeviceProblemRule : Rule
                     f.Cause("The driver failed to load or is corrupted/unsigned.").Rec("Uninstall the device in Device Manager (with 'delete driver' where offered), restart, and install the current driver.");
                     break;
                 case 22:
-                    f.Cause("Disabled manually.").Rec("Ask the customer whether it should be enabled.");
+                    f.Cause("Disabled manually.").Rec("Ask the user whether it should be enabled.");
                     break;
                 default:
                     f.Cause("Driver or configuration problem.").Rec("Update or reinstall the driver for this device.");
@@ -180,7 +180,7 @@ internal sealed class DiskHealthRule : Rule
             if (bad)
             {
                 var f = New($"{d.FriendlyName} reports a health problem", Severity.Critical, Confidence.High,
-                        "The drive itself is reporting that it may fail. Back up the customer's data before doing anything else.", key: $"{Id}:{d.FriendlyName}")
+                        "The drive itself is reporting that it may fail. Back up the user's data before doing anything else.", key: $"{Id}:{d.FriendlyName}")
                     .Ev("Health status", d.HealthStatus, "WMI MSFT_PhysicalDisk.HealthStatus")
                     .Ev("Operational status", d.OperationalStatus.Count > 0 ? string.Join(", ", d.OperationalStatus) : "Unknown", "WMI MSFT_PhysicalDisk.OperationalStatus");
                 if (d.PredictFailure == true) f.Ev("S.M.A.R.T. failure prediction", "Predicts failure", "WMI MSStorageDriver_FailurePredictStatus");

@@ -3,36 +3,42 @@
              xmlns:opt="using:SoftReset.Core.Optimization"
              xmlns:app="using:SoftReset.App"
              x:Class="SoftReset.App.Views.ApprovalDialogView" x:DataType="vm:ApprovalDialogViewModel">
-  <DockPanel Width="680" MaxHeight="760">
-    <StackPanel DockPanel.Dock="Top" Spacing="6" Margin="0,0,0,14">
-      <TextBlock Classes="label" Text="APPROVAL REQUIRED" Foreground="{StaticResource AccentBrush}" />
+  <DockPanel Width="620" MaxHeight="720">
+    <StackPanel DockPanel.Dock="Top" Spacing="8" Margin="0,0,0,14">
       <TextBlock Classes="h2" Text="{Binding Title}" TextWrapping="Wrap" />
-      <TextBlock Classes="body" Text="{Binding Description}" />
+      <WrapPanel>
+        <Border Classes="pill" Margin="0,0,6,0" Background="{StaticResource SuccessBgBrush}" IsVisible="{Binding !IsIrreversible}">
+          <TextBlock Text="{Binding ReversibilityText}" Foreground="{StaticResource SuccessBrush}" />
+        </Border>
+        <Border Classes="pill" Margin="0,0,6,0" Background="{StaticResource DangerBgBrush}" IsVisible="{Binding IsIrreversible}">
+          <TextBlock Text="{Binding ReversibilityText}" Foreground="{StaticResource DangerBrush}" />
+        </Border>
+        <Border Classes="pill" Margin="0,0,6,0" IsVisible="{Binding HasAdminText}"><TextBlock Text="{Binding AdminText}" /></Border>
+        <Border Classes="pill" Margin="0,0,6,0" Background="{StaticResource WarningBgBrush}" IsVisible="{Binding RequiresRestart}"><TextBlock Text="Needs a restart" Foreground="{StaticResource WarningBrush}" /></Border>
+      </WrapPanel>
     </StackPanel>
-    <StackPanel DockPanel.Dock="Bottom" Spacing="12" Margin="0,14,0,0">
-      <CheckBox IsChecked="{Binding CustomerApproved}" x:Name="ApproveCheck">
-        <TextBlock TextWrapping="Wrap" Text="I have explained this change and the customer approves it." />
-      </CheckBox>
+    <StackPanel DockPanel.Dock="Bottom" Spacing="12" Margin="0,16,0,0">
+      <CheckBox IsChecked="{Binding CustomerApproved}" x:Name="ApproveCheck" Content="Yes, make this change" />
       <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
-        <Button Classes="secondary" Content="Don't change" Command="{Binding CancelCommand}" x:Name="CancelButton" />
-        <Button Classes="primary" Content="Apply change" Command="{Binding ApproveCommand}" x:Name="ApplyButton" />
+        <Button Classes="secondary" Content="Cancel" Command="{Binding CancelCommand}" x:Name="CancelButton" />
+        <Button Classes="primary" Content="Apply" Command="{Binding ApproveCommand}" x:Name="ApplyButton" />
       </StackPanel>
     </StackPanel>
     <ScrollViewer>
-      <StackPanel Spacing="12">
+      <StackPanel Spacing="14">
         <Border Classes="soft">
-          <StackPanel Spacing="8">
+          <StackPanel Spacing="6">
             <TextBlock Classes="label" Text="WHAT WILL CHANGE" />
-            <TextBlock Classes="muted" Text="Nothing needs to change — it is already in the requested state." IsVisible="{Binding !Changes.Count}" />
+            <TextBlock Classes="muted" Text="Nothing — it's already set." IsVisible="{Binding !Changes.Count}" />
             <ItemsControl ItemsSource="{Binding Changes}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="opt:PreviewChange">
-                  <Grid ColumnDefinitions="*,Auto" Margin="0,4">
-                    <TextBlock Text="{Binding Target}" TextWrapping="Wrap" FontSize="12.5" Margin="0,0,12,0" />
+                  <Grid ColumnDefinitions="*,Auto" Margin="0,3">
+                    <TextBlock Text="{Binding Target}" TextWrapping="Wrap" FontSize="13" Margin="0,0,12,0" VerticalAlignment="Center" />
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
-                      <Border Classes="pill" Background="{StaticResource InfoBgBrush}"><TextBlock Text="{Binding From}" MaxWidth="180" TextTrimming="CharacterEllipsis" /></Border>
+                      <Border Classes="pill" Background="{StaticResource InfoBgBrush}"><TextBlock Text="{Binding From}" MaxWidth="170" TextTrimming="CharacterEllipsis" /></Border>
                       <TextBlock Text="→" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}" />
-                      <Border Classes="pill"><TextBlock Text="{Binding To}" MaxWidth="200" TextTrimming="CharacterEllipsis" /></Border>
+                      <Border Classes="pill"><TextBlock Text="{Binding To}" MaxWidth="190" TextTrimming="CharacterEllipsis" /></Border>
                     </StackPanel>
                   </Grid>
                 </DataTemplate>
@@ -41,26 +47,16 @@
             <TextBlock Classes="muted small" Text="{Binding FreedText}" IsVisible="{Binding FreedText, Converter={x:Static app:Converters.NotNull}}" />
           </StackPanel>
         </Border>
-        <Grid ColumnDefinitions="*,*" >
+        <Grid ColumnDefinitions="*,*">
           <StackPanel Spacing="4" Margin="0,0,10,0">
-            <TextBlock Classes="label" Text="EXPECTED BENEFIT" />
+            <TextBlock Classes="label" Text="WHY" />
             <TextBlock Classes="body" Text="{Binding ExpectedBenefit}" />
           </StackPanel>
           <StackPanel Grid.Column="1" Spacing="4" Margin="10,0,0,0">
-            <TextBlock Classes="label" Text="RISKS" />
+            <TextBlock Classes="label" Text="WATCH OUT FOR" />
             <TextBlock Classes="body" Text="{Binding Risks}" />
           </StackPanel>
         </Grid>
-        <Border Classes="success" IsVisible="{Binding !IsIrreversible}">
-          <TextBlock Classes="body" Text="{Binding ReversibilityText}" />
-        </Border>
-        <Border Classes="danger" IsVisible="{Binding IsIrreversible}">
-          <TextBlock Classes="body" Text="{Binding ReversibilityText}" FontWeight="SemiBold" Foreground="{StaticResource DangerBrush}" />
-        </Border>
-        <StackPanel Orientation="Horizontal" Spacing="8">
-          <Border Classes="pill"><TextBlock Text="{Binding AdminText}" /></Border>
-          <Border Classes="pill" Background="{StaticResource WarningBgBrush}" IsVisible="{Binding RequiresRestart}"><TextBlock Text="Restart required" Foreground="{StaticResource WarningBrush}" /></Border>
-        </StackPanel>
         <Border Classes="notice" IsVisible="{Binding HasWarnings}">
           <ItemsControl ItemsSource="{Binding Warnings}">
             <ItemsControl.ItemTemplate>
