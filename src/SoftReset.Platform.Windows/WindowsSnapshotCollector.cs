@@ -73,7 +73,7 @@ internal sealed class WindowsSnapshotCollector : ISnapshotCollector
         Step("Thermal sensors", 98, () => CollectThermal(s));
         Step("Cleanup estimate", 99, () => CollectCleanup(s));
         if (!_p.IsElevated)
-            s.AddIssue("Privileges", "The scan ran without administrator rights. Boot timing, crash dumps, SSD wear/temperature, TPM and BitLocker status may be missing. Use 'Restart as administrator' for a complete scan.", true);
+            s.AddIssue("Privileges", "The scan ran without administrator rights. Boot timing, crash dumps, SSD wear/temperature, TPM and BitLocker status may be missing. Click 'Give admin rights' for a complete scan.", true);
         s.CollectionDuration = sw.Elapsed;
         progress?.Report(new CollectionProgress("Done", 100));
         return s;

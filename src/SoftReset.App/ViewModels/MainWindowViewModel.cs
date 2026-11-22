@@ -55,6 +55,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDialogService
     public MainWindowViewModel(AppServices services)
     {
         Services = services;
+        _showAdminBanner = services.AdminDeclinedAtStart && !services.Platform.IsElevated;
         Shell = new Shell(services, this);
         Dashboard = new DashboardViewModel(Shell);
         Diagnostics = new DiagnosticsViewModel(Shell);
@@ -109,7 +110,11 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDialogService
     partial void OnBusyTextChanged(string? value) => OnPropertyChanged(nameof(IsBusy));
 
     public bool IsElevated => Services.Platform.IsElevated;
-    public string ElevationText => IsElevated ? "Administrator" : "Standard rights";
+    public string ElevationText => IsElevated ? "Admin rights: on" : "Admin rights: off";
+
+    /// <summary>Shown when the user said no to the admin prompt as the app opened.</summary>
+    [ObservableProperty] private bool _showAdminBanner;
+    [RelayCommand] private void DismissAdminBanner() => ShowAdminBanner = false;
     public bool DemoMode => Services.DemoMode;
     public string MachineText => Services.DemoMode ? "Demo PC (simulated)" : Environment.MachineName;
 
@@ -138,13 +143,11 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDialogService
 
     public Task ActivateCurrentAsync() => SafeActivate(CurrentPage);
 
+    /// <summary>Reopens the app with admin rights. The Windows prompt itself is the confirmation.</summary>
     [RelayCommand]
-    private async Task RestartAsAdmin()
+    private void RestartAsAdmin()
     {
         if (IsElevated) return;
-        var ok = await ConfirmAsync("Restart as administrator?",
-            "The app will reopen with full access, so scans are more complete and Windows won't ask for permission on every change.", "Restart");
-        if (!ok) return;
         if (Services.Platform.Elevation.RelaunchElevated(out var error))
         {
             if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime d) d.Shutdown();

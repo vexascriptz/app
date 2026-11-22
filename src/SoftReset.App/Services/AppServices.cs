@@ -13,6 +13,8 @@ public sealed class AppSettings
 {
     public int ScanSampleSeconds { get; set; } = 5;
     public bool IncludeConnectivityTests { get; set; }
+    /// <summary>Show the Windows admin prompt as soon as the app opens.</summary>
+    public bool AskForAdminOnStart { get; set; } = true;
 }
 
 /// <summary>Composition root: every service the UI uses, created once at start-up.</summary>
@@ -49,6 +51,9 @@ public sealed class AppServices
     public AppSettings Settings { get; }
     public IReadOnlyList<ChangeRecord> InterruptedChanges { get; }
     public string Edition { get; }
+
+    /// <summary>The user said no to the admin prompt when the app opened.</summary>
+    public bool AdminDeclinedAtStart { get; set; }
 
     /// <summary>The most recent diagnostic report, shown on the Home page.</summary>
     public DiagnosticReport? LastReport { get; set; }

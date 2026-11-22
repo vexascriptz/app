@@ -37,6 +37,6 @@ public partial class App : Application
         var paths = demo && o.DataDirectory is null
             ? new AppPaths(Path.Combine(Path.GetTempPath(), "softreset-demo-data"), false)
             : AppPaths.Resolve(overrideRoot: o.DataDirectory);
-        return new AppServices(platform, paths, demo);
+        return new AppServices(platform, paths, demo) { AdminDeclinedAtStart = o.AdminDeclined && !platform.IsElevated };
     }
 }

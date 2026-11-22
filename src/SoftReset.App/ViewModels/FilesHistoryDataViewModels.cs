@@ -297,17 +297,19 @@ public sealed partial class DataViewModel : PageViewModel
     public DataViewModel(Shell shell) : base(shell)
     {
         _sampleSeconds = S.Settings.ScanSampleSeconds;
+        _askForAdminOnStart = S.Settings.AskForAdminOnStart;
     }
 
     public override string Title => "About";
     public override string Subtitle => "App info and the data it keeps.";
 
     [ObservableProperty] private int _sampleSeconds;
+    [ObservableProperty] private bool _askForAdminOnStart;
     [ObservableProperty] private string _dataSize = "";
     public int[] SampleOptions { get; } = { 3, 5, 10, 20 };
     public string DataRoot => S.Paths.Root;
     public string ModeText => S.Paths.IsPortable
-        ? "Portable mode: all records are stored in the 'softreset-data' folder next to the console. Nothing is written to the customer's profile."
+        ? "Portable mode: everything is kept in the 'softreset-data' folder next to the app. Nothing is written to your user profile."
         : "The folder next to the console is not writable, so records are stored in the current user's local application data.";
     public string Version => typeof(DataViewModel).Assembly.GetName().Version?.ToString(3) ?? "1.0.0";
     public string PlatformText => $"{S.Platform.Name} · Windows build {S.Platform.OsBuild} · {(S.Platform.IsElevated ? "administrator" : "standard rights")}";
@@ -322,6 +324,7 @@ public sealed partial class DataViewModel : PageViewModel
     private void SaveSettings()
     {
         S.Settings.ScanSampleSeconds = SampleSeconds;
+        S.Settings.AskForAdminOnStart = AskForAdminOnStart;
         S.SaveSettings();
         Dialogs.Toast("Settings saved.", ToastKind.Success);
     }

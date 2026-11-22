@@ -16,6 +16,8 @@ internal static class Program
     ///   --probe nvapi-drs &lt;file&gt;   read NVIDIA driver settings in an isolated process
     ///   --self-test &lt;folder&gt;      run read-only checks and write results (used for Windows validation)
     ///   --capture-pages &lt;folder&gt;  open each page, save screenshots, and exit (used for Windows validation)
+    /// Normally the app asks for administrator rights as soon as it opens (see <see cref="AdminStartup"/>);
+    /// --no-admin skips that.
     /// </summary>
     [STAThread]
     public static int Main(string[] args)
@@ -34,6 +36,11 @@ internal static class Program
         }
 
         StartupOptions = StartupOptions.Parse(args);
+        switch (AdminStartup.TryRelaunch(args, StartupOptions))
+        {
+            case AdminStartup.Outcome.Relaunched: return 0; // the admin copy takes over
+            case AdminStartup.Outcome.Declined: StartupOptions.AdminDeclined = true; break;
+        }
         return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }
 
@@ -69,6 +76,8 @@ public sealed class StartupOptions
     public string? DataDirectory { get; set; }
     /// <summary>--capture-pages &lt;folder&gt;: open every page read-only, save a PNG of each, then exit (Windows validation).</summary>
     public string? CaptureDirectory { get; set; }
+    /// <summary>The user said no to the admin prompt at start-up.</summary>
+    public bool AdminDeclined { get; set; }
 
     public static StartupOptions Parse(string[] args)
     {

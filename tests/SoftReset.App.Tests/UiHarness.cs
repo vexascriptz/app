@@ -15,11 +15,11 @@ namespace SoftReset.App.Tests;
 /// <summary>A real MainWindow wired to a simulated PC, rendered by the headless Skia backend.</summary>
 public sealed class UiHarness : IDisposable
 {
-    public UiHarness(int width = 1440, int height = 920, bool elevated = false)
+    public UiHarness(int width = 1440, int height = 920, bool elevated = false, bool adminDeclined = false)
     {
         Root = Path.Combine(AppContext.BaseDirectory, "sandbox", "ui-" + Guid.NewGuid().ToString("N")[..8]);
         Platform = new SimulatedPlatform(Path.Combine(Root, "sim"), elevated);
-        Services = new AppServices(Platform, new AppPaths(Path.Combine(Root, "data"), isPortable: true), demoMode: true);
+        Services = new AppServices(Platform, new AppPaths(Path.Combine(Root, "data"), isPortable: true), demoMode: true) { AdminDeclinedAtStart = adminDeclined };
         Vm = new MainWindowViewModel(Services);
         Window = new MainWindow { DataContext = Vm, Width = width, Height = height };
         Window.Show();

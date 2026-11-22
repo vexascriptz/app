@@ -29,7 +29,9 @@
 
       <Border Classes="card">
         <StackPanel Spacing="10">
-          <TextBlock Classes="h3" Text="Scan length" />
+          <TextBlock Classes="h3" Text="Settings" />
+          <CheckBox IsChecked="{Binding AskForAdminOnStart}" Content="Ask for admin rights when the app opens" x:Name="AskAdminCheck" />
+          <TextBlock Classes="label" Text="SCAN LENGTH" Margin="0,6,0,0" />
           <StackPanel Orientation="Horizontal" Spacing="10">
             <ComboBox ItemsSource="{Binding SampleOptions}" SelectedItem="{Binding SampleSeconds}" Width="140">
               <ComboBox.ItemTemplate>
