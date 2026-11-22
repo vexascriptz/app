@@ -8,6 +8,10 @@ A portable Windows 10/11 tool for fixing PCs. No install, no account, no interne
 
 If Windows says "unknown publisher", click **More info → Run anyway** (the app isn't code-signed yet). To try it without touching the PC, run `SoftResetConsole.exe --demo`.
 
+## New: Auto optimize
+
+One click on Home: picks every safe speed-up this PC needs, applies them with one Windows permission prompt, and has Undo all. Keeps the PC looking the same unless the hardware is too weak. Every page has a one-click button, and every problem and setting has Apply/Fix or Open.
+
 ## What's in it
 
 - **Find problems** — scans the PC and lists what's wrong. Changes nothing.

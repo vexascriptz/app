@@ -14,6 +14,22 @@ If Windows says "unknown publisher", click **More info → Run anyway** (the app
 
 Want to try it without touching the PC? Run `SoftResetConsole.exe --demo`.
 
+## The easy way: Auto optimize
+
+Click **Auto optimize** on the Home page. It checks the PC, shows a short ticked list, and applies everything that helps:
+
+- best power plan and CPU at full speed
+- your monitor's smoothest refresh rate (e.g. 60 → 144 Hz)
+- Game Mode, GPU scheduling, faster windowed games, background game recording off
+- unneeded apps stopped from starting with Windows (launchers, helpers, leftovers)
+- temporary files cleaned, Windows tips and ads turned off
+
+It keeps your PC looking the same. Animations are only reduced if the PC is too weak for them (under 6 GB RAM or 2 CPU threads). It makes a restore point first, asks Windows for permission once, and has an **Undo all** button. It never touches antivirus, Windows Update, your files, chat apps, cloud sync, drivers, or mouse/keyboard/RGB software.
+
+Every page also has its own one-click button, and every problem and setting has an **Apply/Fix** or **Open** button.
+
+![Auto optimize](docs/screenshots/15-auto-plan.png)
+
 ## What each part does
 
 | Page | What it's for |
