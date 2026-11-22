@@ -189,10 +189,29 @@ internal sealed class WindowsMaintenanceService : IMaintenanceService
 {
     public bool? IsSystemRestoreEnabled()
     {
-        var v = new WindowsRegistry().GetValue(RegHive.LocalMachine, @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore", "RPSessionInterval")?.AsInt();
-        var disabledByPolicy = new WindowsRegistry().GetValue(RegHive.LocalMachine, @"SOFTWARE\Policies\Microsoft\Windows NT\SystemRestore", "DisableSR")?.AsInt() == 1;
+        var reg = new WindowsRegistry();
+        const string key = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore";
+        // Windows Server editions don't include System Restore at all (found on a real Windows Server 2025 run).
+        if (!reg.KeyExists(RegHive.LocalMachine, key) || !SystemRestoreClassExists()) return false;
+        var disabledByPolicy = reg.GetValue(RegHive.LocalMachine, @"SOFTWARE\Policies\Microsoft\Windows NT\SystemRestore", "DisableSR")?.AsInt() == 1;
         if (disabledByPolicy) return false;
+        var v = reg.GetValue(RegHive.LocalMachine, key, "RPSessionInterval")?.AsInt();
         return v switch { 1 => true, 0 => false, _ => null };
+    }
+
+    private static bool SystemRestoreClassExists()
+    {
+        try
+        {
+            using var cls = new System.Management.ManagementClass(new System.Management.ManagementScope(@"\\.\root\default"), new System.Management.ManagementPath("SystemRestore"), null);
+            cls.Get();
+            return true;
+        }
+        catch (System.Management.ManagementException ex) when (ex.ErrorCode is System.Management.ManagementStatus.NotFound or System.Management.ManagementStatus.InvalidClass or System.Management.ManagementStatus.InvalidNamespace)
+        {
+            return false;
+        }
+        catch { return true; } // unknown: let the creation attempt report the real error
     }
 
     public RestorePointResult CreateRestorePoint(string description)
@@ -213,6 +232,10 @@ internal sealed class WindowsMaintenanceService : IMaintenanceService
         catch (System.Management.ManagementException ex) when (ex.ErrorCode == System.Management.ManagementStatus.AccessDenied)
         {
             throw new UnauthorizedAccessException("Creating a restore point requires administrator rights.");
+        }
+        catch (System.Management.ManagementException ex) when (ex.ErrorCode is System.Management.ManagementStatus.NotFound or System.Management.ManagementStatus.InvalidClass or System.Management.ManagementStatus.InvalidNamespace)
+        {
+            return new RestorePointResult { Created = false, Message = "System Restore isn't available on this edition of Windows." };
         }
         var after = CountRestorePoints();
         if (before is not null && after is not null && after <= before)

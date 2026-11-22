@@ -114,6 +114,19 @@ public class AutoOptimizerTests
         Assert.All(records.Where(r => r.Status == ChangeStatus.Cancelled), r => Assert.True(r.Elevated));
     }
 
+    [Fact]
+    public async Task No_restore_point_step_when_system_restore_is_not_available()
+    {
+        // Found on a real Windows Server run: System Restore doesn't exist there.
+        using var rig = new TestRig();
+        rig.Platform.State.SystemRestoreEnabled = false;
+        var plan = await new AutoOptimizer(rig.Registry, rig.Context).BuildAsync(AutoScope.Everything, GamingDesktop);
+        Assert.DoesNotContain(plan.Steps, s => s.IsSafetyStep);
+        Assert.True(plan.ChangeCount > 0);
+        var records = await new AutoOptimizer(rig.Registry, rig.Context).ApplyAsync(plan, rig.Executor);
+        Assert.DoesNotContain(records, r => r.Status is Safety.ChangeStatus.Failed);
+    }
+
     [Theory]
     [InlineData("Steam", @"""C:\Program Files (x86)\Steam\steam.exe"" -silent", true, true)]
     [InlineData("Discord", @"""C:\Users\a\AppData\Local\Discord\Update.exe""", true, false)]

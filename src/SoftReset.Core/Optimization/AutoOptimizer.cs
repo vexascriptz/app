@@ -267,6 +267,8 @@ public sealed class AutoOptimizer
     private async Task AddRestorePointAsync(AutoPlan plan, CancellationToken ct)
     {
         var request = new ActionRequest { ActionId = ActionIds.RestorePoint, Parameters = { ["description"] = "Before softreset Auto optimize" } };
+        // Only when System Restore is definitely on; otherwise the backups in Undo changes are the safety net.
+        if (_ctx.Platform.Maintenance.IsSystemRestoreEnabled() != true) return;
         if (await InspectAsync(ActionIds.RestorePoint, request, ct) is null) return;
         if (!_registry.TryGet(ActionIds.RestorePoint, out var action)) return;
         plan.Steps.Insert(0, new AutoStep
