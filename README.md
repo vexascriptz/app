@@ -10,9 +10,11 @@ startup entry.
 
 ## Download and run
 
-1. Download `SoftResetConsole-win-x64` from the latest successful
-   [Windows build and validation](../../actions/workflows/windows-validation.yml) run (Actions → run →
-   *Artifacts*). It is built and tested on a real Windows machine by that workflow.
+1. Download `SoftResetConsole-<version>-win-x64.zip` from the latest
+   [Release](../../releases/latest). Each release is built, tested, and self-tested on Windows by the
+   [release workflow](.github/workflows/release.yml) before it is published. (Builds of every push are
+   also available as `SoftResetConsole-win-x64` artifacts of the
+   [Windows build and validation](../../actions/workflows/windows-validation.yml) workflow.)
 2. Unzip it anywhere — a USB drive, the Desktop, `C:\Tools`. It is one file: `SoftResetConsole.exe`
    (about 56 MB; the .NET runtime is bundled, nothing else needs installing).
 3. Double-click `SoftResetConsole.exe`. It starts with standard rights. When a change needs
@@ -95,7 +97,10 @@ Remove all data* deletes everything the console stored.
 
 ## Building from source (optional)
 
-You don't need to build anything to use the console. To build it yourself, install the .NET 10 SDK and run:
+You don't need to build anything to use the console. To publish a new release, push a version tag
+(for example `v1.0.1`) or run the *Release* workflow from the Actions tab with a version number.
+
+To build it yourself, install the .NET 10 SDK and run:
 
 ```bash
 dotnet test SoftReset.sln

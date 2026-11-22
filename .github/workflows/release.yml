@@ -1,0 +1,97 @@
+name: Release
+
+# Publishes a GitHub Release with the portable executable when a version tag (v1.2.3) is pushed,
+# or when run manually with a version. The executable is rebuilt, the full test suite and the
+# published exe's self-test run on Windows first; nothing is published if any of them fail.
+
+on:
+  push:
+    tags: [ "v*.*.*" ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release, e.g. 1.0.0 (creates tag v<version> on the selected branch)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    env:
+      DOTNET_NOLOGO: "1"
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+      SOFTRESET_ALLOW_SYSTEM_CHANGES: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Determine version
+        id: v
+        shell: pwsh
+        run: |
+          $version = if ("${{ github.event_name }}" -eq "workflow_dispatch") { "${{ inputs.version }}" } else { "${{ github.ref_name }}".TrimStart("v") }
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "Version '$version' is not in the form 1.2.3" }
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "tag=v$version" >> $env:GITHUB_OUTPUT
+          Write-Host "Releasing $version"
+
+      - name: Build
+        run: dotnet build SoftReset.sln -c Release -p:Version=${{ steps.v.outputs.version }}
+
+      - name: Test (core, UI, and Windows-only suites)
+        run: dotnet test SoftReset.sln -c Release --no-build --logger "console;verbosity=normal"
+
+      - name: Publish portable executable
+        run: dotnet publish src/SoftReset.App/SoftReset.App.csproj -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -p:Version=${{ steps.v.outputs.version }} -o out/SoftResetConsole
+
+      - name: Self-test of the published executable (read-only)
+        shell: pwsh
+        run: |
+          $out = Join-Path $pwd "out/self-test"
+          $p = Start-Process -FilePath "out/SoftResetConsole/SoftResetConsole.exe" -ArgumentList "--self-test", "`"$out`"" -Wait -PassThru
+          Get-Content (Join-Path $out "self-test.log")
+          if ($p.ExitCode -ne 0) { throw "Self-test failed with exit code $($p.ExitCode)" }
+
+      - name: Check the executable's version
+        shell: pwsh
+        run: |
+          $info = (Get-Item "out/SoftResetConsole/SoftResetConsole.exe").VersionInfo
+          Write-Host "FileVersion=$($info.FileVersion) ProductVersion=$($info.ProductVersion)"
+          if (-not $info.ProductVersion.StartsWith("${{ steps.v.outputs.version }}")) { throw "Executable version does not match the release version." }
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $v = "${{ steps.v.outputs.version }}"
+          New-Item -ItemType Directory -Force -Path release | Out-Null
+          (Get-Content packaging/START-HERE.txt -Raw).Replace("1.0.0", $v) | Set-Content out/SoftResetConsole/START-HERE.txt -NoNewline
+          Compress-Archive -Path out/SoftResetConsole -DestinationPath "release/SoftResetConsole-$v-win-x64.zip"
+          Copy-Item out/SoftResetConsole/SoftResetConsole.exe release/
+          Push-Location release
+          Get-ChildItem -File | Where-Object Name -ne "SHA256SUMS.txt" | ForEach-Object {
+            "{0}  {1}" -f (Get-FileHash $_.Name -Algorithm SHA256).Hash.ToLower(), $_.Name
+          } | Set-Content SHA256SUMS.txt
+          Get-Content SHA256SUMS.txt
+          Pop-Location
+          (Get-Content packaging/RELEASE_NOTES.md -Raw).Replace("VERSION", $v).Replace("REPOSITORY", "${{ github.repository }}").Replace("COMMIT", "${{ github.sha }}") | Set-Content release-notes.md
+
+      - name: Create GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ steps.v.outputs.tag }}"
+          $v = "${{ steps.v.outputs.version }}"
+          gh release create $tag `
+            "release/SoftResetConsole-$v-win-x64.zip" `
+            "release/SoftResetConsole.exe" `
+            "release/SHA256SUMS.txt" `
+            --target "${{ github.sha }}" `
+            --title "softreset Technician Console $v" `
+            --notes-file release-notes.md
