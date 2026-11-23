@@ -18,6 +18,30 @@ dotnet test SoftReset.sln
 
 ## Recorded results
 
+### Version 1.2.0 (admin prompt on open, Good/Bad labels) — real Windows, GitHub Actions run 17
+
+[Run 45089019725](https://github.com/vexascriptz/app/actions/runs/45089019725), same runner image (Windows Server 2025, elevated VM, no GPU):
+
+- Core: **181 passed**. UI: **40 passed**. Real Windows: **18 passed, 0 skipped**.
+- `--self-test`: **all 15 checks passed**. The new check-up step on the real machine:
+
+```
+[PASS] PC check-up labels: 14 lines, 1 need a look: CPU = Not reported [Unknown]; Heat slowdowns = None [Good];
+       Drive C: = 25.8 GB free of 149.9 GB [Plenty]; Drive D: = 219.3 GB free of 220 GB [Plenty];
+       NVMe Direct Disk v2 = SSD [Healthy]; Virtual_Disk NVME Premium = SSD [Healthy]; Apps starting with Windows = 2 [Normal];
+       Power plan = High performance [Fastest]; HyperVMonitor = 64 Hz [Best]; Antivirus = None running [Off];
+       Firewall = All networks [On]; Windows Update = Last update 6 days ago [Up to date]; Last restart = just now [Recent];
+       Internet = Ethernet [Connected]
+```
+
+  The one line flagged (antivirus off) is correct for this CI machine. It has no GPU or drive temperature sensors,
+  so those lines are absent, and the CPU line honestly says "Not reported".
+- `--capture-pages`: every page opened and was captured.
+- Not testable in CI: the admin prompt when the app opens (the runner is already an administrator, so the app
+  correctly doesn't ask). The decision rules, the "Give admin rights" banner and the setting are covered by UI tests.
+- Fixed along the way: runs 15–16 failed because two real-Windows tests that both change the power plan ran at
+  the same time; the real-Windows suite now runs one test at a time.
+
 ### Version 1.1.0 (Auto optimize) — real Windows, GitHub Actions run 13
 
 [Run 44995986416](https://github.com/vexascriptz/app/actions/runs/44995986416) on `windows-latest`
