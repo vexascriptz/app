@@ -25,7 +25,8 @@ Verification therefore happened in three layers:
 
 | Area | Why it is unverified | How to check |
 |---|---|---|
-| UAC elevation flow | CI runs as an elevated administrator, so the `--elevated-run` path via the UAC prompt (and declining it) has only been tested in simulation. | Run as a standard user, apply an admin action (e.g. *Hibernation*), approve and then decline UAC. |
+| UAC elevation flow | CI runs as an elevated administrator, so the admin prompt when the app opens, and the `--elevated-run` path (and declining either) have only been tested in simulation. | Open the app normally: Windows should ask for admin rights; say Yes once and No once (the banner should appear). As a standard user, apply an admin action (e.g. *Hibernation*). |
+| Temperature and health labels on real sensors | The runner has no GPU or NVMe sensors, so GPU/drive temperatures and their labels have only been checked on the demo PC. | Open Home on a gaming PC and compare the GPU and drive temperatures with Task Manager / the drive maker's tool. |
 | NVIDIA NVAPI driver-settings read and NVML telemetry | The CI runner has no NVIDIA GPU. Structure sizes were checked against NVIDIA's headers, but the probe has not run against a real driver. | On an NVIDIA PC: *Graphics → NVIDIA → Read driver settings*. Compare a few values with the NVIDIA Control Panel. |
 | AMD/Intel GPU detection and D3DKMT telemetry | No GPU on the runner. | Open *Graphics* on AMD and Intel machines. |
 | Display refresh-rate change and auto-revert | The runner has no physical display with multiple modes. | On a high-refresh monitor running at 60 Hz: *Use 144 Hz…*, let the 15-second countdown expire, confirm it reverts; repeat and keep. |
@@ -37,6 +38,9 @@ Verification therefore happened in three layers:
 | High-DPI and multi-monitor layout | Captured at 100 % scaling only. | Run at 150 % and 200 % scaling. |
 
 ## Known limitations (by design or not yet built)
+
+- **No CPU temperature.** Windows has no supported way to read the CPU's own temperature without installing a kernel driver, and this app doesn't install drivers. The check-up says "Not reported" instead of guessing; a motherboard sensor is shown (marked approximate) when Windows exposes one. GPU temperatures come from the graphics driver, drive temperatures from Windows' storage counters (admin rights needed).
+- **Labels are general guidance.** Good/Warm/Hot thresholds follow common manufacturer guidance, not each exact model's limits. "Not signed" means only that — it is never treated as malware.
 
 - **Not code-signed.** SmartScreen will warn on first run. Sign `SoftResetConsole.exe` with an
   Authenticode certificate (e.g. `signtool sign /fd SHA256 /a /tr http://timestamp.digicert.com /td SHA256 SoftResetConsole.exe`)

@@ -23,7 +23,19 @@ public sealed partial class DashboardViewModel : PageViewModel
     [ObservableProperty] private double _cpuNow;
     [ObservableProperty] private double _memoryNow;
     [ObservableProperty] private string _memoryText = "";
+    [ObservableProperty] private Rating? _cpuRating;
+    [ObservableProperty] private Rating? _memoryRating;
     [ObservableProperty] private DiagnosticReport? _lastReport;
+    [ObservableProperty] private bool _isChecking;
+
+    /// <summary>The PC check-up: every reading with a Good / Warm / Problem label, grouped.</summary>
+    public ObservableCollection<CheckupGroup> Checkup { get; } = new();
+    public bool HasCheckup => Checkup.Count > 0;
+    public Rating? HealthRating => LastReport is { } r ? Ratings.HealthScore(r.HealthScore) : null;
+    [ObservableProperty] private string _checkupSummary = "";
+    /// <summary>Turn off the automatic check when Home opens (tests).</summary>
+    public static bool AutoCheckOnOpen { get; set; } = true;
+    partial void OnLastReportChanged(DiagnosticReport? value) { OnPropertyChanged(nameof(HealthRating)); OnPropertyChanged(nameof(HasReport)); }
     public ObservableCollection<Finding> TopFindings { get; } = new();
 
     public int InterruptedCount => S.InterruptedChanges.Count;
@@ -38,9 +50,10 @@ public sealed partial class DashboardViewModel : PageViewModel
     public override Task OnActivatedAsync()
     {
         LastReport = S.LastReport;
-        OnPropertyChanged(nameof(HasReport));
         TopFindings.Clear();
         foreach (var f in LastReport?.Findings.Take(4) ?? Enumerable.Empty<Finding>()) TopFindings.Add(f);
+        if (LastReport is not null) BuildCheckup(LastReport);
+        else if (AutoCheckOnOpen && !IsChecking) _ = CheckNowAsync();
         if (_timer is null)
         {
             S.Platform.Live.Sample();
@@ -62,14 +75,93 @@ public sealed partial class DashboardViewModel : PageViewModel
         MemoryHistory = _mem.ToArray();
         CpuNow = Math.Round(s.CpuPercent);
         MemoryNow = Math.Round(s.MemoryUsedPercent);
+        CpuRating = Ratings.CpuUsage(s.CpuPercent);
+        MemoryRating = Ratings.MemoryUsage(s.MemoryUsedPercent);
         MemoryText = s.MemoryTotalBytes > 0 ? $"{Core.Parsing.ToolOutputParsers.FormatBytes(s.MemoryTotalBytes - s.MemoryAvailableBytes)} of {Core.Parsing.ToolOutputParsers.FormatBytes(s.MemoryTotalBytes)}" : "";
     }
 
     [RelayCommand] private async Task RunDiagnostics() { Shell.Main.Navigate(Shell.Main.Diagnostics); await Shell.Main.Diagnostics.ScanCommand.ExecuteAsync(null); }
     [RelayCommand] private void OpenHistory() => Shell.Main.Navigate(Shell.Main.History);
     [RelayCommand] private void OpenTool(NavItem item) => Shell.Main.Navigate(item.Page);
-    [RelayCommand] private async Task AutoOptimize() { await Auto.RunAsync(Core.Optimization.AutoScope.Everything, "Auto optimize this PC"); RefreshUndoAuto(); }
-    [RelayCommand] private async Task UndoAuto() { await Auto.UndoLastAsync(); RefreshUndoAuto(); }
+    [RelayCommand] private async Task AutoOptimize() { await Auto.RunAsync(Core.Optimization.AutoScope.Everything, "Auto optimize this PC"); RefreshUndoAuto(); await CheckNowAsync(); }
+    [RelayCommand] private async Task UndoAuto() { await Auto.UndoLastAsync(); RefreshUndoAuto(); await CheckNowAsync(); }
+
+    /// <summary>A quick read-only scan (about a second of CPU sampling) that fills the check-up.</summary>
+    [RelayCommand]
+    private async Task CheckNow() => await CheckNowAsync();
+
+    public async Task CheckNowAsync()
+    {
+        if (IsChecking) return;
+        IsChecking = true;
+        try
+        {
+            var options = new CollectionOptions { CpuSampleDuration = TimeSpan.FromSeconds(1), IncludeConnectivityTests = S.Settings.IncludeConnectivityTests };
+            LastReport = await DiagnosticsViewModel.CollectAndAnalyzeAsync(Shell, options, new Progress<CollectionProgress>());
+            BuildCheckup(LastReport);
+        }
+        catch (Exception ex) { S.Log($"Check-up failed: {ex}"); Dialogs.Toast("Couldn't finish the check-up. Try Find problems.", ToastKind.Warning); }
+        finally { IsChecking = false; }
+    }
+
+    private void BuildCheckup(DiagnosticReport report)
+    {
+        var items = PcCheckup.Build(report.Snapshot, DateTimeOffset.Now);
+        Checkup.Clear();
+        foreach (var g in items.GroupBy(i => i.Group))
+            Checkup.Add(new CheckupGroup(g.Key, g.Select(i => new CheckupRow(i, this)).ToList()));
+        var problems = PcCheckup.CountProblems(items);
+        CheckupSummary = problems == 0 ? "Everything looks good." : problems == 1 ? "1 thing needs a look." : $"{problems} things need a look.";
+        OnPropertyChanged(nameof(HasCheckup));
+    }
+
+    internal async Task FixAsync(CheckupItem item)
+    {
+        string? open = null;
+        switch (item.Fix)
+        {
+            case CheckupFix.FreeUpSpace: await Auto.RunAsync(AutoScope.Cleanup, "Free up space"); break;
+            case CheckupFix.SmootherDisplay: await Auto.RunAsync(AutoScope.Graphics, "Make the screen smoother"); break;
+            case CheckupFix.StartupApps: await Auto.RunAsync(AutoScope.Startup, "Stop unneeded apps starting with Windows"); break;
+            case CheckupFix.PowerPlan: await Auto.RunAsync(AutoScope.Power, "Set the best power plan"); break;
+            case CheckupFix.OpenGraphics: Shell.Main.Navigate(Shell.Main.Graphics); return;
+            case CheckupFix.OpenSecurity: open = "windowsdefender:"; break;
+            case CheckupFix.OpenUpdates: open = "ms-settings:windowsupdate"; break;
+            case CheckupFix.OpenBackup: open = "ms-settings:backup"; break;
+            case CheckupFix.OpenNetwork: open = "ms-settings:network-status"; break;
+            default: return;
+        }
+        if (open is not null)
+        {
+            var r = S.Platform.Shell.Launch(ShortcutParser.Parse(open));
+            if (!r.Success) Dialogs.Toast(r.Message, ToastKind.Warning);
+            else if (S.DemoMode) Dialogs.Toast(r.Message);
+            return;
+        }
+        RefreshUndoAuto();
+        await CheckNowAsync();
+    }
+}
+
+public sealed record CheckupGroup(string Title, IReadOnlyList<CheckupRow> Items);
+
+/// <summary>One check-up line with its button.</summary>
+public sealed partial class CheckupRow : ObservableObject
+{
+    private readonly DashboardViewModel _owner;
+    public CheckupRow(CheckupItem item, DashboardViewModel owner) { Item = item; _owner = owner; }
+    public CheckupItem Item { get; }
+    public string Name => Item.Name;
+    public string Value => Item.Value;
+    public Rating Rating => Item.Rating;
+    public string Meaning => Item.Rating.Meaning;
+    public bool ShowFix => Item.ShowFix;
+    /// <summary>"Fix" when the app can do it, "Open" when it opens the right Windows page.</summary>
+    public string FixLabel => Item.Fix is CheckupFix.FreeUpSpace or CheckupFix.SmootherDisplay or CheckupFix.StartupApps or CheckupFix.PowerPlan ? "Fix" : "Open";
+    public bool FixIsPrimary => FixLabel == "Fix";
+    public bool ShowFixButton => ShowFix && FixIsPrimary;
+    public bool ShowOpenButton => ShowFix && !FixIsPrimary;
+    [RelayCommand] private Task Fix() => _owner.FixAsync(Item);
 }
 
 /// <summary>A finding with UI actions for its recommendations.</summary>

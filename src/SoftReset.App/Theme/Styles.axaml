@@ -181,6 +181,16 @@
     <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
     <Setter Property="Foreground" Value="{StaticResource NavyBrush}" />
   </Style>
+  <!-- A button tagged both secondary and primary (e.g. Classes.primary bound to "can apply") shows as primary. -->
+  <Style Selector="Button.secondary.primary">
+    <Setter Property="Background" Value="{StaticResource PrimaryGradient}" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+  <Style Selector="Button.secondary.primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="#1B4A80" />
+    <Setter Property="Foreground" Value="White" />
+  </Style>
   <Style Selector="Button.ghost">
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />

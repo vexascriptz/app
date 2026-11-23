@@ -1,3 +1,4 @@
+using SoftReset.Core.Diagnostics;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -87,6 +88,13 @@ public sealed partial class OptimizationViewModel : PageViewModel
     public bool Applicable => Inspection?.Applicable ?? false;
     public string StateText => Inspection is null ? "Checking…" : Inspection.Applicable ? Inspection.CurrentState : $"Not needed on this PC: {Inspection.NotApplicableReason}";
     public bool CanRollbackLast => LastRecord?.CanRollback == true;
+    public Rating? StateRating => Inspection switch
+    {
+        null => null,
+        { Applicable: false } => new Rating(RatingLevel.Unknown, "Not needed", "This fix doesn't apply to this PC."),
+        { AlreadyOptimal: true } => new Rating(RatingLevel.Good, "Already good", "Nothing to fix here."),
+        _ => new Rating(RatingLevel.Okay, "Can improve", "Click Apply to fix it."),
+    };
 
     partial void OnSelectedChanged(ActionCard? oldValue, ActionCard? newValue)
     {
@@ -95,7 +103,7 @@ public sealed partial class OptimizationViewModel : PageViewModel
         OnPropertyChanged(nameof(HasSelection));
         _ = InspectAsync();
     }
-    partial void OnInspectionChanged(ActionInspection? value) { OnPropertyChanged(nameof(Applicable)); OnPropertyChanged(nameof(StateText)); }
+    partial void OnInspectionChanged(ActionInspection? value) { OnPropertyChanged(nameof(Applicable)); OnPropertyChanged(nameof(StateText)); OnPropertyChanged(nameof(StateRating)); }
     partial void OnLastRecordChanged(ChangeRecord? value) => OnPropertyChanged(nameof(CanRollbackLast));
 
     public async Task SelectActionAsync(string actionId, Dictionary<string, string>? parameters = null)

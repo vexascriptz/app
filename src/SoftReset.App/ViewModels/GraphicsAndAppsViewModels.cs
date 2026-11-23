@@ -29,6 +29,12 @@ public sealed class GpuCard
     public string Extra => string.Join(" · ", new[] { Gpu.Telemetry?.PerformanceState, Gpu.Telemetry?.PcieLink }.Where(x => !string.IsNullOrEmpty(x)));
     public string Source => Gpu.Telemetry is null ? "No live sensor data available for this GPU." : $"Source: {Gpu.Telemetry.Source}";
     public string Throttle => Gpu.Telemetry?.ThrottleReasons is { Count: > 0 } r ? "Clock limits active: " + string.Join(", ", r) : "";
+
+    // Plain-language labels next to each reading.
+    public Rating TemperatureRating => Ratings.GpuTemperature(Gpu.Telemetry?.TemperatureC);
+    public Rating LoadRating => Ratings.GpuLoad(Gpu.Telemetry?.UtilizationPercent);
+    public Rating VramRating => Ratings.VideoMemory(Gpu.Telemetry?.MemoryUsedBytes, Gpu.Telemetry?.MemoryTotalBytes);
+    public Rating? DriverRating => Gpu.Vendor is GpuVendor.Microsoft or GpuVendor.Unknown ? null : Ratings.DriverAge(Gpu.DriverDate, DateTimeOffset.Now);
 }
 
 public sealed partial class DisplayRow : ObservableObject
@@ -39,6 +45,7 @@ public sealed partial class DisplayRow : ObservableObject
     public string Mode => $"{Display.Width} × {Display.Height} @ {Display.RefreshHz} Hz{(Display.ScalePercent is { } s ? $" · {s}% scale" : "")}";
     public string Max => $"Highest at this resolution: {Display.MaxRefreshHzAtCurrentResolution} Hz";
     public bool CanIncrease => Display.MaxRefreshHzAtCurrentResolution > Display.RefreshHz;
+    public Rating RefreshRating => Ratings.RefreshRate(Display.RefreshHz, Math.Max(Display.RefreshHz, Display.MaxRefreshHzAtCurrentResolution));
     public string Adapter => $"Connected to {Display.AdapterName}{(Display.IsPrimary ? " · primary" : "")}";
 }
 

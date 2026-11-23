@@ -5,6 +5,7 @@ using Avalonia.Controls.Templates;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
+using SoftReset.Core.Diagnostics;
 using SoftReset.Core.Models;
 using SoftReset.Core.Parsing;
 using SoftReset.Core.Safety;
@@ -37,6 +38,16 @@ public sealed class ViewLocator : IDataTemplate
 public static class Converters
 {
     private static IBrush B(string key) => Application.Current?.FindResource(key) as IBrush ?? Brushes.Gray;
+
+    /// <summary>Plain words that match the filters on Find problems.</summary>
+    public static readonly IValueConverter SeverityText = new FuncValueConverter<Severity, string>(s => s switch
+    {
+        Severity.Critical => "URGENT",
+        Severity.High => "SERIOUS",
+        Severity.Medium => "MEDIUM",
+        Severity.Low => "MINOR",
+        _ => "INFO",
+    });
 
     public static readonly IValueConverter SeverityForeground = new FuncValueConverter<Severity, IBrush>(s => s switch
     {
@@ -186,5 +197,61 @@ public sealed class HealthRing : Control
         var text = new FormattedText(Value.ToString(), CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
             new Typeface(new FontFamily("fonts:Inter#Inter, $Default"), FontStyle.Normal, FontWeight.SemiBold), size * 0.3, new SolidColorBrush(Color.Parse("#0B2545")));
         ctx.DrawText(text, new Point(c.X - text.Width / 2, c.Y - text.Height / 2));
+    }
+}
+
+/// <summary>
+/// A small coloured label for a <see cref="Rating"/>: green Good, blue OK, amber Check, red Problem,
+/// grey Unknown. Hover shows what it means.
+/// </summary>
+public sealed class RatingPill : Border
+{
+    public static readonly StyledProperty<Rating?> RatingProperty = AvaloniaProperty.Register<RatingPill, Rating?>(nameof(Rating));
+    private readonly TextBlock _text = new() { FontSize = 11.5, FontWeight = FontWeight.SemiBold, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
+
+    public RatingPill()
+    {
+        CornerRadius = new CornerRadius(10);
+        Padding = new Thickness(9, 2, 9, 3);
+        HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left;
+        VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center;
+        Child = _text;
+        Update();
+    }
+
+    public Rating? Rating { get => GetValue(RatingProperty); set => SetValue(RatingProperty, value); }
+
+    /// <summary>The text shown, for tests.</summary>
+    public string Text => _text.Text ?? "";
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == RatingProperty) Update();
+    }
+
+    private void Update()
+    {
+        var r = Rating;
+        IsVisible = r is not null;
+        if (r is null) return;
+        _text.Text = r.Label;
+        ToolTip.SetTip(this, r.Meaning);
+        var (fg, bg) = Brushes(r.Level);
+        Background = bg;
+        _text.Foreground = fg;
+    }
+
+    public static (IBrush Fg, IBrush Bg) Brushes(RatingLevel level)
+    {
+        static IBrush B(string key) => Application.Current?.FindResource(key) as IBrush ?? Avalonia.Media.Brushes.Gray;
+        return level switch
+        {
+            RatingLevel.Good => (B("SuccessBrush"), B("SuccessBgBrush")),
+            RatingLevel.Okay => (B("AccentDarkBrush"), B("SkyLightBrush")),
+            RatingLevel.Warning => (B("WarningBrush"), B("WarningBgBrush")),
+            RatingLevel.Bad => (B("DangerBrush"), B("DangerBgBrush")),
+            _ => (B("InfoBrush"), B("InfoBgBrush")),
+        };
     }
 }

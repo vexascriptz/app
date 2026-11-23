@@ -37,29 +37,82 @@
         <Border Classes="card">
           <StackPanel Spacing="4">
             <TextBlock Classes="label" Text="CPU" />
-            <TextBlock Classes="metric" Text="{Binding CpuNow, StringFormat='{}{0:0}%'}" />
-            <app:Sparkline Height="44" Values="{Binding CpuHistory}" Stroke="{StaticResource AccentBrush}" Fill="#1A2F80ED" />
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <TextBlock Classes="metric" Text="{Binding CpuNow, StringFormat='{}{0:0}%'}" />
+              <app:RatingPill Rating="{Binding CpuRating}" x:Name="CpuPill" />
+            </StackPanel>
+            <TextBlock Classes="muted small wrap" Text="{Binding CpuRating.Meaning, FallbackValue=''}" />
+            <app:Sparkline Height="40" Values="{Binding CpuHistory}" Stroke="{StaticResource AccentBrush}" Fill="#1A2F80ED" />
           </StackPanel>
         </Border>
         <Border Classes="card" Grid.Column="2">
           <StackPanel Spacing="4">
             <TextBlock Classes="label" Text="MEMORY" />
-            <TextBlock Classes="metric" Text="{Binding MemoryNow, StringFormat='{}{0:0}%'}" />
-            <app:Sparkline Height="44" Values="{Binding MemoryHistory}" Stroke="#0B2545" Fill="#122F80ED" />
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <TextBlock Classes="metric" Text="{Binding MemoryNow, StringFormat='{}{0:0}%'}" />
+              <app:RatingPill Rating="{Binding MemoryRating}" x:Name="MemoryPill" />
+            </StackPanel>
+            <TextBlock Classes="muted small wrap" Text="{Binding MemoryRating.Meaning, FallbackValue=''}" />
+            <app:Sparkline Height="40" Values="{Binding MemoryHistory}" Stroke="#0B2545" Fill="#122F80ED" />
           </StackPanel>
         </Border>
         <Border Classes="card" Grid.Column="4">
           <Grid ColumnDefinitions="Auto,*">
             <app:HealthRing Width="78" Height="78" Value="{Binding LastReport.HealthScore, FallbackValue=0}" IsVisible="{Binding HasReport}" Margin="0,0,16,0" />
-            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="8">
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="6">
               <TextBlock Classes="label" Text="HEALTH" />
-              <TextBlock Classes="body" Text="Not scanned yet" IsVisible="{Binding !HasReport}" />
-              <TextBlock Classes="body" Text="{Binding LastReport.Findings.Count, StringFormat='{}{0} problems found', FallbackValue=''}" IsVisible="{Binding HasReport}" />
-              <Button Classes="secondary" Content="Scan this PC" Command="{Binding RunDiagnosticsCommand}" HorizontalAlignment="Left" x:Name="QuickScanButton" />
+              <app:RatingPill Rating="{Binding HealthRating}" x:Name="HealthPill" />
+              <TextBlock Classes="body" Text="Checking…" IsVisible="{Binding IsChecking}" />
+              <TextBlock Classes="body" Text="Not checked yet" IsVisible="{Binding !HasReport}" />
+              <Button Classes="secondary small" Content="Full scan" Command="{Binding RunDiagnosticsCommand}" HorizontalAlignment="Left" x:Name="QuickScanButton" />
             </StackPanel>
           </Grid>
         </Border>
       </Grid>
+
+      <!-- PC check-up: every reading with a Good / Warm / Problem label -->
+      <Border Classes="card" x:Name="CheckupCard">
+        <StackPanel Spacing="12">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="2">
+              <TextBlock Classes="h3" Text="PC check-up" />
+              <TextBlock Classes="muted" Text="{Binding CheckupSummary}" IsVisible="{Binding HasCheckup}" x:Name="CheckupSummary" />
+              <TextBlock Classes="muted" Text="Checking temperatures, drives, security and more…" IsVisible="{Binding IsChecking}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+              <ProgressBar IsIndeterminate="True" Width="90" IsVisible="{Binding IsChecking}" />
+              <Button Classes="secondary small" Content="Check again" Command="{Binding CheckNowCommand}" IsEnabled="{Binding !IsChecking}" x:Name="CheckAgainButton" />
+            </StackPanel>
+          </Grid>
+          <ItemsControl ItemsSource="{Binding Checkup}" x:Name="CheckupGroups">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:CheckupGroup">
+                <StackPanel Spacing="2" Margin="0,4,0,8">
+                  <TextBlock Classes="label" Text="{Binding Title, Converter={x:Static app:Converters.Upper}}" Foreground="{StaticResource AccentBrush}" Margin="0,0,0,4" />
+                  <ItemsControl ItemsSource="{Binding Items}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:CheckupRow">
+                        <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1" Padding="0,7">
+                          <Grid ColumnDefinitions="210,200,118,*,86">
+                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Grid.Column="1" Classes="body" Text="{Binding Value}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="8,0" />
+                            <app:RatingPill Grid.Column="2" Rating="{Binding Rating}" />
+                            <TextBlock Grid.Column="3" Classes="muted small wrap" Text="{Binding Meaning}" VerticalAlignment="Center" Margin="8,0" />
+                            <Panel Grid.Column="4" HorizontalAlignment="Right" VerticalAlignment="Center">
+                              <Button Classes="primary small" Content="Fix" Command="{Binding FixCommand}" IsVisible="{Binding ShowFixButton}" />
+                              <Button Classes="secondary small" Content="Open" Command="{Binding FixCommand}" IsVisible="{Binding ShowOpenButton}" />
+                            </Panel>
+                          </Grid>
+                        </Border>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
 
       <!-- Tools -->
       <ItemsControl ItemsSource="{Binding Tools}" x:Name="ToolTiles">

@@ -12,7 +12,15 @@ A portable Windows 10/11 tool for fixing PCs. Run one `.exe` — no install, no 
 
 If Windows says "unknown publisher", click **More info → Run anyway** (the app isn't code-signed yet).
 
+It asks for admin rights when it opens so it can see everything — click **Yes**. (Saying No is fine too; it still works.)
+
 Want to try it without touching the PC? Run `SoftResetConsole.exe --demo`.
+
+## Easy to read
+
+Home shows a **PC check-up**: every reading — temperatures, drive space and health, startup apps, power plan, monitor refresh rate, drivers, antivirus, firewall, updates, last restart — with a coloured label (**Good**, **Warm**, **Hot**, **Low**, **Problem**…), one line saying what it means, and a **Fix** or **Open** button when something needs a look. The same labels appear on every page.
+
+![PC check-up](docs/screenshots/17-checkup.png)
 
 ## The easy way: Auto optimize
 

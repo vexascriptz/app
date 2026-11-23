@@ -31,7 +31,10 @@
             <Grid ColumnDefinitions="*,Auto">
               <StackPanel Spacing="2" VerticalAlignment="Center">
                 <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" TextWrapping="Wrap" />
-                <TextBlock Text="{Binding Current}" FontSize="12" Foreground="{StaticResource AccentDarkBrush}" TextTrimming="CharacterEllipsis" />
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <TextBlock Text="{Binding Current}" FontSize="12" Foreground="{StaticResource AccentDarkBrush}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" MaxWidth="220" />
+                  <app:RatingPill Rating="{Binding StatusRating}" />
+                </StackPanel>
               </StackPanel>
               <Button Grid.Column="1" Content="{Binding QuickLabel}" VerticalAlignment="Center" Margin="8,0,0,0"
                       Classes="small secondary" Classes.primary="{Binding QuickIsApply}"
@@ -76,7 +79,11 @@
               <Grid ColumnDefinitions="160,*" RowDefinitions="Auto,Auto,Auto,Auto">
                 <TextBlock Classes="label" Text="NOW SET TO" />
                 <StackPanel Grid.Column="1">
-                  <TextBlock Classes="body" FontWeight="SemiBold" Text="{Binding Selected.Current, FallbackValue=''}" />
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Classes="body" FontWeight="SemiBold" Text="{Binding Selected.Current, FallbackValue=''}" VerticalAlignment="Center" />
+                    <app:RatingPill Rating="{Binding Selected.StatusRating, FallbackValue={x:Null}}" />
+                  </StackPanel>
+                  <TextBlock Classes="muted small wrap" Text="{Binding Selected.StatusRating.Meaning, FallbackValue=''}" />
                   <TextBlock Classes="muted small wrap" Text="{Binding Selected.State.Current.Note, FallbackValue=''}" />
                   <TextBlock Classes="small wrap" Foreground="{StaticResource WarningBrush}" Text="{Binding Selected.State.PolicyNote, FallbackValue=''}" />
                 </StackPanel>

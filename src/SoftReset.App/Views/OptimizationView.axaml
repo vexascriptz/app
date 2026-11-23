@@ -69,6 +69,7 @@
             <Border Classes="soft">
               <StackPanel Spacing="2">
                 <TextBlock Classes="label" Text="RIGHT NOW" />
+                <app:RatingPill Rating="{Binding StateRating}" x:Name="StatePill" Margin="0,0,0,2" />
                 <TextBlock Classes="body" FontWeight="SemiBold" Text="{Binding StateText}" x:Name="StateText" />
               </StackPanel>
             </Border>

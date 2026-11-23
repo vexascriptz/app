@@ -11,7 +11,7 @@
             <Grid ColumnDefinitions="Auto,*,Auto">
               <Border CornerRadius="999" Padding="10,3" VerticalAlignment="Top" Margin="0,1,14,0"
                       Background="{Binding Finding.Severity, Converter={x:Static app:Converters.SeverityBackground}}">
-                <TextBlock Text="{Binding Finding.Severity, Converter={x:Static app:Converters.Upper}}" FontSize="11" FontWeight="Bold"
+                <TextBlock Text="{Binding Finding.Severity, Converter={x:Static app:Converters.SeverityText}}" FontSize="11" FontWeight="Bold"
                            Foreground="{Binding Finding.Severity, Converter={x:Static app:Converters.SeverityForeground}}" />
               </Border>
               <StackPanel Grid.Column="1" Spacing="3">

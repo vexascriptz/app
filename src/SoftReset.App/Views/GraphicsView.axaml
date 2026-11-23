@@ -58,8 +58,11 @@
                         <TextBlock Classes="h2" Text="{Binding Name}" TextWrapping="Wrap" />
                         <TextBlock Classes="muted" Text="{Binding VendorText}" />
                         <Grid ColumnDefinitions="140,*" RowDefinitions="Auto,Auto" Margin="0,8,0,0">
-                          <TextBlock Classes="label" Text="DRIVER" />
-                          <TextBlock Grid.Column="1" Classes="body" Text="{Binding Driver}" />
+                          <TextBlock Classes="label" Text="DRIVER" VerticalAlignment="Center" />
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                            <TextBlock Classes="body" Text="{Binding Driver}" VerticalAlignment="Center" />
+                            <app:RatingPill Rating="{Binding DriverRating}" />
+                          </StackPanel>
                           <TextBlock Grid.Row="1" Classes="label" Text="DEDICATED MEMORY" Margin="0,6,0,0" />
                           <TextBlock Grid.Row="1" Grid.Column="1" Classes="body" Text="{Binding Memory}" Margin="0,6,0,0" />
                         </Grid>
@@ -67,11 +70,11 @@
                         <TextBlock Classes="small wrap" Foreground="{StaticResource WarningBrush}" Text="{Binding Throttle}" IsVisible="{Binding Throttle, Converter={x:Static app:Converters.NotEmpty}}" />
                       </StackPanel>
                       <UniformGrid Grid.Column="2" Columns="3" IsVisible="{Binding HasTelemetry}">
-                        <Border Classes="soft" Margin="0,0,8,8"><StackPanel><TextBlock Classes="label" Text="TEMPERATURE" /><TextBlock Classes="h3" Text="{Binding Temperature}" /></StackPanel></Border>
-                        <Border Classes="soft" Margin="0,0,8,8"><StackPanel><TextBlock Classes="label" Text="LOAD" /><TextBlock Classes="h3" Text="{Binding Utilization}" /></StackPanel></Border>
+                        <Border Classes="soft" Margin="0,0,8,8"><StackPanel Spacing="3"><TextBlock Classes="label" Text="TEMPERATURE" /><TextBlock Classes="h3" Text="{Binding Temperature}" /><app:RatingPill Rating="{Binding TemperatureRating}" x:Name="GpuTempPill" /></StackPanel></Border>
+                        <Border Classes="soft" Margin="0,0,8,8"><StackPanel Spacing="3"><TextBlock Classes="label" Text="LOAD" /><TextBlock Classes="h3" Text="{Binding Utilization}" /><app:RatingPill Rating="{Binding LoadRating}" /></StackPanel></Border>
                         <Border Classes="soft" Margin="0,0,0,8"><StackPanel><TextBlock Classes="label" Text="FAN" /><TextBlock Classes="h3" Text="{Binding Fan}" /></StackPanel></Border>
                         <Border Classes="soft" Margin="0,0,8,0"><StackPanel><TextBlock Classes="label" Text="POWER" /><TextBlock Classes="body" FontWeight="SemiBold" Text="{Binding Power}" /></StackPanel></Border>
-                        <Border Classes="soft" Margin="0,0,8,0"><StackPanel><TextBlock Classes="label" Text="VIDEO MEMORY" /><TextBlock Classes="body" FontWeight="SemiBold" Text="{Binding Vram}" /></StackPanel></Border>
+                        <Border Classes="soft" Margin="0,0,8,0"><StackPanel Spacing="3"><TextBlock Classes="label" Text="VIDEO MEMORY" /><TextBlock Classes="body" FontWeight="SemiBold" Text="{Binding Vram}" /><app:RatingPill Rating="{Binding VramRating}" /></StackPanel></Border>
                         <Border Classes="soft"><StackPanel><TextBlock Classes="label" Text="STATE" /><TextBlock Classes="body" FontWeight="SemiBold" Text="{Binding Extra}" /></StackPanel></Border>
                       </UniformGrid>
                     </Grid>
@@ -89,8 +92,12 @@
                       <Border Classes="soft" Margin="0,0,0,8">
                         <Grid ColumnDefinitions="*,Auto">
                           <StackPanel Spacing="2">
-                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" />
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                              <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}" VerticalAlignment="Center" />
+                              <app:RatingPill Rating="{Binding RefreshRating}" />
+                            </StackPanel>
                             <TextBlock Classes="body" Text="{Binding Mode}" />
+                            <TextBlock Classes="muted small" Text="{Binding RefreshRating.Meaning}" />
                             <TextBlock Classes="muted small" Text="{Binding Max}" />
                             <TextBlock Classes="muted small" Text="{Binding Adapter}" />
                           </StackPanel>

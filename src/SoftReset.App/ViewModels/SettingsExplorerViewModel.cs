@@ -80,6 +80,11 @@ public sealed partial class SettingRow : ObservableObject
     };
     public bool IsRecommendedSet => RecommendedControl is { } i && IsCurrent(Definition.Controls[i]);
 
+    /// <summary>Good when already on the recommended value, "Can be better" when Apply would change it; nothing for settings with no recommendation.</summary>
+    public Rating? StatusRating => RecommendedControl is not { } i || State?.Current.Readable != true ? null
+        : IsRecommendedSet ? new Rating(RatingLevel.Good, "Good", "Already set the recommended way.")
+        : new Rating(RatingLevel.Okay, "Can be better", $"Recommended: {Definition.Controls[i].ResultLabel}. Click Apply.");
+
     private bool IsCurrent(SettingControl c) =>
         State?.Current.Readable == true && c.ResultLabel is { Length: > 0 } r && string.Equals(State.Current.Display, r, StringComparison.OrdinalIgnoreCase);
 
@@ -90,6 +95,7 @@ public sealed partial class SettingRow : ObservableObject
         OnPropertyChanged(nameof(QuickIsApply));
         OnPropertyChanged(nameof(QuickLabel));
         OnPropertyChanged(nameof(IsRecommendedSet));
+        OnPropertyChanged(nameof(StatusRating));
     }
 }
 

@@ -62,6 +62,14 @@ public static class SelfTest
                 File.WriteAllBytes(Path.Combine(outDir, "diagnostic-report.pdf"), ReportBuilder.BuildDiagnosticReport(report));
                 return $"{report.RulesEvaluated} rules, {report.Findings.Count} findings, health {report.HealthScore}: " + string.Join("; ", report.Findings.Take(12).Select(f => $"[{f.Severity}] {f.Title}"));
             });
+            Do("PC check-up labels", () =>
+            {
+                var items = PcCheckup.Build(snap, DateTimeOffset.Now);
+                Json.WriteFile(Path.Combine(outDir, "checkup.json"), items.Select(i => new { i.Group, i.Name, i.Value, Level = i.Rating.Level.ToString(), i.Rating.Label, i.Rating.Meaning, Fix = i.ShowFix ? i.Fix.ToString() : null }));
+                var blank = items.Where(i => string.IsNullOrWhiteSpace(i.Value) || string.IsNullOrWhiteSpace(i.Rating.Label) || string.IsNullOrWhiteSpace(i.Rating.Meaning)).ToList();
+                if (blank.Count > 0) throw new Exception("Lines without a value or label: " + string.Join(", ", blank.Select(b => b.Name)));
+                return $"{items.Count} lines, {PcCheckup.CountProblems(items)} need a look: " + string.Join("; ", items.Select(i => $"{i.Name} = {i.Value} [{i.Rating.Label}]"));
+            });
         }
 
         Do("Settings catalog read", () =>

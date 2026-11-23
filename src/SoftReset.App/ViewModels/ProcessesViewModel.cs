@@ -1,3 +1,4 @@
+using SoftReset.Core.Diagnostics;
 using System.Collections.ObjectModel;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -25,7 +26,22 @@ public sealed partial class ProcessRow : ObservableObject
     [ObservableProperty] private bool _isWindowsComponent;
     [ObservableProperty] private string _startup = "";
     public string MemoryText => Core.Parsing.ToolOutputParsers.FormatBytes(Memory);
-    partial void OnMemoryChanged(long value) => OnPropertyChanged(nameof(MemoryText));
+    partial void OnMemoryChanged(long value) { OnPropertyChanged(nameof(MemoryText)); OnPropertyChanged(nameof(UsageRating)); }
+    partial void OnCpuChanged(double value) => OnPropertyChanged(nameof(UsageRating));
+
+    /// <summary>Total memory in the PC, for judging how heavy a program is.</summary>
+    public static long TotalMemoryBytes { get; set; }
+
+    /// <summary>Light / Heavy / Very heavy, from whichever of CPU and memory is worse.</summary>
+    public Rating UsageRating
+    {
+        get
+        {
+            var cpu = Ratings.ProcessCpu(Cpu);
+            var mem = Ratings.ProcessMemory(Memory, TotalMemoryBytes);
+            return mem.Level > cpu.Level ? mem : cpu;
+        }
+    }
     public string Kind => IsWindowsComponent ? "Windows" : SessionId == 0 ? "Service / system" : "App";
     partial void OnIsWindowsComponentChanged(bool value) => OnPropertyChanged(nameof(Kind));
 }
@@ -53,6 +69,7 @@ public sealed partial class ProcessesViewModel : PageViewModel
     [ObservableProperty] private string _locationCheck = "";
     [ObservableProperty] private string _hostedServices = "";
     [ObservableProperty] private string _signerText = "";
+    [ObservableProperty] private Rating? _signerRating;
     [ObservableProperty] private string _summary = "";
     [ObservableProperty] private string _sysinternalsStatus = "";
     public IReadOnlyList<string> Indicators => _indicators;
@@ -96,6 +113,7 @@ public sealed partial class ProcessesViewModel : PageViewModel
     [RelayCommand]
     public void Refresh()
     {
+        if (ProcessRow.TotalMemoryBytes == 0) try { ProcessRow.TotalMemoryBytes = S.Platform.Live.Sample().MemoryTotalBytes; } catch { }
         IReadOnlyList<ProcessInfo> procs;
         try { procs = S.Platform.Processes.Enumerate(); }
         catch (Exception ex) { Dialogs.Toast($"Could not list processes: {ex.Message}", ToastKind.Error); return; }
@@ -215,6 +233,7 @@ public sealed partial class ProcessesViewModel : PageViewModel
             SignatureState.NotChecked => "Not checked",
             _ => d.Signature.ToString(),
         };
+        SignerRating = d is null ? null : Ratings.Signature(d.Signature, d.Signer);
         _indicators = value.Path is null || d is null ? new() : ProcessHeuristics.Evaluate(value.Name, value.Path, d.Signature, S.Platform.Folders);
         OnPropertyChanged(nameof(Indicators)); OnPropertyChanged(nameof(HasIndicators));
     }

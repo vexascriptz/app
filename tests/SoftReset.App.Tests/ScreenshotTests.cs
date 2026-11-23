@@ -16,6 +16,7 @@ public class ScreenshotTests
         using var h = new UiHarness();
         h.Services.Settings.ScanSampleSeconds = 1;
         await h.Vm.ActivateCurrentAsync();
+        await h.WaitAsync(() => h.Vm.Dashboard.HasCheckup && !h.Vm.Dashboard.IsChecking, 30_000);
         for (var i = 0; i < 40; i++) h.Vm.Dashboard.Tick();
         Assert.True(new FileInfo(h.Screenshot("01-home")).Length > 10_000);
 

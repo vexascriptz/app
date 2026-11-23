@@ -16,7 +16,9 @@ Legend for the **Verified by** column:
 | Feature | Verified by |
 |---|---|
 | Single-file portable executable, runtime bundled, no installer | Publish step in CI; launched by Self-test and Capture |
-| Starts with standard rights; per-action UAC elevation through `--elevated-run` | Core (`AdminAction_RunsThroughElevatedHelper…`, `UacDeclined_MakesNoChange…`), UI (`Declined_UAC_prompt…`); real UAC prompt: **Not yet** |
+| Asks for admin rights as soon as it opens (UAC); saying No opens it normally with a "Give admin rights" banner; never asks twice; can be turned off in About; `--no-admin` skips it | UI (`AdminStartupTests`: decision rules, argument quoting, banner, setting); real UAC prompt: **Not yet** (CI is already admin) |
+| Without admin, per-action UAC elevation through `--elevated-run` | Core (`AdminAction_RunsThroughElevatedHelper…`, `UacDeclined_MakesNoChange…`), UI (`Declined_UAC_prompt…`); real UAC prompt: **Not yet** |
+| Plain labels next to every reading (Good / Warm / Hot / Low / Problem / Unknown) with a one-line meaning: Home check-up (temperatures, drives, startup apps, power plan, monitors, driver age, antivirus, firewall, updates, last restart, internet, Wi-Fi, battery), live CPU/memory, Graphics, Running programs, Windows settings, Speed up & fix, Find problems | Core (`RatingsTests`), UI (`CheckupTests`, `LabelsTests`) |
 | Portable data folder next to the exe, fallback to `%LOCALAPPDATA%` | Core (`AppPaths_PortableWhenWritable_FallbackOtherwise`) |
 | Interrupted changes detected at next start | Core (`InterruptedRecords_AreRecoveredAtStartup`, `Journal_SkipsCorruptRecords`) |
 | All 10 pages open and render a real view | UI (`Every_navigation_item_opens_its_page`, `Every_page_renders_with_data`), Capture |

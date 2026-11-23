@@ -44,14 +44,14 @@ jobs:
           SOFTRESET_SCREENSHOTS: ${{ github.workspace }}\artifacts\ui-screenshots
         run: |
           foreach ($p in 'tests/SoftReset.Core.Tests', 'tests/SoftReset.App.Tests') {
-            dotnet test $p -c Release --no-build --logger "trx" --logger "console;verbosity=normal" --results-directory artifacts/test-results
+            dotnet test $p -c Release --no-build --blame-hang-timeout 5m --logger "trx" --logger "console;verbosity=normal" --results-directory artifacts/test-results
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
 
       # Runs on its own: these tests change the real machine (power plan, temp cleanup, …).
       - name: Test (real Windows)
         shell: pwsh
-        run: dotnet test tests/SoftReset.Windows.Tests -c Release --no-build --logger "trx" --logger "console;verbosity=normal" --results-directory artifacts/test-results
+        run: dotnet test tests/SoftReset.Windows.Tests -c Release --no-build --blame-hang-timeout 5m --logger "trx" --logger "console;verbosity=normal" --results-directory artifacts/test-results
 
       - name: Publish portable executable
         run: dotnet publish src/SoftReset.App/SoftReset.App.csproj -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o artifacts/SoftResetConsole

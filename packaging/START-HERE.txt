@@ -1,9 +1,10 @@
-softreset Technician Console 1.1.0
+softreset Technician Console 1.2.0
 ==================================
 
 1. Double-click SoftResetConsole.exe. Nothing to install.
 2. If Windows says "unknown publisher": click "More info" -> "Run anyway".
-3. Start with "Find problems" to scan the PC.
+3. Click "Yes" when Windows asks for admin rights (you can say No, it still works).
+4. Home shows a check-up of the PC: green = good, amber/red = needs a look.
 
 Try it safely first:  SoftResetConsole.exe --demo
 

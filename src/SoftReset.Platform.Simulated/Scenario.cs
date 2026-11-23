@@ -521,7 +521,7 @@ internal static class Scenario
         s.Drives.Add(new DriveStatus { Name = @"C:\", Label = "Windows", FileSystem = "NTFS", TotalBytes = st.SystemDriveTotal, FreeBytes = st.SystemDriveBaseFree + st.BytesFreedInSandbox + (st.HibernationEnabled ? 0 : 6_800_000_000), IsSystemDrive = true });
         s.Drives.Add(new DriveStatus { Name = @"D:\", Label = "Games", FileSystem = "NTFS", TotalBytes = 2_000_250_000_000, FreeBytes = 812_000_000_000 });
         s.PhysicalDisks.Add(new PhysicalDiskInfo { FriendlyName = "Samsung SSD 970 EVO Plus 500GB", MediaType = "SSD", BusType = "NVMe", SizeBytes = 500_107_862_016, HealthStatus = "Healthy", OperationalStatus = { "OK" }, TemperatureC = p.IsElevated ? 47 : null, WearPercent = p.IsElevated ? 11 : null, ReliabilityCountersAvailable = p.IsElevated });
-        s.PhysicalDisks.Add(new PhysicalDiskInfo { FriendlyName = "ST2000DM008-2FR102", MediaType = "HDD", BusType = "SATA", SizeBytes = 2_000_398_934_016, HealthStatus = "Healthy", OperationalStatus = { "OK" }, ReliabilityCountersAvailable = p.IsElevated });
+        s.PhysicalDisks.Add(new PhysicalDiskInfo { FriendlyName = "ST2000DM008-2FR102", MediaType = "HDD", BusType = "SATA", SizeBytes = 2_000_398_934_016, HealthStatus = "Healthy", OperationalStatus = { "OK" }, TemperatureC = p.IsElevated ? 36 : null, ReliabilityCountersAvailable = p.IsElevated });
         if (!p.IsElevated) s.AddIssue("Disk reliability", "SSD wear and temperature counters require administrator rights.", true);
 
         // Suspicious process indicators (shared heuristics)
